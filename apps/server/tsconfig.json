@@ -7,8 +7,9 @@
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
-    "module": "nodenext",
-    "target": "esnext",
+    "target": "es2022",
+    "module": "Node16",
+    "moduleResolution": "Node16",
     "types": [],
     // For nodejs:
     // "lib": ["esnext"],
@@ -35,10 +36,12 @@
     // Recommended Options
     "strict": true,
     "jsx": "react-jsx",
-    "verbatimModuleSyntax": true,
+    "verbatimModuleSyntax": false,
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
     "skipLibCheck": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true
   }
 }
