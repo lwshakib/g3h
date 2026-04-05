@@ -33,7 +33,7 @@ export const apiAuthPrefix = '/api/auth';
  * The default redirect path after logging in
  * @type {string}
  */
-export const DEFAULT_LOGIN_REDIRECT = '/workflows';
+export const DEFAULT_LOGIN_REDIRECT = '/home/workflows';
 
 /**
  * Proxy function that acts as middleware to handle route protection and session handling.

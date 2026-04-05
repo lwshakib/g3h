@@ -54,11 +54,11 @@ class AuthClient {
   public signIn = {
     /**
      * Redirect to social OAuth provider with callbackURL state.
-     * Defaults to /workflows if no callbackURL is provided.
+     * Defaults to /home/workflows if no callbackURL is provided.
      */
     social: async (options: { provider: "google" | "github"; callbackURL?: string }) => {
       const { provider } = options;
-      const callbackURL = options.callbackURL || `${this.NEXT_PUBLIC_BASE_URL}/workflows`;
+      const callbackURL = options.callbackURL || `${this.NEXT_PUBLIC_BASE_URL}/home/workflows`;
       
       const url = new URL(`${this.BASE_URL}/${provider}`);
       url.searchParams.set("callbackURL", callbackURL);
@@ -68,7 +68,7 @@ class AuthClient {
 
     /**
      * Authenticate via Email.
-     * Redirects to the callbackURL or /workflows after success.
+     * Redirects to the callbackURL or /home/workflows after success.
      */
     email: async (options: EmailSignInOptions, callbacks?: AuthOptions) => {
       callbacks?.onRequest?.();
@@ -91,8 +91,8 @@ class AuthClient {
 
         callbacks?.onSuccess?.(data);
 
-        // Dynamic Redirection (Defaults to /workflows)
-        const redirectPath = options.callbackURL || `${this.NEXT_PUBLIC_BASE_URL}/workflows`;
+        // Dynamic Redirection (Defaults to /home/workflows)
+        const redirectPath = options.callbackURL || `${this.NEXT_PUBLIC_BASE_URL}/home/workflows`;
         window.location.href = redirectPath;
       } catch (error: any) {
         callbacks?.onError?.({ error: { message: error.message } });
