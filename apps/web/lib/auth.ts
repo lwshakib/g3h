@@ -5,7 +5,13 @@
  * optimizing session recovery and secure operations in Server Components and Actions.
  */
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api/v1/auth";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+
+if (!BASE_URL) {
+  throw new Error(
+    "[ServerAuth] Critical system configuration missing: NEXT_PUBLIC_API_URL. Please check your .env file."
+  );
+}
 
 interface SignInOptions {
   body: {

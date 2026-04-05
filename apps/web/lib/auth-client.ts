@@ -49,22 +49,26 @@ const CookieStorage = {
  */
 class AuthClient {
   private readonly BASE_URL: string;
+  private readonly NEXT_PUBLIC_BASE_URL: string;
 
   public signIn = {
     /**
-     * Redirect to social OAuth provider with callbackURL state
+     * Redirect to social OAuth provider with callbackURL state.
+     * Defaults to /workflows if no callbackURL is provided.
      */
     social: async (options: { provider: "google" | "github"; callbackURL?: string }) => {
-      const { provider, callbackURL } = options;
+      const { provider } = options;
+      const callbackURL = options.callbackURL || `${this.NEXT_PUBLIC_BASE_URL}/workflows`;
+      
       const url = new URL(`${this.BASE_URL}/${provider}`);
-      if (callbackURL) {
-        url.searchParams.set("callbackURL", callbackURL);
-      }
+      url.searchParams.set("callbackURL", callbackURL);
+      
       window.location.href = url.toString();
     },
 
     /**
-     * Authenticate via Email
+     * Authenticate via Email.
+     * Redirects to the callbackURL or /workflows after success.
      */
     email: async (options: EmailSignInOptions, callbacks?: AuthOptions) => {
       callbacks?.onRequest?.();
@@ -87,8 +91,8 @@ class AuthClient {
 
         callbacks?.onSuccess?.(data);
 
-        // Dynamic Redirection
-        const redirectPath = options.callbackURL || "/workflows";
+        // Dynamic Redirection (Defaults to /workflows)
+        const redirectPath = options.callbackURL || `${this.NEXT_PUBLIC_BASE_URL}/workflows`;
         window.location.href = redirectPath;
       } catch (error: any) {
         callbacks?.onError?.({ error: { message: error.message } });
@@ -221,7 +225,17 @@ class AuthClient {
   }
 
   constructor() {
-    this.BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api/v1/auth";
+    const apiURL = process.env.NEXT_PUBLIC_API_URL;
+    const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
+
+    if (!apiURL || !baseURL) {
+      throw new Error(
+        "[AuthClient] Critical system configuration missing: NEXT_PUBLIC_API_URL or NEXT_PUBLIC_BASE_URL. Please check your .env file."
+      );
+    }
+
+    this.BASE_URL = apiURL;
+    this.NEXT_PUBLIC_BASE_URL = baseURL;
   }
 }
 
