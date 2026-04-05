@@ -3,17 +3,48 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Mail, Lock, ArrowRight, ShieldCheck, User } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { authClient } from "../../../lib/auth-client";
 
 export default function SignUpPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Registering with:", name, email, password);
-    // Registration logic here
+    
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    await authClient.signUp.email(
+      {
+        name,
+        email,
+        password,
+        callbackURL: process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000",
+      },
+      {
+        onRequest: () => {
+          setLoading(true);
+        },
+        onSuccess: () => {
+          toast.success("Registration successful");
+          router.push("/sign-in");
+          setLoading(false);
+        },
+        onError: (ctx) => {
+          toast.error(ctx.error.message);
+          setLoading(false);
+        },
+      }
+    );
   };
 
   return (
@@ -41,8 +72,9 @@ export default function SignUpPage() {
                 placeholder="Subject Zero"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full bg-black border border-white/10 px-10 py-3 text-sm font-light text-white transition-all duration-300 focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 rounded-none placeholder:text-neutral-700 font-mono"
+                className="w-full bg-black border border-white/10 px-10 py-3 text-sm font-light text-white transition-all duration-300 focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 rounded-none placeholder:text-neutral-700 font-mono disabled:opacity-50 disabled:cursor-not-allowed"
                 required
+                disabled={loading}
               />
             </div>
           </div>
@@ -58,8 +90,9 @@ export default function SignUpPage() {
                 placeholder="identity@axonix.ai"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-black border border-white/10 px-10 py-3 text-sm font-light text-white transition-all duration-300 focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 rounded-none placeholder:text-neutral-700 font-mono"
+                className="w-full bg-black border border-white/10 px-10 py-3 text-sm font-light text-white transition-all duration-300 focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 rounded-none placeholder:text-neutral-700 font-mono disabled:opacity-50 disabled:cursor-not-allowed"
                 required
+                disabled={loading}
               />
             </div>
           </div>
@@ -75,8 +108,9 @@ export default function SignUpPage() {
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-black border border-white/10 px-10 py-3 text-sm font-light text-white transition-all duration-300 focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 rounded-none placeholder:text-neutral-700 font-mono"
+                className="w-full bg-black border border-white/10 px-10 py-3 text-sm font-light text-white transition-all duration-300 focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 rounded-none placeholder:text-neutral-700 font-mono disabled:opacity-50 disabled:cursor-not-allowed"
                 required
+                disabled={loading}
               />
             </div>
           </div>
@@ -92,8 +126,9 @@ export default function SignUpPage() {
                 placeholder="••••••••"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full bg-black border border-white/10 px-10 py-3 text-sm font-light text-white transition-all duration-300 focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 rounded-none placeholder:text-neutral-700 font-mono"
+                className="w-full bg-black border border-white/10 px-10 py-3 text-sm font-light text-white transition-all duration-300 focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 rounded-none placeholder:text-neutral-700 font-mono disabled:opacity-50 disabled:cursor-not-allowed"
                 required
+                disabled={loading}
               />
             </div>
           </div>
@@ -101,14 +136,49 @@ export default function SignUpPage() {
           {/* Submit Button */}
           <button
             type="submit"
-            className="group relative w-full border border-cyan-400 bg-cyan-400/10 text-cyan-400 font-orbitron font-normal text-xs uppercase tracking-[0.3em] py-4 transition-all duration-300 overflow-hidden rounded-none"
+            disabled={loading}
+            className="group relative w-full border border-cyan-400 bg-cyan-400/10 text-cyan-400 font-orbitron font-normal text-xs uppercase tracking-[0.3em] py-4 transition-all duration-300 overflow-hidden rounded-none disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <div className="absolute inset-0 w-full h-full bg-cyan-400 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-0"></div>
             <span className="relative z-10 flex items-center justify-center gap-3 group-hover:text-black transition-colors duration-300">
-              Init_Identity <ArrowRight className="w-4 h-4" />
+              {loading ? "Registering..." : "Init_Identity"} <ArrowRight className="w-4 h-4" />
             </span>
           </button>
         </form>
+
+        <div className="flex flex-col gap-4 mt-2">
+          <div className="flex items-center gap-3">
+            <div className="h-[1px] flex-1 bg-white/5"></div>
+            <span className="font-orbitron text-[8px] uppercase tracking-widest text-neutral-600">Secondary Identifiers</span>
+            <div className="h-[1px] flex-1 bg-white/5"></div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+             <button 
+               onClick={async () => {
+                 await authClient.signIn.social({
+                   provider: "google",
+                   callbackURL: process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000",
+                 });
+               }}
+               disabled={loading}
+               className="border border-white/10 bg-black py-3 text-[10px] font-orbitron text-neutral-400 uppercase tracking-widest hover:border-white/30 hover:bg-white/5 transition-all text-center disabled:opacity-50 disabled:cursor-not-allowed"
+             >
+               Google_Link
+             </button>
+             <button 
+               onClick={async () => {
+                 await authClient.signIn.social({
+                   provider: "github",
+                   callbackURL: process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000",
+                 });
+               }}
+               disabled={loading}
+               className="border border-white/10 bg-black py-3 text-[10px] font-orbitron text-neutral-400 uppercase tracking-widest hover:border-white/30 hover:bg-white/5 transition-all text-center disabled:opacity-50 disabled:cursor-not-allowed"
+             >
+               GitHub_Link
+             </button>
+          </div>
+        </div>
 
         <p className="font-orbitron font-light text-[10px] uppercase tracking-widest text-neutral-500 text-center mt-4">
           Node already exists? <Link href="/sign-in" className="text-cyan-500 hover:underline">Link identity</Link>

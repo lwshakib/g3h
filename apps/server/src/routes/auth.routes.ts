@@ -52,4 +52,25 @@ router.get(
   }
 );
 
+// --- Email Authentication Routes (Mock) ---
+router.post("/login", (req, res) => {
+  const { email, password } = req.body;
+  console.log(`Login attempt: ${email} with password: ${password}`);
+  res.json({
+    success: true,
+    message: "Login successful",
+    user: { email, name: "Axonix User" },
+  });
+});
+
+router.post("/register", (req, res) => {
+  const { name, email, password } = req.body;
+  console.log(`Register attempt: ${name} (${email})`);
+  res.json({
+    success: true,
+    message: "Registration successful",
+    user: { name, email },
+  });
+});
+
 export default router;

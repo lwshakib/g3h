@@ -3,15 +3,40 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Mail, Lock, ArrowRight, ShieldCheck } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { authClient } from "../../../lib/auth-client";
 
 export default function SignInPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Signing in with:", email, password);
-    // Authentication logic here
+    
+    await authClient.signIn.email(
+      {
+        email,
+        password,
+        callbackURL: process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000",
+      },
+      {
+        onRequest: () => {
+          setLoading(true);
+        },
+        onSuccess: () => {
+          toast.success("Signed in successfully");
+          router.push("/");
+          setLoading(false);
+        },
+        onError: (ctx) => {
+          toast.error(ctx.error.message);
+          setLoading(false);
+        },
+      }
+    );
   };
 
   return (
@@ -39,8 +64,9 @@ export default function SignInPage() {
                 placeholder="identity@axonix.ai"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-black border border-white/10 px-10 py-3 text-sm font-light text-white transition-all duration-300 focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 rounded-none placeholder:text-neutral-700 font-mono"
+                className="w-full bg-black border border-white/10 px-10 py-3 text-sm font-light text-white transition-all duration-300 focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 rounded-none placeholder:text-neutral-700 font-mono disabled:opacity-50 disabled:cursor-not-allowed"
                 required
+                disabled={loading}
               />
             </div>
           </div>
@@ -59,8 +85,9 @@ export default function SignInPage() {
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-black border border-white/10 px-10 py-3 text-sm font-light text-white transition-all duration-300 focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 rounded-none placeholder:text-neutral-700 font-mono"
+                className="w-full bg-black border border-white/10 px-10 py-3 text-sm font-light text-white transition-all duration-300 focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 rounded-none placeholder:text-neutral-700 font-mono disabled:opacity-50 disabled:cursor-not-allowed"
                 required
+                disabled={loading}
               />
             </div>
           </div>
@@ -68,7 +95,11 @@ export default function SignInPage() {
           {/* Remember Me */}
           <div className="flex items-center gap-3">
             <div className="relative w-4 h-4 border border-white/10 bg-black cursor-pointer group/check">
-              <input type="checkbox" className="peer absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+              <input 
+                type="checkbox" 
+                className="peer absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10 disabled:cursor-not-allowed" 
+                disabled={loading}
+              />
               <div className="absolute inset-0 bg-cyan-500 transform scale-0 peer-checked:scale-100 transition-transform duration-200"></div>
             </div>
             <span className="font-orbitron font-light text-[10px] uppercase tracking-widest text-neutral-500">Maintain Link State</span>
@@ -77,11 +108,12 @@ export default function SignInPage() {
           {/* Submit Button */}
           <button
             type="submit"
-            className="group relative w-full border border-cyan-400 bg-cyan-400/10 text-cyan-400 font-orbitron font-normal text-xs uppercase tracking-[0.3em] py-4 transition-all duration-300 overflow-hidden rounded-none"
+            disabled={loading}
+            className="group relative w-full border border-cyan-400 bg-cyan-400/10 text-cyan-400 font-orbitron font-normal text-xs uppercase tracking-[0.3em] py-4 transition-all duration-300 overflow-hidden rounded-none disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <div className="absolute inset-0 w-full h-full bg-cyan-400 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-0"></div>
             <span className="relative z-10 flex items-center justify-center gap-3 group-hover:text-black transition-colors duration-300">
-              Init_Sequence <ArrowRight className="w-4 h-4" />
+              {loading ? "Processing..." : "Init_Sequence"} <ArrowRight className="w-4 h-4" />
             </span>
           </button>
         </form>
@@ -93,8 +125,30 @@ export default function SignInPage() {
             <div className="h-[1px] flex-1 bg-white/5"></div>
           </div>
           <div className="grid grid-cols-2 gap-3">
-             <button className="border border-white/10 bg-black py-3 text-[10px] font-orbitron text-neutral-400 uppercase tracking-widest hover:border-white/30 hover:bg-white/5 transition-all">Google_Link</button>
-             <button className="border border-white/10 bg-black py-3 text-[10px] font-orbitron text-neutral-400 uppercase tracking-widest hover:border-white/30 hover:bg-white/5 transition-all">GitHub_Link</button>
+             <button 
+               onClick={async () => {
+                 await authClient.signIn.social({
+                   provider: "google",
+                   callbackURL: process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000",
+                 });
+               }}
+               disabled={loading}
+               className="border border-white/10 bg-black py-3 text-[10px] font-orbitron text-neutral-400 uppercase tracking-widest hover:border-white/30 hover:bg-white/5 transition-all text-center disabled:opacity-50 disabled:cursor-not-allowed"
+             >
+               Google_Link
+             </button>
+             <button 
+               onClick={async () => {
+                 await authClient.signIn.social({
+                   provider: "github",
+                   callbackURL: process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000",
+                 });
+               }}
+               disabled={loading}
+               className="border border-white/10 bg-black py-3 text-[10px] font-orbitron text-neutral-400 uppercase tracking-widest hover:border-white/30 hover:bg-white/5 transition-all text-center disabled:opacity-50 disabled:cursor-not-allowed"
+             >
+               GitHub_Link
+             </button>
           </div>
         </div>
 

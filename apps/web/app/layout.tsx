@@ -3,6 +3,7 @@ import { Inter, Orbitron } from "next/font/google";
 import "./globals.css";
 
 import { ThemeProvider } from "@repo/ui/theme-provider";
+import { Toaster } from "@repo/ui/components/ui/sonner";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -34,6 +35,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
+          <Toaster position="top-right" closeButton richColors theme="dark" />
         </ThemeProvider>
       </body>
     </html>
