@@ -126,9 +126,9 @@ export default function LandingPage() {
               <a href="#licensing" className="text-xs font-orbitron uppercase tracking-[0.2em] text-neutral-500 hover:text-cyan-400 transition-colors">Licensing</a>
             </div>
 
-            <a href="#contact" className="font-orbitron text-xs uppercase tracking-[0.2em] border border-cyan-500/30 text-cyan-400 bg-cyan-500/5 px-6 py-2.5 md:py-3 hover:bg-cyan-400 hover:text-black hover:border-cyan-400 transition-all duration-300 relative group overflow-hidden rounded-none">
+            <a href="#contact" className="font-orbitron text-xs uppercase tracking-[0.2em] border border-cyan-500/30 text-cyan-400 bg-cyan-500/5 px-6 py-2.5 md:py-3 transition-all duration-300 relative group overflow-hidden rounded-none inline-flex items-center justify-center">
               <div className="absolute inset-0 w-full h-full bg-cyan-400 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-0"></div>
-              <span className="relative z-10">Init_Sequence</span>
+              <span className="relative z-10 group-hover:text-black transition-colors duration-300">Init_Sequence</span>
             </a>
           </div>
         </div>
