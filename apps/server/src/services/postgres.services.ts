@@ -1,6 +1,6 @@
 import pg from "pg";
 const { Pool } = pg;
-import { DATABASE_URL } from "../env.js";
+import { DATABASE_URL } from "../envs.js";
 import logger from "../logger/winston.logger.js";
 
 /**

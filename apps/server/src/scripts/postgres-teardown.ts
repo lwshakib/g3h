@@ -15,7 +15,10 @@ async function teardown() {
     await client.query(`DROP TABLE IF EXISTS verification CASCADE;`);
     await client.query(`DROP TABLE IF EXISTS "user" CASCADE;`);
 
-    logger.info("All tables dropped successfully.");
+    // Drop Enum type
+    await client.query(`DROP TYPE IF EXISTS role_enum;`);
+
+    logger.info("All tables and types dropped successfully.");
     logger.info("PostgreSQL complete teardown completed.");
   } catch (error) {
     logger.error("Error during PostgreSQL teardown:", error);

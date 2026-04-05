@@ -3,12 +3,22 @@ import logger from "../logger/winston.logger.js";
 
 /**
  * Setup script to initialize the complete database schema.
- * includes: user, session, account, and verification tables.
+ * includes: role_enum, user, session, account, and verification tables.
  */
 async function setup() {
   const client = await pool.connect();
   try {
     logger.info("Starting PostgreSQL complete schema setup...");
+
+    // Create Role Enum
+    await client.query(`
+      DO $$ BEGIN
+        CREATE TYPE role_enum AS ENUM ('USER', 'ADMIN');
+      EXCEPTION
+        WHEN duplicate_object THEN null;
+      END $$;
+    `);
+    logger.info("Enum 'role_enum' verified/created.");
 
     // Create User table
     await client.query(`
@@ -18,6 +28,7 @@ async function setup() {
         email VARCHAR(255) UNIQUE NOT NULL,
         "emailVerified" BOOLEAN DEFAULT FALSE,
         image TEXT,
+        role role_enum NOT NULL DEFAULT 'USER',
         "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
