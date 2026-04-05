@@ -1,0 +1,29 @@
+import pool from "../services/postgres.services.js";
+import logger from "../logger/winston.logger.js";
+
+/**
+ * Teardown script to safely clean up the complete database schema.
+ */
+async function teardown() {
+  const client = await pool.connect();
+  try {
+    logger.info("Starting PostgreSQL complete schema teardown...");
+
+    // Drop tables in reverse dependency order
+    await client.query(`DROP TABLE IF EXISTS session CASCADE;`);
+    await client.query(`DROP TABLE IF EXISTS account CASCADE;`);
+    await client.query(`DROP TABLE IF EXISTS verification CASCADE;`);
+    await client.query(`DROP TABLE IF EXISTS "user" CASCADE;`);
+
+    logger.info("All tables dropped successfully.");
+    logger.info("PostgreSQL complete teardown completed.");
+  } catch (error) {
+    logger.error("Error during PostgreSQL teardown:", error);
+    process.exit(1);
+  } finally {
+    client.release();
+    await pool.end();
+  }
+}
+
+teardown();
