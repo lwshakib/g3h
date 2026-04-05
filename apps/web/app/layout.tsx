@@ -1,16 +1,17 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
+import { Inter, Orbitron } from "next/font/google";
 import "./globals.css";
 
 import { ThemeProvider } from "@repo/ui/theme-provider";
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
 });
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
+
+const orbitron = Orbitron({
+  subsets: ["latin"],
+  variable: "--font-orbitron",
 });
 
 export const metadata: Metadata = {
@@ -25,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body className={`${inter.variable} ${orbitron.variable} font-sans`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
