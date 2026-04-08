@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Orbitron } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
 import { ThemeProvider } from "@repo/ui/theme-provider";
@@ -9,11 +9,6 @@ import { AuthHandler } from "@/components/AuthHandler";
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
-});
-
-const orbitron = Orbitron({
-  subsets: ["latin"],
-  variable: "--font-orbitron",
 });
 
 export const metadata: Metadata = {
@@ -28,7 +23,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} ${orbitron.variable} font-sans`}>
+      <body className={`${inter.variable} font-sans`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

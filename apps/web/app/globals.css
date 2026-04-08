@@ -3,13 +3,17 @@
 @source "../../../packages/ui/src/components/**/*.{ts,tsx}";
 
 @theme {
-  --font-orbitron: var(--font-orbitron);
   --font-inter: var(--font-inter);
 }
 
 @layer base {
   .font-orbitron {
-    font-family: var(--font-orbitron), sans-serif;
+    font-family: var(--font-inter), sans-serif;
+  }
+
+  /* Keep copy readable for broad users: disable forced uppercase styling globally. */
+  .uppercase {
+    text-transform: none;
   }
 }
 
