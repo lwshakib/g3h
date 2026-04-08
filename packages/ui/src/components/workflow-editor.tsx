@@ -45,6 +45,22 @@ type WorkflowNodeData = {
   label: string;
 };
 
+function GeminiLogoIcon({ className }: { className?: string }) {
+  return <img src="/logos/gemini.svg" alt="Gemini" className={className} />;
+}
+
+function OpenAiLogoIcon({ className }: { className?: string }) {
+  return <img src="/logos/openai.svg" alt="OpenAI" className={className} />;
+}
+
+function AnthropicLogoIcon({ className }: { className?: string }) {
+  return <img src="/logos/anthropic.svg" alt="Anthropic" className={className} />;
+}
+
+function TavilyLogoIcon({ className }: { className?: string }) {
+  return <img src="/logos/tavily.svg" alt="Tavily" className={className} />;
+}
+
 const SelectorContext = React.createContext<{
   openSelector: (sourceNodeId?: string, mode?: "all" | "executions") => void;
   connectingFromNodeId: string | null;
@@ -273,6 +289,198 @@ function HttpRequestNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
   );
 }
 
+function GeminiExecutionNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
+  const ctx = React.useContext(SelectorContext);
+  const isConnectingFromThisNode = ctx?.connectingFromNodeId === id;
+  const edges = useStore((state) => state.edges);
+  const hasOutgoingConnection = React.useMemo(
+    () => edges.some((edge) => edge.source === id),
+    [edges, id]
+  );
+  const showAddAffordance = !isConnectingFromThisNode && !hasOutgoingConnection;
+
+  return (
+    <div className="relative w-[244px]">
+      <div className="flex items-center justify-center">
+        <div className="relative flex h-[94px] w-[94px] items-center justify-center rounded-[24px] border border-[#3a3a3a] bg-[#1f1f1f] shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
+          <GeminiLogoIcon className="h-11 w-11" />
+          <Handle
+            type="target"
+            position={Position.Left}
+            className="!pointer-events-auto !z-[60] !h-[18px] !w-[18px] !border-[#4a4a4a] !bg-[#202020] !shadow-none"
+          />
+          <Handle
+            type="source"
+            position={Position.Right}
+            className="!pointer-events-auto !z-[60] !h-[18px] !w-[18px] !border-[#4a4a4a] !bg-[#202020] !shadow-none"
+          />
+          {showAddAffordance && (
+            <>
+              <div className="pointer-events-none absolute right-[-50px] top-1/2 h-px w-[34px] -translate-y-1/2 bg-[#4a4a4a]" />
+              <button
+                type="button"
+                onClick={() => ctx?.openSelector(id, "executions")}
+                className="pointer-events-auto absolute right-[-76px] top-1/2 flex h-[24px] w-[24px] -translate-y-1/2 items-center justify-center rounded-[6px] border border-[#3f3f3f] bg-[#292929] text-[#9a9a9a] hover:text-white"
+              >
+                <PlusIcon className="size-3.5 stroke-[2.4]" />
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+      {!isConnectingFromThisNode && (
+        <p className="mt-[16px] text-center text-[24px] font-medium leading-[1.08] tracking-[-0.01em] text-foreground">
+          {data.label}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function ChatGptExecutionNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
+  const ctx = React.useContext(SelectorContext);
+  const isConnectingFromThisNode = ctx?.connectingFromNodeId === id;
+  const edges = useStore((state) => state.edges);
+  const hasOutgoingConnection = React.useMemo(
+    () => edges.some((edge) => edge.source === id),
+    [edges, id]
+  );
+  const showAddAffordance = !isConnectingFromThisNode && !hasOutgoingConnection;
+
+  return (
+    <div className="relative w-[244px]">
+      <div className="flex items-center justify-center">
+        <div className="relative flex h-[94px] w-[94px] items-center justify-center rounded-[24px] border border-[#3a3a3a] bg-[#1f1f1f] shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
+          <OpenAiLogoIcon className="h-11 w-11" />
+          <Handle
+            type="target"
+            position={Position.Left}
+            className="!pointer-events-auto !z-[60] !h-[18px] !w-[18px] !border-[#4a4a4a] !bg-[#202020] !shadow-none"
+          />
+          <Handle
+            type="source"
+            position={Position.Right}
+            className="!pointer-events-auto !z-[60] !h-[18px] !w-[18px] !border-[#4a4a4a] !bg-[#202020] !shadow-none"
+          />
+          {showAddAffordance && (
+            <>
+              <div className="pointer-events-none absolute right-[-50px] top-1/2 h-px w-[34px] -translate-y-1/2 bg-[#4a4a4a]" />
+              <button
+                type="button"
+                onClick={() => ctx?.openSelector(id, "executions")}
+                className="pointer-events-auto absolute right-[-76px] top-1/2 flex h-[24px] w-[24px] -translate-y-1/2 items-center justify-center rounded-[6px] border border-[#3f3f3f] bg-[#292929] text-[#9a9a9a] hover:text-white"
+              >
+                <PlusIcon className="size-3.5 stroke-[2.4]" />
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+      {!isConnectingFromThisNode && (
+        <p className="mt-[16px] text-center text-[24px] font-medium leading-[1.08] tracking-[-0.01em] text-foreground">
+          {data.label}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function AnthropicExecutionNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
+  const ctx = React.useContext(SelectorContext);
+  const isConnectingFromThisNode = ctx?.connectingFromNodeId === id;
+  const edges = useStore((state) => state.edges);
+  const hasOutgoingConnection = React.useMemo(
+    () => edges.some((edge) => edge.source === id),
+    [edges, id]
+  );
+  const showAddAffordance = !isConnectingFromThisNode && !hasOutgoingConnection;
+
+  return (
+    <div className="relative w-[244px]">
+      <div className="flex items-center justify-center">
+        <div className="relative flex h-[94px] w-[94px] items-center justify-center rounded-[24px] border border-[#3a3a3a] bg-[#1f1f1f] shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
+          <AnthropicLogoIcon className="h-11 w-11" />
+          <Handle
+            type="target"
+            position={Position.Left}
+            className="!pointer-events-auto !z-[60] !h-[18px] !w-[18px] !border-[#4a4a4a] !bg-[#202020] !shadow-none"
+          />
+          <Handle
+            type="source"
+            position={Position.Right}
+            className="!pointer-events-auto !z-[60] !h-[18px] !w-[18px] !border-[#4a4a4a] !bg-[#202020] !shadow-none"
+          />
+          {showAddAffordance && (
+            <>
+              <div className="pointer-events-none absolute right-[-50px] top-1/2 h-px w-[34px] -translate-y-1/2 bg-[#4a4a4a]" />
+              <button
+                type="button"
+                onClick={() => ctx?.openSelector(id, "executions")}
+                className="pointer-events-auto absolute right-[-76px] top-1/2 flex h-[24px] w-[24px] -translate-y-1/2 items-center justify-center rounded-[6px] border border-[#3f3f3f] bg-[#292929] text-[#9a9a9a] hover:text-white"
+              >
+                <PlusIcon className="size-3.5 stroke-[2.4]" />
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+      {!isConnectingFromThisNode && (
+        <p className="mt-[16px] text-center text-[24px] font-medium leading-[1.08] tracking-[-0.01em] text-foreground">
+          {data.label}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function TavilyExecutionNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
+  const ctx = React.useContext(SelectorContext);
+  const isConnectingFromThisNode = ctx?.connectingFromNodeId === id;
+  const edges = useStore((state) => state.edges);
+  const hasOutgoingConnection = React.useMemo(
+    () => edges.some((edge) => edge.source === id),
+    [edges, id]
+  );
+  const showAddAffordance = !isConnectingFromThisNode && !hasOutgoingConnection;
+
+  return (
+    <div className="relative w-[244px]">
+      <div className="flex items-center justify-center">
+        <div className="relative flex h-[94px] w-[94px] items-center justify-center rounded-[24px] border border-[#3a3a3a] bg-[#1f1f1f] shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
+          <TavilyLogoIcon className="h-11 w-11" />
+          <Handle
+            type="target"
+            position={Position.Left}
+            className="!pointer-events-auto !z-[60] !h-[18px] !w-[18px] !border-[#4a4a4a] !bg-[#202020] !shadow-none"
+          />
+          <Handle
+            type="source"
+            position={Position.Right}
+            className="!pointer-events-auto !z-[60] !h-[18px] !w-[18px] !border-[#4a4a4a] !bg-[#202020] !shadow-none"
+          />
+          {showAddAffordance && (
+            <>
+              <div className="pointer-events-none absolute right-[-50px] top-1/2 h-px w-[34px] -translate-y-1/2 bg-[#4a4a4a]" />
+              <button
+                type="button"
+                onClick={() => ctx?.openSelector(id, "executions")}
+                className="pointer-events-auto absolute right-[-76px] top-1/2 flex h-[24px] w-[24px] -translate-y-1/2 items-center justify-center rounded-[6px] border border-[#3f3f3f] bg-[#292929] text-[#9a9a9a] hover:text-white"
+              >
+                <PlusIcon className="size-3.5 stroke-[2.4]" />
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+      {!isConnectingFromThisNode && (
+        <p className="mt-[16px] text-center text-[24px] font-medium leading-[1.08] tracking-[-0.01em] text-foreground">
+          {data.label}
+        </p>
+      )}
+    </div>
+  );
+}
+
 const defaultInitialNodes: Node[] = [
   {
     id: "initial-plus",
@@ -298,6 +506,30 @@ const nodeOptions = [
     icon: GlobeIcon,
   },
   {
+    type: "gemini-execution",
+    label: "Gemini",
+    description: "Use Gemini model execution.",
+    icon: GeminiLogoIcon,
+  },
+  {
+    type: "chatgpt-execution",
+    label: "ChatGPT",
+    description: "Use ChatGPT model execution.",
+    icon: OpenAiLogoIcon,
+  },
+  {
+    type: "anthropic-execution",
+    label: "Anthropic",
+    description: "Use Anthropic model execution.",
+    icon: AnthropicLogoIcon,
+  },
+  {
+    type: "tavily-execution",
+    label: "Tavily",
+    description: "Use Tavily search execution.",
+    icon: TavilyLogoIcon,
+  },
+  {
     type: "webhook-trigger",
     label: "Webhook call",
     description: "Runs the flow when a webhook is called.",
@@ -317,7 +549,14 @@ const triggerNodeOptions = nodeOptions.filter(
     option.type === "webhook-trigger" ||
     option.type === "schedule-trigger"
 );
-const executionNodeOptions = nodeOptions.filter((option) => option.type === "http-request");
+const executionNodeOptions = nodeOptions.filter(
+  (option) =>
+    option.type === "http-request" ||
+    option.type === "gemini-execution" ||
+    option.type === "chatgpt-execution" ||
+    option.type === "anthropic-execution" ||
+    option.type === "tavily-execution"
+);
 
 export function WorkflowEditor({
   initialNodes = defaultInitialNodes,
@@ -343,6 +582,10 @@ export function WorkflowEditor({
       webhookTrigger: WebhookTriggerNode,
       scheduleTrigger: ScheduleTriggerNode,
       httpRequest: HttpRequestNode,
+      geminiExecution: GeminiExecutionNode,
+      chatGptExecution: ChatGptExecutionNode,
+      anthropicExecution: AnthropicExecutionNode,
+      tavilyExecution: TavilyExecutionNode,
     }),
     []
   );
@@ -408,7 +651,14 @@ export function WorkflowEditor({
         return;
       }
 
-      if (selection.type === "http-request" && !hasAnyTrigger) {
+      const isExecutionType =
+        selection.type === "http-request" ||
+        selection.type === "gemini-execution" ||
+        selection.type === "chatgpt-execution" ||
+        selection.type === "anthropic-execution" ||
+        selection.type === "tavily-execution";
+
+      if (isExecutionType && !hasAnyTrigger) {
         setSelectorOpen(false);
         return;
       }
@@ -431,6 +681,14 @@ export function WorkflowEditor({
                 ? "webhookTrigger"
                 : selection.type === "schedule-trigger"
                   ? "scheduleTrigger"
+                  : selection.type === "gemini-execution"
+                    ? "geminiExecution"
+                    : selection.type === "chatgpt-execution"
+                      ? "chatGptExecution"
+                      : selection.type === "anthropic-execution"
+                        ? "anthropicExecution"
+                        : selection.type === "tavily-execution"
+                          ? "tavilyExecution"
                   : "httpRequest",
           position: sourceNode
             ? {
