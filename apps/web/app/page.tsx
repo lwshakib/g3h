@@ -116,19 +116,19 @@ export default function LandingPage() {
         <div className="md:px-10 lg:px-16 flex md:h-20 w-full h-16 pr-6 pl-6 items-center">
           <div className="flex items-center gap-4">
             <div className="w-2 h-2 bg-cyan-500 animate-pulse"></div>
-            <a href="#home" className="font-orbitron text-sm md:text-base uppercase tracking-[0.3em] text-white/90 hover:text-cyan-400 transition-colors">LAB.01 // SYSTEM</a>
+            <a href="#home" className="font-orbitron text-sm md:text-base tracking-[0.08em] text-white/90 hover:text-cyan-400 transition-colors">Axonix Agent Automation</a>
           </div>
 
           <div className="ml-auto flex items-center gap-6 md:gap-10">
             <div className="hidden md:flex items-center gap-10">
-              <a href="#experiments" className="text-xs font-orbitron uppercase tracking-[0.2em] text-neutral-500 hover:text-cyan-400 transition-colors">Experiments</a>
-              <a href="#system" className="text-xs font-orbitron uppercase tracking-[0.2em] text-neutral-500 hover:text-cyan-400 transition-colors">System</a>
-              <a href="#licensing" className="text-xs font-orbitron uppercase tracking-[0.2em] text-neutral-500 hover:text-cyan-400 transition-colors">Licensing</a>
+              <a href="#experiments" className="text-xs font-orbitron tracking-[0.08em] text-neutral-500 hover:text-cyan-400 transition-colors">Workflows</a>
+              <a href="#system" className="text-xs font-orbitron tracking-[0.08em] text-neutral-500 hover:text-cyan-400 transition-colors">Platform</a>
+              <a href="#licensing" className="text-xs font-orbitron tracking-[0.08em] text-neutral-500 hover:text-cyan-400 transition-colors">Pricing</a>
             </div>
 
-            <a href="#contact" className="font-orbitron text-xs uppercase tracking-[0.2em] border border-cyan-500/30 text-cyan-400 bg-cyan-500/5 px-6 py-2.5 md:py-3 transition-all duration-300 relative group overflow-hidden rounded-none inline-flex items-center justify-center">
+            <a href="#contact" className="font-orbitron text-xs tracking-[0.08em] border border-cyan-500/30 text-cyan-400 bg-cyan-500/5 px-6 py-2.5 md:py-3 transition-all duration-300 relative group overflow-hidden rounded-none inline-flex items-center justify-center">
               <div className="absolute inset-0 w-full h-full bg-cyan-400 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-0"></div>
-              <span className="relative z-10 group-hover:text-black transition-colors duration-300">Init_Sequence</span>
+              <span className="relative z-10 group-hover:text-black transition-colors duration-300">Get started</span>
             </a>
           </div>
         </div>
@@ -144,26 +144,26 @@ export default function LandingPage() {
 
           <div className="absolute bottom-12 left-6 md:left-12 lg:left-16 z-20 pointer-events-none w-full max-w-4xl animate-hero-rise">
             <div className="flex items-center gap-3 mb-4">
-              <span className="text-xs md:text-sm font-orbitron tracking-[0.4em] text-cyan-500 uppercase">SYS.ONLINE</span>
+              <span className="text-xs md:text-sm font-orbitron tracking-[0.2em] text-cyan-500">Platform online</span>
               <span className="w-10 h-[1px] bg-cyan-500/50"></span>
             </div>
-            <h1 className="font-orbitron text-white uppercase leading-[1.1] tracking-tight text-3xl md:text-5xl lg:text-6xl drop-shadow-[0_0_30px_rgba(0,255,255,0.15)] kinetic-heading">
-              Real-Time Interfaces<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-white/50">for the AI Era.</span>
+            <h1 className="font-orbitron text-white leading-[1.1] tracking-tight text-3xl md:text-5xl lg:text-6xl drop-shadow-[0_0_30px_rgba(0,255,255,0.15)] kinetic-heading">
+              Build agent workflows<br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-white/50">that run your operations.</span>
             </h1>
             <p className="mt-6 text-base text-neutral-400 font-light tracking-wide max-w-xl border-l border-cyan-500/30 pl-4 py-1">
-              Interactive experiments in WebGL, motion systems, and immersive UI. Bridging the gap between raw compute and human perception.
+              Design automation flows with triggers, AI executions, and data actions. Connect nodes visually, test quickly, and ship reliable agent systems.
             </p>
 
             <div className="mt-8 flex flex-col sm:flex-row items-start gap-4 pointer-events-auto">
-              <a href="#contact" className="group relative inline-flex items-center gap-3 border border-cyan-400 bg-cyan-400/10 text-cyan-400 font-orbitron font-normal text-xs uppercase tracking-[0.2em] px-6 py-3 transition-all duration-300 hover:bg-cyan-400 hover:text-black hover:shadow-[0_0_40px_rgba(0,255,255,0.4)] rounded-none">
-                <span>Enter the Lab</span>
+              <a href="#contact" className="group relative inline-flex items-center gap-3 border border-cyan-400 bg-cyan-400/10 text-cyan-400 font-orbitron font-normal text-xs tracking-[0.08em] px-6 py-3 transition-all duration-300 hover:bg-cyan-400 hover:text-black hover:shadow-[0_0_40px_rgba(0,255,255,0.4)] rounded-none">
+                <span>Start building</span>
                 <ArrowRight className="w-4 h-4" />
                 <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-white/50 group-hover:border-black/50"></div>
                 <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-white/50 group-hover:border-black/50"></div>
               </a>
-              <a href="#experiments" className="group relative inline-flex items-center gap-3 border border-white/10 bg-transparent text-white font-orbitron font-normal text-xs uppercase tracking-[0.2em] px-6 py-3 transition-all duration-300 hover:border-white/30 hover:bg-white/5 rounded-none">
-                <span>View Experiments</span>
+              <a href="#experiments" className="group relative inline-flex items-center gap-3 border border-white/10 bg-transparent text-white font-orbitron font-normal text-xs tracking-[0.08em] px-6 py-3 transition-all duration-300 hover:border-white/30 hover:bg-white/5 rounded-none">
+                <span>Explore workflows</span>
                 <Radar className="w-4 h-4" />
               </a>
             </div>
@@ -171,11 +171,11 @@ export default function LandingPage() {
 
           {/* Tech Stack Indicators */}
           <div className="absolute bottom-12 right-6 lg:right-16 z-30 flex flex-col items-end gap-2 text-right pointer-events-none reveal-on-scroll" style={{ ["--reveal-delay" as any]: "0ms" }}>
-            <p className="font-orbitron text-xs tracking-[0.3em] text-neutral-600 uppercase">Core Technologies</p>
+            <p className="font-orbitron text-xs tracking-[0.2em] text-neutral-600">Core technologies</p>
             <div className="flex gap-3 text-xs font-mono text-cyan-500/70 mt-1">
-              <span>[ WEBGL ]</span>
-              <span>[ SHADERS ]</span>
-              <span>[ GLSL ]</span>
+              <span>[ React Flow ]</span>
+              <span>[ AI models ]</span>
+              <span>[ PostgreSQL ]</span>
             </div>
           </div>
         </section>
@@ -186,12 +186,12 @@ export default function LandingPage() {
             <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-6 reveal-on-scroll" style={{ ["--reveal-delay" as any]: "0ms" }}>
               <div className="">
                 <p className="font-orbitron text-xs uppercase tracking-[0.4em] text-cyan-500 mb-3 flex items-center gap-3">
-                  <span className="w-6 md:w-8 h-[1px] bg-cyan-500"></span> 01 // Experiments
+                  <span className="w-6 md:w-8 h-[1px] bg-cyan-500"></span> Workflow automation
                 </p>
-                <h2 className="text-2xl md:text-4xl font-normal tracking-tight text-white font-orbitron uppercase">Research & Development</h2>
+                <h2 className="text-2xl md:text-4xl font-normal tracking-tight text-white font-orbitron">Design, connect, execute</h2>
               </div>
-              <p className="text-neutral-500 text-xs font-orbitron tracking-[0.2em] uppercase max-w-xs text-right">
-                Live prototypes pushing browser capabilities.
+              <p className="text-neutral-500 text-xs font-orbitron tracking-[0.08em] max-w-xs text-right">
+                Build production-ready agent workflows with a visual editor.
               </p>
             </div>
 
@@ -272,7 +272,7 @@ export default function LandingPage() {
             <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4 reveal-on-scroll border-b border-white/10 pb-6" style={{ ["--reveal-delay" as any]: "0ms" }}>
               <div className="">
                 <p className="uppercase flex items-center gap-3 text-xs md:text-sm text-cyan-500 tracking-[0.4em] font-orbitron mb-3">
-                  <span className="bg-cyan-500 w-6 md:w-8 h-[1px]"></span> 04 // Interactive Simulation
+                  <span className="bg-cyan-500 w-6 md:w-8 h-[1px]"></span> Interactive simulation
                 </p>
                 <h2 className="text-2xl md:text-4xl uppercase font-normal text-white tracking-tight font-orbitron">Agents operation system</h2>
               </div>
@@ -562,7 +562,7 @@ export default function LandingPage() {
             <div className="flex flex-col md:flex-row md:items-end gap-6 reveal-on-scroll border-white/10 border-b mb-12 pb-6 justify-between" style={{ ["--reveal-delay" as any]: "0ms" }}>
               <div className="">
                 <p className="uppercase flex items-center gap-3 text-xs md:text-sm text-cyan-500 tracking-[0.4em] font-orbitron mb-3">
-                  <span className="w-6 md:w-8 h-[1px] bg-cyan-500"></span> 01.5 // Active Units
+                  <span className="w-6 md:w-8 h-[1px] bg-cyan-500"></span> Active units
                 </p>
                 <h2 className="text-2xl md:text-4xl font-normal tracking-tight text-white font-orbitron uppercase">Agent Workforces</h2>
               </div>
@@ -663,7 +663,7 @@ export default function LandingPage() {
           <div className="max-w-7xl mx-auto relative z-10">
             <div className="max-w-2xl mb-12 md:mb-16 reveal-on-scroll">
               <p className="font-orbitron text-xs md:text-sm uppercase tracking-[0.4em] text-cyan-500 mb-3 flex items-center gap-3">
-                <span className="w-6 md:w-8 h-[1px] bg-cyan-500"></span> 11.5 // Specialized Units
+                <span className="w-6 md:w-8 h-[1px] bg-cyan-500"></span> Specialized units
               </p>
               <h2 className="text-3xl md:text-5xl font-normal tracking-tight text-white font-orbitron uppercase mb-6 leading-tight">
                 The A-Team <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-white/50">Agents.</span>
@@ -781,17 +781,17 @@ export default function LandingPage() {
             <div>
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-2 h-2 bg-cyan-500 animate-pulse"></div>
-                <span className="font-orbitron text-sm md:text-base uppercase tracking-[0.3em] text-white/90">LAB.01 // SYSTEM</span>
+                <span className="font-orbitron text-sm md:text-base tracking-[0.08em] text-white/90">Axonix Agent Automation</span>
               </div>
-              <p className="text-xs text-neutral-500 font-mono">Initialize sequence. Connect to central grid.</p>
+              <p className="text-xs text-neutral-500 font-mono">Design workflows. Connect agents. Run automation.</p>
             </div>
             
             <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-              <a href="#" className="text-xs font-orbitron uppercase tracking-[0.2em] text-neutral-500 hover:text-cyan-400 transition-colors">GitHub</a>
-              <a href="#" className="text-xs font-orbitron uppercase tracking-[0.2em] text-neutral-500 hover:text-cyan-400 transition-colors">Twitter</a>
-              <a href="#" className="text-xs font-orbitron uppercase tracking-[0.2em] text-neutral-500 hover:text-cyan-400 transition-colors">LinkedIn</a>
-              <a href="mailto:hello@axonix.ai" className="font-orbitron text-xs uppercase tracking-[0.2em] border border-cyan-500/30 text-cyan-400 bg-cyan-500/5 px-6 py-2.5 hover:bg-cyan-400 hover:text-black hover:shadow-[0_0_20px_rgba(0,255,255,0.3)] transition-all duration-300">
-                Transmit Signal
+              <a href="#" className="text-xs font-orbitron tracking-[0.08em] text-neutral-500 hover:text-cyan-400 transition-colors">GitHub</a>
+              <a href="#" className="text-xs font-orbitron tracking-[0.08em] text-neutral-500 hover:text-cyan-400 transition-colors">Twitter</a>
+              <a href="#" className="text-xs font-orbitron tracking-[0.08em] text-neutral-500 hover:text-cyan-400 transition-colors">LinkedIn</a>
+              <a href="mailto:hello@axonix.ai" className="font-orbitron text-xs tracking-[0.08em] border border-cyan-500/30 text-cyan-400 bg-cyan-500/5 px-6 py-2.5 hover:bg-cyan-400 hover:text-black hover:shadow-[0_0_20px_rgba(0,255,255,0.3)] transition-all duration-300">
+                Contact sales
               </a>
             </div>
           </div>
