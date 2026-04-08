@@ -3,11 +3,15 @@
 import * as React from "react";
 import {
   addEdge,
+  BaseEdge,
   Background,
   ConnectionLineType,
   Controls,
+  EdgeLabelRenderer,
   Handle,
   MiniMap,
+  getBezierPath,
+  type EdgeProps,
   type NodeProps,
   Panel,
   Position,
@@ -49,6 +53,8 @@ type WorkflowEditorProps = {
 type WorkflowNodeData = {
   label: string;
 };
+
+const EDGE_TYPE = "buttonEdge";
 
 function GeminiLogoIcon({ className }: { className?: string }) {
   return <img src="/logos/gemini.svg" alt="Gemini" className={className} />;
@@ -98,6 +104,89 @@ const SelectorContext = React.createContext<{
   openSelector: (sourceNodeId?: string, mode?: "all" | "executions") => void;
   connectingFromNodeId: string | null;
 } | null>(null);
+
+const EdgeActionsContext = React.createContext<{
+  onEdgeInsert: (edgeId: string, source: string, target: string) => void;
+  onEdgeDelete: (edgeId: string) => void;
+} | null>(null);
+
+function ButtonEdge({
+  id,
+  source,
+  target,
+  sourceX,
+  sourceY,
+  targetX,
+  targetY,
+  sourcePosition,
+  targetPosition,
+}: EdgeProps<Edge>) {
+  const actions = React.useContext(EdgeActionsContext);
+  const [isHovered, setIsHovered] = React.useState(false);
+  const [edgePath, labelX, labelY] = getBezierPath({
+    sourceX,
+    sourceY,
+    targetX,
+    targetY,
+    sourcePosition,
+    targetPosition,
+  });
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+  };
+
+  return (
+    <>
+      <BaseEdge id={id} path={edgePath} />
+      <path
+        d={edgePath}
+        fill="none"
+        stroke="transparent"
+        strokeWidth={24}
+        className="cursor-pointer"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      />
+      <EdgeLabelRenderer>
+        <div
+          className={`nodrag nopan absolute z-20 -translate-x-1/2 -translate-y-1/2 transition-opacity duration-150 ${
+            isHovered ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
+          style={{ left: labelX, top: labelY }}
+        >
+          <div
+            className="flex items-center gap-2"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
+            <button
+              type="button"
+              onClick={(event) => {
+                handleClick(event);
+                actions?.onEdgeInsert(id, source, target);
+              }}
+              className="pointer-events-auto rounded-md border border-[#3f3f3f] bg-[#1b1b1b] p-1 text-[#cfcfcf] shadow-[0_2px_8px_rgba(0,0,0,0.3)] hover:bg-[#2a2a2a] hover:text-white"
+            >
+              <PlusIcon className="h-3.5 w-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={(event) => {
+                handleClick(event);
+                actions?.onEdgeDelete(id);
+              }}
+              className="pointer-events-auto rounded-md border border-[#3f3f3f] bg-[#1b1b1b] p-1 text-[#cfcfcf] shadow-[0_2px_8px_rgba(0,0,0,0.3)] hover:bg-[#2a2a2a] hover:text-white"
+            >
+              <Trash2Icon className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+      </EdgeLabelRenderer>
+    </>
+  );
+}
 
 function NodeTopToolbar({ onDelete }: { onDelete: () => void }) {
   const handleToolbarClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -653,6 +742,11 @@ export function WorkflowEditor({
   const [selectorOpen, setSelectorOpen] = React.useState(false);
   const [selectorMode, setSelectorMode] = React.useState<"all" | "executions">("all");
   const [pendingSourceNodeId, setPendingSourceNodeId] = React.useState<string | null>(null);
+  const [pendingEdgeInsert, setPendingEdgeInsert] = React.useState<{
+    edgeId: string;
+    source: string;
+    target: string;
+  } | null>(null);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [lastExecutedAt, setLastExecutedAt] = React.useState<string | null>(null);
   const [connectingFromNodeId, setConnectingFromNodeId] = React.useState<string | null>(null);
@@ -670,6 +764,7 @@ export function WorkflowEditor({
     }),
     []
   );
+  const edgeTypes = React.useMemo(() => ({ [EDGE_TYPE]: ButtonEdge }), []);
 
   React.useEffect(() => {
     setMounted(true);
@@ -695,7 +790,7 @@ export function WorkflowEditor({
       addEdge(
         {
           ...params,
-          type: "default",
+          type: EDGE_TYPE,
           style: { stroke: "#8b8b8b", strokeWidth: 1.5 },
         },
         snapshot
@@ -707,13 +802,13 @@ export function WorkflowEditor({
     setEdges((current) => {
       let changed = false;
       const normalized = current.map((edge) => {
-        const needsType = edge.type !== "default";
+        const needsType = edge.type !== EDGE_TYPE;
         const needsStyle = edge.style?.stroke !== "#8b8b8b" || edge.style?.strokeWidth !== 1.5;
         if (!needsType && !needsStyle) return edge;
         changed = true;
         return {
           ...edge,
-          type: "default",
+          type: EDGE_TYPE,
           style: {
             ...(edge.style ?? {}),
             stroke: "#8b8b8b",
@@ -729,6 +824,7 @@ export function WorkflowEditor({
     (selection: (typeof nodeOptions)[number]) => {
       if (selection.type === "manual-trigger" && hasManualTrigger) {
         setSelectorOpen(false);
+        setPendingEdgeInsert(null);
         return;
       }
 
@@ -741,6 +837,7 @@ export function WorkflowEditor({
 
       if (isExecutionType && !hasAnyTrigger) {
         setSelectorOpen(false);
+        setPendingEdgeInsert(null);
         return;
       }
 
@@ -750,6 +847,12 @@ export function WorkflowEditor({
         const existingInitial = currentNodes.find((node) => node.type === "initialPlus");
         const sourceNode = pendingSourceNodeId
           ? currentNodes.find((node) => node.id === pendingSourceNodeId)
+          : null;
+        const insertSourceNode = pendingEdgeInsert
+          ? currentNodes.find((node) => node.id === pendingEdgeInsert.source)
+          : null;
+        const insertTargetNode = pendingEdgeInsert
+          ? currentNodes.find((node) => node.id === pendingEdgeInsert.target)
           : null;
         const nextIndex = currentNodes.length + 1;
         const y = 120 + (nextIndex % 5) * 120;
@@ -776,6 +879,11 @@ export function WorkflowEditor({
                 x: sourceNode.position.x + 220,
                 y: sourceNode.position.y,
               }
+            : insertSourceNode && insertTargetNode
+              ? {
+                  x: (insertSourceNode.position.x + insertTargetNode.position.x) / 2,
+                  y: (insertSourceNode.position.y + insertTargetNode.position.y) / 2,
+                }
             : existingInitial
               ? existingInitial.position
             : {
@@ -801,19 +909,46 @@ export function WorkflowEditor({
               id: `e-${pendingSourceNodeId}-${newNodeId}`,
               source: pendingSourceNodeId,
               target: newNodeId,
-              type: "default",
+              type: EDGE_TYPE,
               style: { stroke: "#8b8b8b", strokeWidth: 1.5 },
             },
             snapshot
           )
         );
       }
+      if (pendingEdgeInsert) {
+        setEdges((snapshot) => {
+          const withoutOriginal = snapshot.filter((edge) => edge.id !== pendingEdgeInsert.edgeId);
+          const withSourceToNew = addEdge(
+            {
+              id: `e-${pendingEdgeInsert.source}-${newNodeId}`,
+              source: pendingEdgeInsert.source,
+              target: newNodeId,
+              type: EDGE_TYPE,
+              style: { stroke: "#8b8b8b", strokeWidth: 1.5 },
+            },
+            withoutOriginal
+          );
+
+          return addEdge(
+            {
+              id: `e-${newNodeId}-${pendingEdgeInsert.target}`,
+              source: newNodeId,
+              target: pendingEdgeInsert.target,
+              type: EDGE_TYPE,
+              style: { stroke: "#8b8b8b", strokeWidth: 1.5 },
+            },
+            withSourceToNew
+          );
+        });
+      }
 
       setPendingSourceNodeId(null);
+      setPendingEdgeInsert(null);
       setSelectorMode("all");
       setSelectorOpen(false);
     },
-    [hasAnyTrigger, nodes, pendingSourceNodeId, setEdges, setNodes]
+    [hasAnyTrigger, nodes, pendingEdgeInsert, pendingSourceNodeId, setEdges, setNodes]
   );
 
   const normalizedQuery = searchQuery.trim().toLowerCase();
@@ -828,6 +963,7 @@ export function WorkflowEditor({
     <SelectorContext.Provider
       value={{
         openSelector: (sourceNodeId?: string, mode: "all" | "executions" = "all") => {
+          setPendingEdgeInsert(null);
           setPendingSourceNodeId(sourceNodeId ?? null);
           setSelectorMode(mode);
           setSelectorOpen(true);
@@ -835,7 +971,20 @@ export function WorkflowEditor({
         connectingFromNodeId,
       }}
     >
-      <div className="relative h-full w-full overflow-hidden">
+      <EdgeActionsContext.Provider
+        value={{
+          onEdgeInsert: (edgeId, source, target) => {
+            setPendingSourceNodeId(null);
+            setPendingEdgeInsert({ edgeId, source, target });
+            setSelectorMode("executions");
+            setSelectorOpen(true);
+          },
+          onEdgeDelete: (edgeId) => {
+            setEdges((snapshot) => snapshot.filter((edge) => edge.id !== edgeId));
+          },
+        }}
+      >
+        <div className="relative h-full w-full overflow-hidden">
         <ReactFlow
           key={colorMode ?? "pending-theme"}
           colorMode={colorMode}
@@ -845,6 +994,7 @@ export function WorkflowEditor({
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           connectionLineType={ConnectionLineType.Bezier}
+          edgeTypes={edgeTypes}
           onConnectStart={(_, params) => {
             if (params?.handleType === "source" && params?.nodeId) {
               setConnectingFromNodeId(params.nodeId);
@@ -873,9 +1023,11 @@ export function WorkflowEditor({
                 onClick={() => {
                   if (selectorOpen && selectorMode === "all" && !pendingSourceNodeId) {
                     setSelectorOpen(false);
+                    setPendingEdgeInsert(null);
                     return;
                   }
                   setPendingSourceNodeId(null);
+                  setPendingEdgeInsert(null);
                   setSelectorMode("all");
                   setSelectorOpen(true);
                 }}
@@ -908,7 +1060,10 @@ export function WorkflowEditor({
               type="button"
               aria-label="Close node selector"
               className="absolute inset-0 z-20 cursor-default bg-transparent"
-              onClick={() => setSelectorOpen(false)}
+              onClick={() => {
+                setSelectorOpen(false);
+                setPendingEdgeInsert(null);
+              }}
             />
             <aside className="absolute inset-y-0 right-0 z-30 w-full max-w-md overflow-y-auto border-l border-border bg-background text-foreground shadow-2xl">
             <div className="flex items-start justify-between border-b border-border px-5 py-4">
@@ -926,7 +1081,10 @@ export function WorkflowEditor({
                 size="icon"
                 variant="ghost"
                 className="text-muted-foreground hover:text-foreground"
-                onClick={() => setSelectorOpen(false)}
+                onClick={() => {
+                  setSelectorOpen(false);
+                  setPendingEdgeInsert(null);
+                }}
               >
                 <XIcon />
               </Button>
@@ -986,7 +1144,8 @@ export function WorkflowEditor({
             </aside>
           </>
         )}
-      </div>
+        </div>
+      </EdgeActionsContext.Provider>
     </SelectorContext.Provider>
   );
 }
