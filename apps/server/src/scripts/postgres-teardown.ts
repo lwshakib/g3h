@@ -10,6 +10,10 @@ async function teardown() {
     logger.info("Starting PostgreSQL complete schema teardown...");
 
     // Drop tables in reverse dependency order
+    await client.query(`DROP TABLE IF EXISTS execution CASCADE;`);
+    await client.query(`DROP TABLE IF EXISTS connection CASCADE;`);
+    await client.query(`DROP TABLE IF EXISTS node CASCADE;`);
+    await client.query(`DROP TABLE IF EXISTS credential CASCADE;`);
     await client.query(`DROP TABLE IF EXISTS workflow CASCADE;`);
     await client.query(`DROP TABLE IF EXISTS session CASCADE;`);
     await client.query(`DROP TABLE IF EXISTS account CASCADE;`);

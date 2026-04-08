@@ -179,6 +179,29 @@ export class PostgresService {
     return rows[0];
   }
 
+  public async createWorkflowWithAutoName(userId: string, baseName = "My Workflow", data: any = {}) {
+    const escapedBaseName = baseName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const existingNamesResult = await this.pool.query(
+      'SELECT name FROM workflow WHERE "userId" = $1 AND (name = $2 OR name ~ $3)',
+      [userId, baseName, `^${escapedBaseName} [0-9]+$`]
+    );
+
+    const existingNames = new Set(existingNamesResult.rows.map((row) => row.name as string));
+    let candidate = baseName;
+    let suffix = 2;
+
+    while (existingNames.has(candidate)) {
+      candidate = `${baseName} ${suffix}`;
+      suffix += 1;
+    }
+
+    return this.createWorkflow({
+      name: candidate,
+      userId,
+      data,
+    });
+  }
+
   public async findWorkflowsByUserId(userId: string) {
     const { rows } = await this.pool.query(
       'SELECT * FROM workflow WHERE "userId" = $1 ORDER BY "updatedAt" DESC',

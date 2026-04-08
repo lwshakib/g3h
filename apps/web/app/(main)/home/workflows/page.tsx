@@ -29,17 +29,67 @@ import {
   PaginationPrevious,
 } from "@repo/ui/components/ui/pagination"
 
-const workflows = [
-  {
-    id: 1,
-    name: "My workflow",
-    updated: "23 minutes ago",
-    created: "5 April",
-    owner: "Personal",
-  },
-]
+type WorkflowItem = {
+  id: string
+  name: string
+  createdAt: string
+  updatedAt: string
+}
+
+const getSessionToken = () => {
+  if (typeof document === "undefined") return null
+  const value = `; ${document.cookie}`
+  const parts = value.split(`; axonix_session_token=`)
+  if (parts.length === 2) return parts.pop()?.split(";").shift() ?? null
+  return null
+}
+
+const formatDate = (value: string) => {
+  const date = new Date(value)
+  return new Intl.DateTimeFormat("en-US", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(date)
+}
 
 export default function WorkflowsPage() {
+  const [workflows, setWorkflows] = React.useState<WorkflowItem[]>([])
+  const [isLoading, setIsLoading] = React.useState(true)
+
+  React.useEffect(() => {
+    const run = async () => {
+      const token = getSessionToken()
+      if (!token) {
+        setWorkflows([])
+        setIsLoading(false)
+        return
+      }
+
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/workflow`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+
+        if (!response.ok) {
+          throw new Error("Failed to load workflows")
+        }
+
+        const payload = await response.json()
+        setWorkflows(payload.workflows ?? [])
+      } catch (error) {
+        console.error("[WorkflowsPage] Failed to load workflows:", error)
+        setWorkflows([])
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    void run()
+  }, [])
+
   return (
     <div className="space-y-6">
       {/* Search & Filter Bar */}
@@ -68,6 +118,12 @@ export default function WorkflowsPage() {
 
       {/* Workflow List */}
       <div className="space-y-3">
+        {isLoading && (
+          <div className="text-sm text-muted-foreground">Loading workflows...</div>
+        )}
+        {!isLoading && workflows.length === 0 && (
+          <div className="text-sm text-muted-foreground">No workflows yet. Click Create workflow.</div>
+        )}
         {workflows.map((wf) => (
           <div 
             key={wf.id} 
@@ -76,7 +132,7 @@ export default function WorkflowsPage() {
             <div className="space-y-1">
               <h3 className="font-semibold text-[15px] group-hover:text-red-500 transition-colors">{wf.name}</h3>
               <p className="text-xs text-muted-foreground flex items-center gap-2">
-                Last updated {wf.updated} <span className="h-4 w-px bg-muted-foreground/30 mx-1" /> Created {wf.created}
+                Last updated {formatDate(wf.updatedAt)} <span className="h-4 w-px bg-muted-foreground/30 mx-1" /> Created {formatDate(wf.createdAt)}
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -94,7 +150,7 @@ export default function WorkflowsPage() {
 
       {/* Pagination Footer */}
       <div className="flex items-center justify-end gap-6 pt-6 text-sm text-muted-foreground">
-        <p className="text-xs">Total 1</p>
+        <p className="text-xs">Total {workflows.length}</p>
         <Pagination className="w-auto mx-0">
           <PaginationContent className="gap-1">
             <PaginationItem>

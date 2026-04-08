@@ -19,12 +19,51 @@ const actions = [
   { label: "Create data table", href: "/home/data-tables" },
 ]
 
+const getSessionToken = () => {
+  if (typeof document === "undefined") return null
+  const value = `; ${document.cookie}`
+  const parts = value.split(`; axonix_session_token=`)
+  if (parts.length === 2) return parts.pop()?.split(";").shift() ?? null
+  return null
+}
+
 export function DashboardHeader() {
   const pathname = usePathname()
+  const [isCreating, setIsCreating] = React.useState(false)
   
   // Find current action based on path
   const currentAction = actions.find(a => pathname.includes(a.href)) ?? actions[0]!
   const otherActions = actions.filter(a => a.label !== currentAction.label)
+
+  const createWorkflow = async () => {
+    if (isCreating) return
+    const token = getSessionToken()
+    if (!token) return
+
+    try {
+      setIsCreating(true)
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/workflow`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify({ name: "My Workflow" }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Create workflow failed")
+      }
+
+      if (typeof window !== "undefined") {
+        window.location.href = "/home/workflows"
+      }
+    } catch (error) {
+      console.error("[DashboardHeader] Failed to create workflow:", error)
+    } finally {
+      setIsCreating(false)
+    }
+  }
 
   return (
     <div className="flex items-center justify-between px-6 py-4">
@@ -39,6 +78,12 @@ export function DashboardHeader() {
         <Button 
           variant="ghost"
           className="rounded-none h-10 px-4 border-r border-primary-foreground/10 text-sm font-semibold text-primary-foreground hover:bg-white/10 active:bg-white/20 whitespace-nowrap"
+          onClick={() => {
+            if (currentAction.href === "/home/workflows") {
+              void createWorkflow()
+            }
+          }}
+          disabled={isCreating && currentAction.href === "/home/workflows"}
         >
           {currentAction.label}
         </Button>
