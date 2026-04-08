@@ -26,6 +26,7 @@ import {
 } from "./tooltip"
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
+const SIDEBAR_LOCAL_STORAGE_KEY = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
 const SIDEBAR_WIDTH = "16rem"
 const SIDEBAR_WIDTH_MOBILE = "18rem"
@@ -80,6 +81,19 @@ const SidebarProvider = React.forwardRef<
     // We use openProp and setOpenProp for control from outside the component.
     const [_open, _setOpen] = React.useState(defaultOpen)
     const open = openProp ?? _open
+
+    React.useEffect(() => {
+      if (openProp !== undefined) return
+      try {
+        const stored = window.localStorage.getItem(SIDEBAR_LOCAL_STORAGE_KEY)
+        if (stored === "true" || stored === "false") {
+          _setOpen(stored === "true")
+        }
+      } catch {
+        // ignore storage read issues
+      }
+    }, [openProp])
+
     const setOpen = React.useCallback(
       (value: boolean | ((value: boolean) => boolean)) => {
         const openState = typeof value === "function" ? value(open) : value
@@ -91,16 +105,19 @@ const SidebarProvider = React.forwardRef<
 
         // This sets the cookie to keep the sidebar state.
         document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
+        try {
+          window.localStorage.setItem(SIDEBAR_LOCAL_STORAGE_KEY, String(openState))
+        } catch {
+          // ignore storage write issues
+        }
       },
       [setOpenProp, open]
     )
 
     // Helper to toggle the sidebar.
     const toggleSidebar = React.useCallback(() => {
-      return isMobile
-        ? setOpenMobile((open) => !open)
-        : setOpen((open) => !open)
-    }, [isMobile, setOpen, setOpenMobile])
+      return setOpen((currentOpen) => !currentOpen)
+    }, [setOpen])
 
     // Adds a keyboard shortcut to toggle the sidebar.
     React.useEffect(() => {
@@ -198,35 +215,11 @@ const Sidebar = React.forwardRef<
       )
     }
 
-    if (isMobile) {
-      return (
-        <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
-          <SheetContent
-            data-sidebar="sidebar"
-            data-mobile="true"
-            className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
-            style={
-              {
-                "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
-              } as React.CSSProperties
-            }
-            side={side}
-          >
-            <SheetHeader className="sr-only">
-              <SheetTitle>Sidebar</SheetTitle>
-              <SheetDescription>Displays the mobile sidebar.</SheetDescription>
-            </SheetHeader>
-            <div className="flex h-full w-full flex-col">{children}</div>
-          </SheetContent>
-        </Sheet>
-      )
-    }
-
     return (
       <div
         ref={ref}
         className={cn(
-          "group peer hidden h-svh w-(--sidebar-width) shrink-0 text-sidebar-foreground transition-[width] duration-200 ease-linear md:block",
+          "group peer h-svh w-(--sidebar-width) shrink-0 text-sidebar-foreground transition-[width] duration-200 ease-linear block",
           "data-[state=collapsed]:w-(--sidebar-width-icon)",
           "data-[collapsible=offcanvas]:w-0",
           className
@@ -238,7 +231,7 @@ const Sidebar = React.forwardRef<
       >
         <div
           className={cn(
-            "fixed inset-y-0 z-20 hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-200 ease-linear md:flex",
+            "fixed inset-y-0 z-20 h-svh w-(--sidebar-width) transition-[left,right,width] duration-200 ease-linear flex",
             side === "left"
               ? "left-0 data-[state=collapsed]:left-0 data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
               : "right-0 data-[state=collapsed]:right-0 data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",
