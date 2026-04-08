@@ -22,7 +22,16 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useTheme } from "next-themes";
-import { GlobeIcon, MousePointerIcon, PlusIcon, Settings2Icon, WandSparklesIcon, XIcon } from "lucide-react";
+import {
+  CalendarClockIcon,
+  GlobeIcon,
+  MousePointerIcon,
+  PlusIcon,
+  Settings2Icon,
+  WandSparklesIcon,
+  WebhookIcon,
+  XIcon,
+} from "lucide-react";
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
 import { Input } from "./ui/input";
@@ -37,7 +46,7 @@ type WorkflowNodeData = {
 };
 
 const SelectorContext = React.createContext<{
-  openSelector: () => void;
+  openSelector: (sourceNodeId?: string, mode?: "all" | "executions") => void;
   connectingFromNodeId: string | null;
 } | null>(null);
 
@@ -105,7 +114,7 @@ function ManualTriggerNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
               <div className="pointer-events-none absolute right-[-50px] top-1/2 h-px w-[34px] -translate-y-1/2 bg-[#4a4a4a]" />
               <button
                 type="button"
-                onClick={() => ctx?.openSelector()}
+                onClick={() => ctx?.openSelector(id, "executions")}
                 className="pointer-events-auto absolute right-[-76px] top-1/2 flex h-[24px] w-[24px] -translate-y-1/2 items-center justify-center rounded-[6px] border border-[#3f3f3f] bg-[#292929] text-[#9a9a9a] hover:text-white"
               >
                 <PlusIcon className="size-3.5 stroke-[2.4]" />
@@ -120,6 +129,94 @@ function ManualTriggerNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
         </p>
       )}
 
+    </div>
+  );
+}
+
+function WebhookTriggerNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
+  const { setNodes, setEdges } = useReactFlow();
+  const ctx = React.useContext(SelectorContext);
+  const isConnectingFromThisNode = ctx?.connectingFromNodeId === id;
+  const edges = useStore((state) => state.edges);
+  const hasOutgoingConnection = React.useMemo(
+    () => edges.some((edge) => edge.source === id),
+    [edges, id]
+  );
+  const showAddAffordance = !isConnectingFromThisNode && !hasOutgoingConnection;
+
+  return (
+    <div className="relative w-[244px]">
+      <div className="flex items-center justify-center">
+        <div className="relative flex h-[94px] w-[94px] items-center justify-center rounded-[24px] border border-[#3a3a3a] bg-[#1f1f1f] shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
+          <WebhookIcon className="size-11 text-[#8a8a8a] stroke-[1.8]" />
+          <Handle
+            type="source"
+            position={Position.Right}
+            className="!pointer-events-auto !z-[60] !h-[18px] !w-[18px] !border-[#4a4a4a] !bg-[#202020] !shadow-none"
+          />
+          {showAddAffordance && (
+            <>
+              <div className="pointer-events-none absolute right-[-50px] top-1/2 h-px w-[34px] -translate-y-1/2 bg-[#4a4a4a]" />
+              <button
+                type="button"
+                onClick={() => ctx?.openSelector(id, "executions")}
+                className="pointer-events-auto absolute right-[-76px] top-1/2 flex h-[24px] w-[24px] -translate-y-1/2 items-center justify-center rounded-[6px] border border-[#3f3f3f] bg-[#292929] text-[#9a9a9a] hover:text-white"
+              >
+                <PlusIcon className="size-3.5 stroke-[2.4]" />
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+      {!isConnectingFromThisNode && (
+        <p className="mt-[16px] text-center text-[24px] font-medium leading-[1.08] tracking-[-0.01em] text-foreground">
+          {data.label}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function ScheduleTriggerNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
+  const { setNodes, setEdges } = useReactFlow();
+  const ctx = React.useContext(SelectorContext);
+  const isConnectingFromThisNode = ctx?.connectingFromNodeId === id;
+  const edges = useStore((state) => state.edges);
+  const hasOutgoingConnection = React.useMemo(
+    () => edges.some((edge) => edge.source === id),
+    [edges, id]
+  );
+  const showAddAffordance = !isConnectingFromThisNode && !hasOutgoingConnection;
+
+  return (
+    <div className="relative w-[244px]">
+      <div className="flex items-center justify-center">
+        <div className="relative flex h-[94px] w-[94px] items-center justify-center rounded-[24px] border border-[#3a3a3a] bg-[#1f1f1f] shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
+          <CalendarClockIcon className="size-11 text-[#8a8a8a] stroke-[1.8]" />
+          <Handle
+            type="source"
+            position={Position.Right}
+            className="!pointer-events-auto !z-[60] !h-[18px] !w-[18px] !border-[#4a4a4a] !bg-[#202020] !shadow-none"
+          />
+          {showAddAffordance && (
+            <>
+              <div className="pointer-events-none absolute right-[-50px] top-1/2 h-px w-[34px] -translate-y-1/2 bg-[#4a4a4a]" />
+              <button
+                type="button"
+                onClick={() => ctx?.openSelector(id, "executions")}
+                className="pointer-events-auto absolute right-[-76px] top-1/2 flex h-[24px] w-[24px] -translate-y-1/2 items-center justify-center rounded-[6px] border border-[#3f3f3f] bg-[#292929] text-[#9a9a9a] hover:text-white"
+              >
+                <PlusIcon className="size-3.5 stroke-[2.4]" />
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+      {!isConnectingFromThisNode && (
+        <p className="mt-[16px] text-center text-[24px] font-medium leading-[1.08] tracking-[-0.01em] text-foreground">
+          {data.label}
+        </p>
+      )}
     </div>
   );
 }
@@ -158,7 +255,7 @@ function HttpRequestNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
               <div className="pointer-events-none absolute right-[-50px] top-1/2 h-px w-[34px] -translate-y-1/2 bg-[#4a4a4a]" />
               <button
                 type="button"
-                onClick={() => ctx?.openSelector()}
+                onClick={() => ctx?.openSelector(id, "executions")}
                 className="pointer-events-auto absolute right-[-76px] top-1/2 flex h-[24px] w-[24px] -translate-y-1/2 items-center justify-center rounded-[6px] border border-[#3f3f3f] bg-[#292929] text-[#9a9a9a] hover:text-white"
               >
                 <PlusIcon className="size-3.5 stroke-[2.4]" />
@@ -200,9 +297,26 @@ const nodeOptions = [
     description: "Perform an HTTP request step.",
     icon: GlobeIcon,
   },
+  {
+    type: "webhook-trigger",
+    label: "Webhook call",
+    description: "Runs the flow when a webhook is called.",
+    icon: WebhookIcon,
+  },
+  {
+    type: "schedule-trigger",
+    label: "On schedule",
+    description: "Runs the flow on a schedule.",
+    icon: CalendarClockIcon,
+  },
 ] as const;
 
-const triggerNodeOptions = nodeOptions.filter((option) => option.type === "manual-trigger");
+const triggerNodeOptions = nodeOptions.filter(
+  (option) =>
+    option.type === "manual-trigger" ||
+    option.type === "webhook-trigger" ||
+    option.type === "schedule-trigger"
+);
 const executionNodeOptions = nodeOptions.filter((option) => option.type === "http-request");
 
 export function WorkflowEditor({
@@ -217,6 +331,8 @@ export function WorkflowEditor({
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [selectorOpen, setSelectorOpen] = React.useState(false);
+  const [selectorMode, setSelectorMode] = React.useState<"all" | "executions">("all");
+  const [pendingSourceNodeId, setPendingSourceNodeId] = React.useState<string | null>(null);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [lastExecutedAt, setLastExecutedAt] = React.useState<string | null>(null);
   const [connectingFromNodeId, setConnectingFromNodeId] = React.useState<string | null>(null);
@@ -224,6 +340,8 @@ export function WorkflowEditor({
     () => ({
       initialPlus: InitialPlusNode,
       manualTrigger: ManualTriggerNode,
+      webhookTrigger: WebhookTriggerNode,
+      scheduleTrigger: ScheduleTriggerNode,
       httpRequest: HttpRequestNode,
     }),
     []
@@ -235,6 +353,16 @@ export function WorkflowEditor({
 
   const hasManualTrigger = React.useMemo(
     () => nodes.some((n) => n.type === "manualTrigger"),
+    [nodes]
+  );
+  const hasAnyTrigger = React.useMemo(
+    () =>
+      nodes.some(
+        (n) =>
+          n.type === "manualTrigger" ||
+          n.type === "webhookTrigger" ||
+          n.type === "scheduleTrigger"
+      ),
     [nodes]
   );
 
@@ -280,20 +408,37 @@ export function WorkflowEditor({
         return;
       }
 
-      if (selection.type === "http-request" && !hasManualTrigger) {
+      if (selection.type === "http-request" && !hasAnyTrigger) {
         setSelectorOpen(false);
         return;
       }
 
+      const newNodeId = `node-${Date.now()}-${nodes.length + 1}`;
+
       setNodes((currentNodes: Node[]) => {
         const existingInitial = currentNodes.find((node) => node.type === "initialPlus");
+        const sourceNode = pendingSourceNodeId
+          ? currentNodes.find((node) => node.id === pendingSourceNodeId)
+          : null;
         const nextIndex = currentNodes.length + 1;
         const y = 120 + (nextIndex % 5) * 120;
         const newNode: Node = {
-          id: `node-${Date.now()}-${nextIndex}`,
-          type: selection.type === "manual-trigger" ? "manualTrigger" : "httpRequest",
-          position: existingInitial
-            ? existingInitial.position
+          id: newNodeId,
+          type:
+            selection.type === "manual-trigger"
+              ? "manualTrigger"
+              : selection.type === "webhook-trigger"
+                ? "webhookTrigger"
+                : selection.type === "schedule-trigger"
+                  ? "scheduleTrigger"
+                  : "httpRequest",
+          position: sourceNode
+            ? {
+                x: sourceNode.position.x + 220,
+                y: sourceNode.position.y,
+              }
+            : existingInitial
+              ? existingInitial.position
             : {
                 x: 220 + nextIndex * 40,
                 y,
@@ -309,9 +454,27 @@ export function WorkflowEditor({
 
         return [...currentNodes, newNode];
       });
+
+      if (pendingSourceNodeId) {
+        setEdges((snapshot) =>
+          addEdge(
+            {
+              id: `e-${pendingSourceNodeId}-${newNodeId}`,
+              source: pendingSourceNodeId,
+              target: newNodeId,
+              type: "default",
+              style: { stroke: "#8b8b8b", strokeWidth: 1.5 },
+            },
+            snapshot
+          )
+        );
+      }
+
+      setPendingSourceNodeId(null);
+      setSelectorMode("all");
       setSelectorOpen(false);
     },
-    [hasManualTrigger, nodes, setNodes]
+    [hasAnyTrigger, nodes, pendingSourceNodeId, setEdges, setNodes]
   );
 
   const normalizedQuery = searchQuery.trim().toLowerCase();
@@ -325,7 +488,11 @@ export function WorkflowEditor({
   return (
     <SelectorContext.Provider
       value={{
-        openSelector: () => setSelectorOpen(true),
+        openSelector: (sourceNodeId?: string, mode: "all" | "executions" = "all") => {
+          setPendingSourceNodeId(sourceNodeId ?? null);
+          setSelectorMode(mode);
+          setSelectorOpen(true);
+        },
         connectingFromNodeId,
       }}
     >
@@ -364,7 +531,15 @@ export function WorkflowEditor({
                 size="icon"
                 variant="outline"
                 className="bg-background text-foreground border-border shadow-sm"
-                onClick={() => setSelectorOpen((open) => !open)}
+                onClick={() => {
+                  if (selectorOpen && selectorMode === "all" && !pendingSourceNodeId) {
+                    setSelectorOpen(false);
+                    return;
+                  }
+                  setPendingSourceNodeId(null);
+                  setSelectorMode("all");
+                  setSelectorOpen(true);
+                }}
               >
                 <PlusIcon />
               </Button>
@@ -392,9 +567,13 @@ export function WorkflowEditor({
           <aside className="absolute inset-y-0 right-0 z-30 w-full max-w-md overflow-y-auto border-l border-border bg-background text-foreground shadow-2xl">
             <div className="flex items-start justify-between border-b border-border px-5 py-4">
               <div>
-                <h3 className="font-semibold">What triggers this workflow?</h3>
+                <h3 className="font-semibold">
+                  {selectorMode === "executions" ? "Add execution step" : "What triggers this workflow?"}
+                </h3>
                 <p className="text-sm text-muted-foreground">
-                  A trigger is a step that starts your workflow.
+                  {selectorMode === "executions"
+                    ? "Select an execution to continue this workflow."
+                    : "A trigger is a step that starts your workflow."}
                 </p>
               </div>
               <Button
@@ -414,30 +593,33 @@ export function WorkflowEditor({
                 placeholder="Search nodes..."
                 className="mb-2"
               />
-              <p className="px-3 pb-1 text-xs font-medium text-muted-foreground">Triggers</p>
-              {filteredTriggerNodeOptions.map((option) => {
-                const Icon = option.icon;
-                return (
-                  <button
-                    key={option.type}
-                    onClick={() => addNodeFromSelector(option)}
-                    className="flex w-full items-start gap-3 p-3 text-left transition-colors hover:border-l-2 hover:border-l-primary hover:bg-accent/40"
-                  >
-                    <Icon className="mt-1 h-5 w-5 shrink-0 text-foreground" />
-                    <div className="min-w-0 flex-1">
-                      <div className="font-medium">{option.label}</div>
-                      <div className="text-sm text-muted-foreground">{option.description}</div>
-                    </div>
-                  </button>
-                );
-              })}
-              {hasManualTrigger && (
+              {selectorMode === "all" && (
                 <>
+                  <p className="px-3 pb-1 text-xs font-medium text-muted-foreground">Triggers</p>
+                  {filteredTriggerNodeOptions.map((option) => {
+                    const Icon = option.icon;
+                    return (
+                      <button
+                        key={option.type}
+                        onClick={() => addNodeFromSelector(option)}
+                        className="flex w-full items-start gap-3 p-3 text-left transition-colors hover:border-l-2 hover:border-l-primary hover:bg-accent/40"
+                      >
+                        <Icon className="mt-1 h-5 w-5 shrink-0 text-foreground" />
+                        <div className="min-w-0 flex-1">
+                          <div className="font-medium">{option.label}</div>
+                          <div className="text-sm text-muted-foreground">{option.description}</div>
+                        </div>
+                      </button>
+                    );
+                  })}
                   <Separator />
-                  <p className="px-3 pb-1 pt-1 text-xs font-medium text-muted-foreground">Executions</p>
                 </>
               )}
-              {hasManualTrigger && filteredExecutionNodeOptions.map((option) => {
+
+              {(selectorMode === "executions" || hasAnyTrigger) && (
+                <p className="px-3 pb-1 pt-1 text-xs font-medium text-muted-foreground">Executions</p>
+              )}
+              {(selectorMode === "executions" || hasAnyTrigger) && filteredExecutionNodeOptions.map((option) => {
                 const Icon = option.icon;
                 return (
                   <button
