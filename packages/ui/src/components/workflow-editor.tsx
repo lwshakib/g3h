@@ -4,6 +4,7 @@ import * as React from "react";
 import {
   addEdge,
   Background,
+  ConnectionLineType,
   Controls,
   Handle,
   MiniMap,
@@ -12,6 +13,7 @@ import {
   Position,
   ReactFlow,
   useReactFlow,
+  useStore,
   useEdgesState,
   useNodesState,
   type Connection,
@@ -34,7 +36,10 @@ type WorkflowNodeData = {
   label: string;
 };
 
-const SelectorContext = React.createContext<{ openSelector: () => void } | null>(null);
+const SelectorContext = React.createContext<{
+  openSelector: () => void;
+  isConnecting: boolean;
+} | null>(null);
 
 function InitialPlusNode() {
   const ctx = React.useContext(SelectorContext);
@@ -71,42 +76,51 @@ function InitialPlusNode() {
 }
 
 function ManualTriggerNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
-  const [triggeredAt, setTriggeredAt] = React.useState<string | null>(null);
   const { setNodes, setEdges } = useReactFlow();
+  const ctx = React.useContext(SelectorContext);
+  const isConnecting = Boolean(ctx?.isConnecting);
+  const edges = useStore((state) => state.edges);
+  const hasOutgoingConnection = React.useMemo(
+    () => edges.some((edge) => edge.source === id),
+    [edges, id]
+  );
 
   return (
-    <div className="w-72 rounded-md border bg-card text-card-foreground shadow-sm">
-      <div className="flex items-center justify-between gap-2 px-3 py-2">
-        <div className="flex items-center gap-2">
-          <MousePointerIcon className="size-4 text-primary" />
-          <p className="text-sm font-semibold">{data.label}</p>
+    <div className="relative w-[244px]">
+      <div className="flex items-center justify-center">
+        <div className="relative flex h-[94px] w-[94px] items-center justify-center rounded-[24px] border border-[#3a3a3a] bg-[#1f1f1f] shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
+          <MousePointerIcon className="size-11 text-[#8a8a8a] stroke-[1.8]" />
+
+          {/* Visible connection source exactly on border center */}
+          <Handle
+            type="source"
+            position={Position.Right}
+            className="!pointer-events-auto !z-[60] !h-[18px] !w-[18px] !border-[#4a4a4a] !bg-[#202020] !shadow-none"
+          />
+
+          {/* Add-step affordance hidden once already connected */}
+          {!hasOutgoingConnection && (
+            <>
+              <div className="pointer-events-none absolute right-[-50px] top-1/2 h-px w-[34px] -translate-y-1/2 bg-[#4a4a4a]" />
+              {!isConnecting && (
+                <button
+                  type="button"
+                  onClick={() => ctx?.openSelector()}
+                  className="pointer-events-auto absolute right-[-76px] top-1/2 flex h-[24px] w-[24px] -translate-y-1/2 items-center justify-center rounded-[6px] border border-[#3f3f3f] bg-[#292929] text-[#9a9a9a] hover:text-white"
+                >
+                  <PlusIcon className="size-3.5 stroke-[2.4]" />
+                </button>
+              )}
+            </>
+          )}
         </div>
-        <Button
-          size="icon"
-          variant="ghost"
-          className="h-7 w-7 text-muted-foreground hover:text-foreground"
-          onClick={() => {
-            setNodes((nodes) => nodes.filter((n) => n.id !== id));
-            setEdges((edges) => edges.filter((e) => e.source !== id && e.target !== id));
-          }}
-        >
-          <Settings2Icon className="size-4" />
-        </Button>
       </div>
-      <div className="border-t px-3 py-3">
-        <p className="mb-3 text-xs text-muted-foreground">When clicking "Execute workflow"</p>
-        <Button
-          size="sm"
-          className="w-full"
-          onClick={() => setTriggeredAt(new Date().toLocaleTimeString())}
-        >
-          Execute workflow
-        </Button>
-      </div>
-      {triggeredAt && (
-        <p className="px-3 pb-2 text-xs text-muted-foreground">Triggered at {triggeredAt}</p>
+      {!isConnecting && (
+        <p className="mt-[16px] text-center text-[24px] font-medium leading-[1.08] tracking-[-0.01em] text-foreground">
+          When clicking &lsquo;Execute workflow&rsquo;
+        </p>
       )}
-      <Handle type="source" position={Position.Right} />
+
     </div>
   );
 }
@@ -210,6 +224,9 @@ export function WorkflowEditor({
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [selectorOpen, setSelectorOpen] = React.useState(false);
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const [lastExecutedAt, setLastExecutedAt] = React.useState<string | null>(null);
+  const [isConnecting, setIsConnecting] = React.useState(false);
   const nodeTypes = React.useMemo(
     () => ({
       initialPlus: InitialPlusNode,
@@ -223,13 +240,54 @@ export function WorkflowEditor({
     setMounted(true);
   }, []);
 
+  const hasManualTrigger = React.useMemo(
+    () => nodes.some((n) => n.type === "manualTrigger"),
+    [nodes]
+  );
+
   const onConnect = React.useCallback((params: Connection) => {
-    setEdges((snapshot) => addEdge(params, snapshot));
+    setEdges((snapshot) =>
+      addEdge(
+        {
+          ...params,
+          type: "default",
+          style: { stroke: "#8b8b8b", strokeWidth: 1.5 },
+        },
+        snapshot
+      )
+    );
+  }, [setEdges]);
+
+  React.useEffect(() => {
+    setEdges((current) => {
+      let changed = false;
+      const normalized = current.map((edge) => {
+        const needsType = edge.type !== "default";
+        const needsStyle = edge.style?.stroke !== "#8b8b8b" || edge.style?.strokeWidth !== 1.5;
+        if (!needsType && !needsStyle) return edge;
+        changed = true;
+        return {
+          ...edge,
+          type: "default",
+          style: {
+            ...(edge.style ?? {}),
+            stroke: "#8b8b8b",
+            strokeWidth: 1.5,
+          },
+        };
+      });
+      return changed ? normalized : current;
+    });
   }, [setEdges]);
 
   const addNodeFromSelector = React.useCallback(
     (selection: (typeof nodeOptions)[number]) => {
-      if (selection.type === "manual-trigger" && nodes.some((n) => n.type === "manualTrigger")) {
+      if (selection.type === "manual-trigger" && hasManualTrigger) {
+        setSelectorOpen(false);
+        return;
+      }
+
+      if (selection.type === "http-request" && !hasManualTrigger) {
         setSelectorOpen(false);
         return;
       }
@@ -260,11 +318,24 @@ export function WorkflowEditor({
       });
       setSelectorOpen(false);
     },
-    [nodes, setNodes]
+    [hasManualTrigger, nodes, setNodes]
+  );
+
+  const normalizedQuery = searchQuery.trim().toLowerCase();
+  const filteredTriggerNodeOptions = triggerNodeOptions.filter((option) =>
+    `${option.label} ${option.description}`.toLowerCase().includes(normalizedQuery)
+  );
+  const filteredExecutionNodeOptions = executionNodeOptions.filter((option) =>
+    `${option.label} ${option.description}`.toLowerCase().includes(normalizedQuery)
   );
 
   return (
-    <SelectorContext.Provider value={{ openSelector: () => setSelectorOpen(true) }}>
+    <SelectorContext.Provider
+      value={{
+        openSelector: () => setSelectorOpen(true),
+        isConnecting,
+      }}
+    >
       <div className="relative h-full w-full overflow-hidden">
         <ReactFlow
           key={colorMode ?? "pending-theme"}
@@ -274,6 +345,9 @@ export function WorkflowEditor({
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
+          connectionLineType={ConnectionLineType.Bezier}
+          onConnectStart={() => setIsConnecting(true)}
+          onConnectEnd={() => setIsConnecting(false)}
           nodeTypes={nodeTypes}
           panOnDrag={false}
           selectionOnDrag
@@ -295,6 +369,22 @@ export function WorkflowEditor({
               >
                 <PlusIcon />
               </Button>
+            </Panel>
+          )}
+          {hasManualTrigger && (
+            <Panel position="bottom-center">
+              <div className="flex flex-col items-center gap-2">
+                <Button
+                  onClick={() => setLastExecutedAt(new Date().toLocaleTimeString())}
+                >
+                  Execute workflow
+                </Button>
+                {lastExecutedAt && (
+                  <p className="text-xs text-muted-foreground">
+                    Last executed at {lastExecutedAt}
+                  </p>
+                )}
+              </div>
             </Panel>
           )}
         </ReactFlow>
@@ -319,7 +409,14 @@ export function WorkflowEditor({
             </div>
 
             <div className="space-y-1 p-3">
-              {triggerNodeOptions.map((option) => {
+              <Input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search nodes..."
+                className="mb-2"
+              />
+              <p className="px-3 pb-1 text-xs font-medium text-muted-foreground">Triggers</p>
+              {filteredTriggerNodeOptions.map((option) => {
                 const Icon = option.icon;
                 return (
                   <button
@@ -335,8 +432,13 @@ export function WorkflowEditor({
                   </button>
                 );
               })}
-              <Separator />
-              {executionNodeOptions.map((option) => {
+              {hasManualTrigger && (
+                <>
+                  <Separator />
+                  <p className="px-3 pb-1 pt-1 text-xs font-medium text-muted-foreground">Executions</p>
+                </>
+              )}
+              {hasManualTrigger && filteredExecutionNodeOptions.map((option) => {
                 const Icon = option.icon;
                 return (
                   <button
