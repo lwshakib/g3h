@@ -38,6 +38,20 @@ type WorkflowRunStatus = {
   };
 };
 
+const interpolateString = (str: string, context: Record<string, any>) => {
+  return str.replace(/\{\{\s*(.+?)\s*\}\}/g, (match, expr) => {
+    const path = expr.trim().split('.');
+    let current = context;
+    for (const key of path) {
+      if (current === null || current === undefined) {
+        return "";
+      }
+      current = current[key];
+    }
+    return current !== undefined ? (typeof current === 'object' ? JSON.stringify(current) : String(current)) : "";
+  });
+};
+
 const runWorkflowSequence = async (
   workflow: any,
   onStatus?: (status: WorkflowRunStatus) => void,
@@ -136,10 +150,12 @@ const runWorkflowSequence = async (
 
   const visited = new Set<string>();
   const queued = new Set<string>([manualTrigger.id]);
-  const queue: string[] = [manualTrigger.id];
+  const queue: { nodeId: string; inputData: any }[] = [{ nodeId: manualTrigger.id, inputData: null }];
 
   while (queue.length > 0) {
-    const currentNodeId = queue.shift();
+    const currentItem = queue.shift();
+    if (!currentItem) continue;
+    const { nodeId: currentNodeId, inputData } = currentItem;
     if (!currentNodeId || visited.has(currentNodeId)) continue;
     visited.add(currentNodeId);
 
@@ -147,6 +163,7 @@ const runWorkflowSequence = async (
     if (!node) continue;
 
     let canContinueBranch = true;
+    let nextInputData: any = null;
 
     if (node.type === "manualTrigger" || node.type === "manual-trigger") {
       emit({
@@ -163,8 +180,12 @@ const runWorkflowSequence = async (
       });
     } else if (node.type === "httpRequest" || node.type === "http-request") {
       const method = (node.data?.method || "GET").toUpperCase();
-      const url = node.data?.url;
-      const payload = node.data?.inputSample;
+      const rawUrl = node.data?.url;
+      const rawPayload = node.data?.inputSample;
+
+      const context = { $json: inputData };
+      const url = rawUrl ? interpolateString(rawUrl, context) : undefined;
+      const payload = rawPayload ? interpolateString(rawPayload, context) : undefined;
 
       if (!url) {
         emit({
@@ -198,9 +219,11 @@ const runWorkflowSequence = async (
           const rawBody = await response.text();
           let output = rawBody;
           try {
-            output = JSON.stringify(JSON.parse(rawBody), null, 2);
+            const parsed = JSON.parse(rawBody);
+            output = JSON.stringify(parsed, null, 2);
+            nextInputData = parsed;
           } catch {
-            // Keep non-JSON response bodies as-is.
+            nextInputData = rawBody;
           }
           emit({
             nodeId: node.id,
@@ -268,7 +291,7 @@ const runWorkflowSequence = async (
     const nextEdges = outgoing.get(currentNodeId) ?? [];
     for (const edge of nextEdges) {
       if (!edge.target || visited.has(edge.target) || queued.has(edge.target)) continue;
-      queue.push(edge.target);
+      queue.push({ nodeId: edge.target, inputData: nextInputData });
       queued.add(edge.target);
     }
   }
