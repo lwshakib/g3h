@@ -27,6 +27,7 @@ import {
 import "@xyflow/react/dist/style.css";
 import { useTheme } from "next-themes";
 import {
+  AlertTriangleIcon,
   CalendarClockIcon,
   CheckCircle2Icon,
   ChevronDownIcon,
@@ -93,6 +94,39 @@ type WorkflowNodeData = {
 };
 
 type NodeRunStatus = "initial" | "loading" | "success" | "error";
+
+const isNodeConfigured = (nodeType: string, data: WorkflowNodeData): boolean => {
+  if (nodeType === "httpRequest") {
+    return Boolean(data.url?.trim());
+  }
+  return true;
+};
+
+function NodeConfigIndicator({
+  configured,
+  runStatus,
+}: {
+  configured: boolean;
+  runStatus: NodeRunStatus;
+}) {
+  if (runStatus === "success") {
+    return (
+      <CheckCircle2Icon
+        className="pointer-events-none absolute bottom-2 right-2 z-30 h-4 w-4 text-emerald-500"
+        aria-hidden="true"
+      />
+    );
+  }
+
+  if (configured) return null;
+
+  return (
+    <AlertTriangleIcon
+      className="pointer-events-none absolute bottom-2 right-2 z-30 h-4 w-4 text-red-500"
+      aria-hidden="true"
+    />
+  );
+}
 
 const getJsonType = (value: unknown): string => {
   if (value === null) return "null";
@@ -287,12 +321,28 @@ const getOutputItemCount = (parsedOutput: unknown | null): number => {
 function OutputTabsPanel({
   parsedOutput,
   prettyJsonOutput,
+  hasOutput,
+  isExecuting,
+  onExecuteStep,
 }: {
   parsedOutput: unknown | null;
   prettyJsonOutput: string;
+  hasOutput: boolean;
+  isExecuting: boolean;
+  onExecuteStep: () => void;
 }) {
   const [activeTab, setActiveTab] = React.useState("schema");
   const itemCount = getOutputItemCount(parsedOutput);
+
+  if (!hasOutput) {
+    return (
+      <div className="flex h-full min-w-0 items-center justify-center overflow-hidden rounded-md border border-border bg-card p-4">
+        <Button onClick={onExecuteStep} disabled={isExecuting}>
+          {isExecuting ? "Running..." : "Execute step"}
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <Tabs
@@ -391,14 +441,7 @@ function NodeStatusBorder({
     );
   }
 
-  if (status === "success") {
-    return (
-      <>
-        <div className="pointer-events-none absolute -top-1.5 -left-1.5 -z-10 h-[calc(100%+12px)] w-[calc(100%+12px)] rounded-[30px] bg-[#161616]" />
-        <div className="pointer-events-none absolute -top-1.5 -left-1.5 -z-10 h-[calc(100%+12px)] w-[calc(100%+12px)] rounded-[30px] border-[3px] border-emerald-600/60" />
-      </>
-    );
-  }
+  if (status === "success") return null;
 
   return (
     <>
@@ -665,6 +708,7 @@ function ManualTriggerNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
   );
   const showAddAffordance = !isConnectingFromThisNode && !hasOutgoingConnection;
   const runStatus = ctx?.getNodeStatus(id) ?? "initial";
+  const configured = isNodeConfigured("manualTrigger", data);
 
   return (
     <div
@@ -676,6 +720,7 @@ function ManualTriggerNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
         <div className="relative flex h-[94px] w-[94px] items-center justify-center rounded-[24px] border border-[#3a3a3a] bg-[#1f1f1f] shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
           <NodeStatusBorder status={runStatus} />
           <MousePointerIcon className="size-11 text-[#8a8a8a] stroke-[1.8]" />
+          <NodeConfigIndicator configured={configured} runStatus={runStatus} />
 
           {/* Visible connection source exactly on border center */}
           <Handle
@@ -720,6 +765,7 @@ function WebhookTriggerNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
   );
   const showAddAffordance = !isConnectingFromThisNode && !hasOutgoingConnection;
   const runStatus = ctx?.getNodeStatus(id) ?? "initial";
+  const configured = isNodeConfigured("webhookTrigger", data);
 
   return (
     <div
@@ -731,6 +777,7 @@ function WebhookTriggerNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
         <div className="relative flex h-[94px] w-[94px] items-center justify-center rounded-[24px] border border-[#3a3a3a] bg-[#1f1f1f] shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
           <NodeStatusBorder status={runStatus} />
           <WebhookIcon className="size-11 text-[#8a8a8a] stroke-[1.8]" />
+          <NodeConfigIndicator configured={configured} runStatus={runStatus} />
           <Handle
             type="source"
             position={Position.Right}
@@ -770,6 +817,7 @@ function ScheduleTriggerNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
   );
   const showAddAffordance = !isConnectingFromThisNode && !hasOutgoingConnection;
   const runStatus = ctx?.getNodeStatus(id) ?? "initial";
+  const configured = isNodeConfigured("scheduleTrigger", data);
 
   return (
     <div
@@ -781,6 +829,7 @@ function ScheduleTriggerNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
         <div className="relative flex h-[94px] w-[94px] items-center justify-center rounded-[24px] border border-[#3a3a3a] bg-[#1f1f1f] shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
           <NodeStatusBorder status={runStatus} />
           <CalendarClockIcon className="size-11 text-[#8a8a8a] stroke-[1.8]" />
+          <NodeConfigIndicator configured={configured} runStatus={runStatus} />
           <Handle
             type="source"
             position={Position.Right}
@@ -820,6 +869,7 @@ function HttpRequestNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
   );
   const showAddAffordance = !isConnectingFromThisNode && !hasOutgoingConnection;
   const runStatus = ctx?.getNodeStatus(id) ?? "initial";
+  const configured = isNodeConfigured("httpRequest", data);
 
   return (
     <div
@@ -831,6 +881,7 @@ function HttpRequestNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
         <div className="relative flex h-[94px] w-[94px] items-center justify-center rounded-[24px] border border-[#3a3a3a] bg-[#1f1f1f] shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
           <NodeStatusBorder status={runStatus} />
           <GlobeIcon className="size-11 text-[#8a8a8a] stroke-[1.8]" />
+          <NodeConfigIndicator configured={configured} runStatus={runStatus} />
 
           <Handle
             type="target"
@@ -878,6 +929,7 @@ function GeminiExecutionNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
   );
   const showAddAffordance = !isConnectingFromThisNode && !hasOutgoingConnection;
   const runStatus = ctx?.getNodeStatus(id) ?? "initial";
+  const configured = isNodeConfigured("geminiExecution", data);
 
   return (
     <div
@@ -889,6 +941,7 @@ function GeminiExecutionNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
         <div className="relative flex h-[94px] w-[94px] items-center justify-center rounded-[24px] border border-[#3a3a3a] bg-[#1f1f1f] shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
           <NodeStatusBorder status={runStatus} />
           <GeminiLogoIcon className="h-11 w-11" />
+          <NodeConfigIndicator configured={configured} runStatus={runStatus} />
           <Handle
             type="target"
             position={Position.Left}
@@ -933,6 +986,7 @@ function ChatGptExecutionNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
   );
   const showAddAffordance = !isConnectingFromThisNode && !hasOutgoingConnection;
   const runStatus = ctx?.getNodeStatus(id) ?? "initial";
+  const configured = isNodeConfigured("chatGptExecution", data);
 
   return (
     <div
@@ -944,6 +998,7 @@ function ChatGptExecutionNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
         <div className="relative flex h-[94px] w-[94px] items-center justify-center rounded-[24px] border border-[#3a3a3a] bg-[#1f1f1f] shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
           <NodeStatusBorder status={runStatus} />
           <OpenAiLogoIcon className="h-11 w-11" />
+          <NodeConfigIndicator configured={configured} runStatus={runStatus} />
           <Handle
             type="target"
             position={Position.Left}
@@ -988,6 +1043,7 @@ function AnthropicExecutionNode({ id, data }: NodeProps<Node<WorkflowNodeData>>)
   );
   const showAddAffordance = !isConnectingFromThisNode && !hasOutgoingConnection;
   const runStatus = ctx?.getNodeStatus(id) ?? "initial";
+  const configured = isNodeConfigured("anthropicExecution", data);
 
   return (
     <div
@@ -999,6 +1055,7 @@ function AnthropicExecutionNode({ id, data }: NodeProps<Node<WorkflowNodeData>>)
         <div className="relative flex h-[94px] w-[94px] items-center justify-center rounded-[24px] border border-[#3a3a3a] bg-[#1f1f1f] shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
           <NodeStatusBorder status={runStatus} />
           <AnthropicLogoIcon className="h-11 w-11" />
+          <NodeConfigIndicator configured={configured} runStatus={runStatus} />
           <Handle
             type="target"
             position={Position.Left}
@@ -1043,6 +1100,7 @@ function TavilyExecutionNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
   );
   const showAddAffordance = !isConnectingFromThisNode && !hasOutgoingConnection;
   const runStatus = ctx?.getNodeStatus(id) ?? "initial";
+  const configured = isNodeConfigured("tavilyExecution", data);
 
   return (
     <div
@@ -1054,6 +1112,7 @@ function TavilyExecutionNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
         <div className="relative flex h-[94px] w-[94px] items-center justify-center rounded-[24px] border border-[#3a3a3a] bg-[#1f1f1f] shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
           <NodeStatusBorder status={runStatus} />
           <TavilyLogoIcon className="h-11 w-11" />
+          <NodeConfigIndicator configured={configured} runStatus={runStatus} />
           <Handle
             type="target"
             position={Position.Left}
@@ -1220,7 +1279,7 @@ export function WorkflowEditor({
     method: "GET",
     url: "",
     inputSample: '{\n  "key": "value"\n}',
-    outputSample: '{\n  "status": "ok"\n}',
+    outputSample: "",
   });
   const [leftPaneWidth, setLeftPaneWidth] = React.useState(0.3);
   const [centerPaneWidth, setCenterPaneWidth] = React.useState(0.4);
@@ -1452,6 +1511,161 @@ export function WorkflowEditor({
     }
     return nodeEditor.outputSample || "";
   }, [nodeEditor.outputSample, parsedOutput]);
+  const hasAnyOutput = React.useMemo(
+    () => (nodeEditor.outputSample?.trim()?.length ?? 0) > 0,
+    [nodeEditor.outputSample]
+  );
+
+  const executeWorkflowNow = async () => {
+    setIsExecuting(true);
+    const now = new Date().toLocaleTimeString();
+    setLastExecutedAt(now);
+    setExecutionStatuses([]);
+    const initialStatuses: Record<string, NodeRunStatus> = {};
+    for (const node of nodes) {
+      initialStatuses[node.id] = "initial";
+    }
+    const manualNode = nodes.find((n) => n.type === "manualTrigger");
+    if (manualNode) {
+      initialStatuses[manualNode.id] = "loading";
+    }
+    setNodeStatuses(initialStatuses);
+    try {
+      if (onExecuteWorkflow) {
+        const toNodeRunStatus = (
+          status: "running" | "success" | "error" | "skipped"
+        ): NodeRunStatus =>
+          status === "success"
+            ? "success"
+            : status === "error"
+              ? "error"
+              : status === "running"
+                ? "loading"
+                : "initial";
+        const streamedStatuses: Array<{
+          nodeId: string;
+          label: string;
+          status: "running" | "success" | "error" | "skipped";
+          message?: string;
+          statusCode?: number;
+          output?: string;
+        }> = [];
+        const result = await onExecuteWorkflow((status) => {
+          streamedStatuses.push(status);
+          setExecutionStatuses([...streamedStatuses]);
+
+          setNodeStatuses((current) => {
+            const next = { ...current };
+            if (status.status === "running") {
+              for (const nodeId of Object.keys(next)) {
+                if (next[nodeId] === "loading" && nodeId !== status.nodeId) {
+                  next[nodeId] = "success";
+                }
+              }
+            }
+            next[status.nodeId] = toNodeRunStatus(status.status);
+            return next;
+          });
+
+          if (status.output) {
+            setNodes((currentNodes) =>
+              currentNodes.map((node) =>
+                node.id === status.nodeId
+                  ? {
+                      ...node,
+                      data: {
+                        ...(node.data as WorkflowNodeData),
+                        outputSample: status.output ?? "",
+                      },
+                    }
+                  : node
+              )
+            );
+            setNodeEditor((currentEditor) =>
+              currentEditor.nodeId === status.nodeId
+                ? {
+                    ...currentEditor,
+                    outputSample: status.output ?? "",
+                  }
+                : currentEditor
+            );
+          }
+        });
+        const finalStatuses = result?.statuses?.length
+          ? result.statuses
+          : streamedStatuses;
+        setExecutionStatuses(finalStatuses);
+        if (finalStatuses.length) {
+          const mapped: Record<string, NodeRunStatus> = { ...initialStatuses };
+
+          for (const item of finalStatuses) {
+            mapped[item.nodeId] = toNodeRunStatus(item.status);
+            if (item.output) {
+              setNodes((currentNodes) =>
+                currentNodes.map((node) =>
+                  node.id === item.nodeId
+                    ? {
+                        ...node,
+                        data: {
+                          ...(node.data as WorkflowNodeData),
+                          outputSample: item.output ?? "",
+                        },
+                      }
+                    : node
+                )
+              );
+              setNodeEditor((currentEditor) =>
+                currentEditor.nodeId === item.nodeId
+                  ? {
+                      ...currentEditor,
+                      outputSample: item.output ?? "",
+                    }
+                  : currentEditor
+              );
+            }
+          }
+          setNodeStatuses(mapped);
+        } else {
+          setNodeStatuses(() => {
+            const fallbackStatuses = { ...initialStatuses };
+            if (manualNode) {
+              fallbackStatuses[manualNode.id] = "error";
+            }
+            return fallbackStatuses;
+          });
+          if (manualNode) {
+            setExecutionStatuses([
+              {
+                nodeId: manualNode.id,
+                label: (manualNode.data as WorkflowNodeData)?.label || "Manual Trigger",
+                status: "error",
+                message: "Execution stream ended before node updates were received.",
+              },
+            ]);
+          }
+        }
+      } else {
+        setExecutionStatuses([
+          {
+            nodeId: "manual",
+            label: "Manual Trigger",
+            status: "success",
+            message: "Executed locally",
+          },
+        ]);
+        if (manualNode) {
+          setNodeStatuses({
+            ...initialStatuses,
+            [manualNode.id]: "success",
+          });
+        } else {
+          setNodeStatuses(initialStatuses);
+        }
+      }
+    } finally {
+      setIsExecuting(false);
+    }
+  };
 
   return (
     <SelectorContext.Provider
@@ -1474,7 +1688,7 @@ export function WorkflowEditor({
             method: data.method || "GET",
             url: data.url || "",
             inputSample: data.inputSample || '{\n  "key": "value"\n}',
-            outputSample: data.outputSample || '{\n  "status": "ok"\n}',
+            outputSample: data.outputSample || "",
           });
         },
         getNodeStatus: (nodeId: string) => nodeStatuses[nodeId] ?? "initial",
@@ -1551,156 +1765,7 @@ export function WorkflowEditor({
               <div className="flex flex-col items-center gap-2">
                 <Button
                   disabled={isExecuting}
-                  onClick={async () => {
-                    setIsExecuting(true);
-                    const now = new Date().toLocaleTimeString();
-                    setLastExecutedAt(now);
-                    setExecutionStatuses([]);
-                    const initialStatuses: Record<string, NodeRunStatus> = {};
-                    for (const node of nodes) {
-                      initialStatuses[node.id] = "initial";
-                    }
-                    const manualNode = nodes.find((n) => n.type === "manualTrigger");
-                    if (manualNode) {
-                      initialStatuses[manualNode.id] = "loading";
-                    }
-                    setNodeStatuses(initialStatuses);
-                    try {
-                      if (onExecuteWorkflow) {
-                        const toNodeRunStatus = (
-                          status: "running" | "success" | "error" | "skipped"
-                        ): NodeRunStatus =>
-                          status === "success"
-                            ? "success"
-                            : status === "error"
-                              ? "error"
-                              : status === "running"
-                                ? "loading"
-                                : "initial";
-                        const streamedStatuses: Array<{
-                          nodeId: string;
-                          label: string;
-                          status: "running" | "success" | "error" | "skipped";
-                          message?: string;
-                          statusCode?: number;
-                          output?: string;
-                        }> = [];
-                        const result = await onExecuteWorkflow((status) => {
-                          streamedStatuses.push(status);
-                          setExecutionStatuses([...streamedStatuses]);
-
-                          setNodeStatuses((current) => {
-                            const next = { ...current };
-                            if (status.status === "running") {
-                              for (const nodeId of Object.keys(next)) {
-                                if (next[nodeId] === "loading" && nodeId !== status.nodeId) {
-                                  next[nodeId] = "success";
-                                }
-                              }
-                            }
-                            next[status.nodeId] = toNodeRunStatus(status.status);
-                            return next;
-                          });
-
-                          if (status.output) {
-                            setNodes((currentNodes) =>
-                              currentNodes.map((node) =>
-                                node.id === status.nodeId
-                                  ? {
-                                      ...node,
-                                      data: {
-                                        ...(node.data as WorkflowNodeData),
-                                        outputSample: status.output ?? "",
-                                      },
-                                    }
-                                  : node
-                              )
-                            );
-                            setNodeEditor((currentEditor) =>
-                              currentEditor.nodeId === status.nodeId
-                                ? {
-                                    ...currentEditor,
-                                    outputSample: status.output ?? "",
-                                  }
-                                : currentEditor
-                            );
-                          }
-                        });
-                        const finalStatuses = result?.statuses?.length
-                          ? result.statuses
-                          : streamedStatuses;
-                        setExecutionStatuses(finalStatuses);
-                        if (finalStatuses.length) {
-                          const mapped: Record<string, NodeRunStatus> = { ...initialStatuses };
-
-                          for (const item of finalStatuses) {
-                            mapped[item.nodeId] = toNodeRunStatus(item.status);
-                            if (item.output) {
-                              setNodes((currentNodes) =>
-                                currentNodes.map((node) =>
-                                  node.id === item.nodeId
-                                    ? {
-                                        ...node,
-                                        data: {
-                                          ...(node.data as WorkflowNodeData),
-                                          outputSample: item.output ?? "",
-                                        },
-                                      }
-                                    : node
-                                )
-                              );
-                              setNodeEditor((currentEditor) =>
-                                currentEditor.nodeId === item.nodeId
-                                  ? {
-                                      ...currentEditor,
-                                      outputSample: item.output ?? "",
-                                    }
-                                  : currentEditor
-                              );
-                            }
-                          }
-                          setNodeStatuses(mapped);
-                        } else {
-                          setNodeStatuses(() => {
-                            const fallbackStatuses = { ...initialStatuses };
-                            if (manualNode) {
-                              fallbackStatuses[manualNode.id] = "error";
-                            }
-                            return fallbackStatuses;
-                          });
-                          if (manualNode) {
-                            setExecutionStatuses([
-                              {
-                                nodeId: manualNode.id,
-                                label: (manualNode.data as WorkflowNodeData)?.label || "Manual Trigger",
-                                status: "error",
-                                message: "Execution stream ended before node updates were received.",
-                              },
-                            ]);
-                          }
-                        }
-                      } else {
-                        setExecutionStatuses([
-                          {
-                            nodeId: "manual",
-                            label: "Manual Trigger",
-                            status: "success",
-                            message: "Executed locally",
-                          },
-                        ]);
-                        if (manualNode) {
-                          setNodeStatuses({
-                            ...initialStatuses,
-                            [manualNode.id]: "success",
-                          });
-                        } else {
-                          setNodeStatuses(initialStatuses);
-                        }
-                      }
-                    } finally {
-                      setIsExecuting(false);
-                    }
-                  }}
+                  onClick={executeWorkflowNow}
                 >
                   {isExecuting ? "Running..." : "Execute workflow"}
                 </Button>
@@ -2003,7 +2068,13 @@ export function WorkflowEditor({
 
                     <div className="min-w-0 overflow-hidden p-4">
                       <div className="h-[calc(100%-22px)]">
-                        <OutputTabsPanel parsedOutput={parsedOutput} prettyJsonOutput={prettyJsonOutput} />
+                        <OutputTabsPanel
+                          parsedOutput={parsedOutput}
+                          prettyJsonOutput={prettyJsonOutput}
+                          hasOutput={hasAnyOutput}
+                          isExecuting={isExecuting}
+                          onExecuteStep={executeWorkflowNow}
+                        />
                       </div>
                     </div>
                   </div>

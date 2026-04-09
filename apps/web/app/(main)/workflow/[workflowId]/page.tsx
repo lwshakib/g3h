@@ -114,7 +114,19 @@ export default function WorkflowByIdPage({ params }: WorkflowPageProps) {
 
   const persistWorkflow = React.useCallback(
     async (payload: { nodes: Node[]; edges: Edge[] }) => {
-      pendingSaveRef.current = payload
+      const sanitizedNodes = payload.nodes.map((node) => {
+        const data = (node.data ?? {}) as Record<string, unknown>
+        const { inputSample: _inputSample, outputSample: _outputSample, ...restData } = data
+        return {
+          ...node,
+          data: restData,
+        }
+      })
+
+      pendingSaveRef.current = {
+        nodes: sanitizedNodes,
+        edges: payload.edges,
+      }
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
       saveTimerRef.current = setTimeout(() => {
         void flushPersist()
