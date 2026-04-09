@@ -76,8 +76,52 @@ function TavilyLogoIcon({ className }: { className?: string }) {
 function deleteNodeAndConnections(
   nodeId: string,
   setNodes: ReturnType<typeof useReactFlow>["setNodes"],
-  setEdges: ReturnType<typeof useReactFlow>["setEdges"]
+  setEdges: ReturnType<typeof useReactFlow>["setEdges"],
+  getNodes: ReturnType<typeof useReactFlow>["getNodes"]
 ) {
+  setEdges((currentEdges: Edge[]) => {
+    const currentNodes = getNodes();
+    const incomingEdges = currentEdges.filter((edge) => edge.target === nodeId);
+    const outgoingEdges = currentEdges.filter((edge) => edge.source === nodeId);
+
+    const remainingEdges = currentEdges.filter(
+      (edge) => edge.source !== nodeId && edge.target !== nodeId
+    );
+
+    // Bridge previous and next nodes when a middle node is removed.
+    const bridgeEdges: Edge[] = [];
+    for (const incoming of incomingEdges) {
+      for (const outgoing of outgoingEdges) {
+        if (!incoming.source || !outgoing.target) continue;
+        if (incoming.source === outgoing.target) continue;
+
+        const sourceExists = currentNodes.some((node) => node.id === incoming.source);
+        const targetExists = currentNodes.some((node) => node.id === outgoing.target);
+        if (!sourceExists || !targetExists) continue;
+
+        const alreadyExists =
+          remainingEdges.some(
+            (edge) => edge.source === incoming.source && edge.target === outgoing.target
+          ) ||
+          bridgeEdges.some(
+            (edge) => edge.source === incoming.source && edge.target === outgoing.target
+          );
+
+        if (!alreadyExists) {
+          bridgeEdges.push({
+            id: `e-${incoming.source}-${outgoing.target}`,
+            source: incoming.source,
+            target: outgoing.target,
+            type: EDGE_TYPE,
+            style: { stroke: "#8b8b8b", strokeWidth: 1.5 },
+          });
+        }
+      }
+    }
+
+    return [...remainingEdges, ...bridgeEdges];
+  });
+
   setNodes((currentNodes: Node[]) => {
     const remainingNodes = currentNodes.filter((node) => node.id !== nodeId);
     const hasWorkflowNodes = remainingNodes.some((node) => node.type !== "initialPlus");
@@ -95,10 +139,6 @@ function deleteNodeAndConnections(
 
     return remainingNodes;
   });
-
-  setEdges((currentEdges: Edge[]) =>
-    currentEdges.filter((edge) => edge.source !== nodeId && edge.target !== nodeId)
-  );
 }
 
 const SelectorContext = React.createContext<{
@@ -260,7 +300,7 @@ function InitialPlusNode() {
 }
 
 function ManualTriggerNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
-  const { setNodes, setEdges } = useReactFlow();
+  const { setNodes, setEdges, getNodes } = useReactFlow();
   const ctx = React.useContext(SelectorContext);
   const isConnectingFromThisNode = ctx?.connectingFromNodeId === id;
   const edges = useStore((state) => state.edges);
@@ -272,7 +312,7 @@ function ManualTriggerNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
 
   return (
     <div className="group/node relative w-[244px]">
-      <NodeTopToolbar onDelete={() => deleteNodeAndConnections(id, setNodes, setEdges)} />
+      <NodeTopToolbar onDelete={() => deleteNodeAndConnections(id, setNodes, setEdges, getNodes)} />
       <div className="flex items-center justify-center">
         <div className="relative flex h-[94px] w-[94px] items-center justify-center rounded-[24px] border border-[#3a3a3a] bg-[#1f1f1f] shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
           <MousePointerIcon className="size-11 text-[#8a8a8a] stroke-[1.8]" />
@@ -310,7 +350,7 @@ function ManualTriggerNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
 }
 
 function WebhookTriggerNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
-  const { setNodes, setEdges } = useReactFlow();
+  const { setNodes, setEdges, getNodes } = useReactFlow();
   const ctx = React.useContext(SelectorContext);
   const isConnectingFromThisNode = ctx?.connectingFromNodeId === id;
   const edges = useStore((state) => state.edges);
@@ -322,7 +362,7 @@ function WebhookTriggerNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
 
   return (
     <div className="group/node relative w-[244px]">
-      <NodeTopToolbar onDelete={() => deleteNodeAndConnections(id, setNodes, setEdges)} />
+      <NodeTopToolbar onDelete={() => deleteNodeAndConnections(id, setNodes, setEdges, getNodes)} />
       <div className="flex items-center justify-center">
         <div className="relative flex h-[94px] w-[94px] items-center justify-center rounded-[24px] border border-[#3a3a3a] bg-[#1f1f1f] shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
           <WebhookIcon className="size-11 text-[#8a8a8a] stroke-[1.8]" />
@@ -355,7 +395,7 @@ function WebhookTriggerNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
 }
 
 function ScheduleTriggerNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
-  const { setNodes, setEdges } = useReactFlow();
+  const { setNodes, setEdges, getNodes } = useReactFlow();
   const ctx = React.useContext(SelectorContext);
   const isConnectingFromThisNode = ctx?.connectingFromNodeId === id;
   const edges = useStore((state) => state.edges);
@@ -367,7 +407,7 @@ function ScheduleTriggerNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
 
   return (
     <div className="group/node relative w-[244px]">
-      <NodeTopToolbar onDelete={() => deleteNodeAndConnections(id, setNodes, setEdges)} />
+      <NodeTopToolbar onDelete={() => deleteNodeAndConnections(id, setNodes, setEdges, getNodes)} />
       <div className="flex items-center justify-center">
         <div className="relative flex h-[94px] w-[94px] items-center justify-center rounded-[24px] border border-[#3a3a3a] bg-[#1f1f1f] shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
           <CalendarClockIcon className="size-11 text-[#8a8a8a] stroke-[1.8]" />
@@ -400,7 +440,7 @@ function ScheduleTriggerNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
 }
 
 function HttpRequestNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
-  const { setNodes, setEdges } = useReactFlow();
+  const { setNodes, setEdges, getNodes } = useReactFlow();
   const ctx = React.useContext(SelectorContext);
   const isConnectingFromThisNode = ctx?.connectingFromNodeId === id;
   const edges = useStore((state) => state.edges);
@@ -412,7 +452,7 @@ function HttpRequestNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
 
   return (
     <div className="group/node relative w-[244px]">
-      <NodeTopToolbar onDelete={() => deleteNodeAndConnections(id, setNodes, setEdges)} />
+      <NodeTopToolbar onDelete={() => deleteNodeAndConnections(id, setNodes, setEdges, getNodes)} />
       <div className="flex items-center justify-center">
         <div className="relative flex h-[94px] w-[94px] items-center justify-center rounded-[24px] border border-[#3a3a3a] bg-[#1f1f1f] shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
           <GlobeIcon className="size-11 text-[#8a8a8a] stroke-[1.8]" />
@@ -453,7 +493,7 @@ function HttpRequestNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
 }
 
 function GeminiExecutionNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
-  const { setNodes, setEdges } = useReactFlow();
+  const { setNodes, setEdges, getNodes } = useReactFlow();
   const ctx = React.useContext(SelectorContext);
   const isConnectingFromThisNode = ctx?.connectingFromNodeId === id;
   const edges = useStore((state) => state.edges);
@@ -465,7 +505,7 @@ function GeminiExecutionNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
 
   return (
     <div className="group/node relative w-[244px]">
-      <NodeTopToolbar onDelete={() => deleteNodeAndConnections(id, setNodes, setEdges)} />
+      <NodeTopToolbar onDelete={() => deleteNodeAndConnections(id, setNodes, setEdges, getNodes)} />
       <div className="flex items-center justify-center">
         <div className="relative flex h-[94px] w-[94px] items-center justify-center rounded-[24px] border border-[#3a3a3a] bg-[#1f1f1f] shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
           <GeminiLogoIcon className="h-11 w-11" />
@@ -503,7 +543,7 @@ function GeminiExecutionNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
 }
 
 function ChatGptExecutionNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
-  const { setNodes, setEdges } = useReactFlow();
+  const { setNodes, setEdges, getNodes } = useReactFlow();
   const ctx = React.useContext(SelectorContext);
   const isConnectingFromThisNode = ctx?.connectingFromNodeId === id;
   const edges = useStore((state) => state.edges);
@@ -515,7 +555,7 @@ function ChatGptExecutionNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
 
   return (
     <div className="group/node relative w-[244px]">
-      <NodeTopToolbar onDelete={() => deleteNodeAndConnections(id, setNodes, setEdges)} />
+      <NodeTopToolbar onDelete={() => deleteNodeAndConnections(id, setNodes, setEdges, getNodes)} />
       <div className="flex items-center justify-center">
         <div className="relative flex h-[94px] w-[94px] items-center justify-center rounded-[24px] border border-[#3a3a3a] bg-[#1f1f1f] shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
           <OpenAiLogoIcon className="h-11 w-11" />
@@ -553,7 +593,7 @@ function ChatGptExecutionNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
 }
 
 function AnthropicExecutionNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
-  const { setNodes, setEdges } = useReactFlow();
+  const { setNodes, setEdges, getNodes } = useReactFlow();
   const ctx = React.useContext(SelectorContext);
   const isConnectingFromThisNode = ctx?.connectingFromNodeId === id;
   const edges = useStore((state) => state.edges);
@@ -565,7 +605,7 @@ function AnthropicExecutionNode({ id, data }: NodeProps<Node<WorkflowNodeData>>)
 
   return (
     <div className="group/node relative w-[244px]">
-      <NodeTopToolbar onDelete={() => deleteNodeAndConnections(id, setNodes, setEdges)} />
+      <NodeTopToolbar onDelete={() => deleteNodeAndConnections(id, setNodes, setEdges, getNodes)} />
       <div className="flex items-center justify-center">
         <div className="relative flex h-[94px] w-[94px] items-center justify-center rounded-[24px] border border-[#3a3a3a] bg-[#1f1f1f] shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
           <AnthropicLogoIcon className="h-11 w-11" />
@@ -603,7 +643,7 @@ function AnthropicExecutionNode({ id, data }: NodeProps<Node<WorkflowNodeData>>)
 }
 
 function TavilyExecutionNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
-  const { setNodes, setEdges } = useReactFlow();
+  const { setNodes, setEdges, getNodes } = useReactFlow();
   const ctx = React.useContext(SelectorContext);
   const isConnectingFromThisNode = ctx?.connectingFromNodeId === id;
   const edges = useStore((state) => state.edges);
@@ -615,7 +655,7 @@ function TavilyExecutionNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
 
   return (
     <div className="group/node relative w-[244px]">
-      <NodeTopToolbar onDelete={() => deleteNodeAndConnections(id, setNodes, setEdges)} />
+      <NodeTopToolbar onDelete={() => deleteNodeAndConnections(id, setNodes, setEdges, getNodes)} />
       <div className="flex items-center justify-center">
         <div className="relative flex h-[94px] w-[94px] items-center justify-center rounded-[24px] border border-[#3a3a3a] bg-[#1f1f1f] shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
           <TavilyLogoIcon className="h-11 w-11" />
