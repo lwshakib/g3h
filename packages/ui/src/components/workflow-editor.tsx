@@ -42,6 +42,7 @@ import {
   PlusIcon,
   PowerIcon,
   Loader2Icon,
+  CircleXIcon,
   SearchIcon,
   Settings2Icon,
   SparklesIcon,
@@ -133,6 +134,15 @@ function NodeConfigIndicator({
     return (
       <CheckCircle2Icon
         className="pointer-events-none absolute bottom-2 right-2 z-30 h-4 w-4 text-emerald-500"
+        aria-hidden="true"
+      />
+    );
+  }
+
+  if (runStatus === "error") {
+    return (
+      <CircleXIcon
+        className="pointer-events-none absolute bottom-2 right-2 z-30 h-4 w-4 text-red-500"
         aria-hidden="true"
       />
     );
@@ -580,6 +590,7 @@ function ButtonEdge({
   id,
   source,
   target,
+  style,
   sourceX,
   sourceY,
   targetX,
@@ -605,7 +616,7 @@ function ButtonEdge({
 
   return (
     <>
-      <BaseEdge id={id} path={edgePath} />
+      <BaseEdge id={id} path={edgePath} style={style} />
       <path
         d={edgePath}
         fill="none"
@@ -1335,6 +1346,30 @@ export function WorkflowEditor({
     []
   );
   const edgeTypes = React.useMemo(() => ({ [EDGE_TYPE]: ButtonEdge }), []);
+  const displayEdges = React.useMemo(
+    () =>
+      edges.map((edge) => {
+        const targetStatus = nodeStatuses[edge.target];
+        const statusStroke =
+          targetStatus === "success"
+            ? "#10b981"
+            : targetStatus === "error"
+              ? "#ef4444"
+              : targetStatus === "loading"
+                ? "#2a43e9"
+                : "#8b8b8b";
+
+        return {
+          ...edge,
+          style: {
+            ...(edge.style ?? {}),
+            stroke: statusStroke,
+            strokeWidth: targetStatus && targetStatus !== "initial" ? 2 : 1.5,
+          },
+        };
+      }),
+    [edges, nodeStatuses]
+  );
 
   React.useEffect(() => {
     setMounted(true);
@@ -1763,7 +1798,7 @@ export function WorkflowEditor({
           key={colorMode ?? "pending-theme"}
           colorMode={colorMode}
           nodes={nodes}
-          edges={edges}
+          edges={displayEdges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
