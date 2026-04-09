@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/create-next-app).
+<p align="left">
+  <img src="public/logo.svg" alt="Axonix Logo" width="40" height="40" style="margin-right: 12px; vertical-align: middle;">
+  <h1 style="display: inline-block; vertical-align: middle; margin: 0;">Axonix Web Portal</h1>
+</p>
 
-## Getting Started
+This is the primary frontend for the Axonix ecosystem. It provides an intuitive, high-performance interface for building, managing, and monitoring agentic workflows.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🔥 Key Features
+
+- **Visual Workflow Builder**: A drag-and-drop editor powered by `@xyflow/react` for designing complex node-based logic.
+- **Real-time Monitoring**: Live status updates for workflow executions using Server-Sent Events (SSE).
+- **Authentication**: Secure sign-in/up flows with Google and GitHub OAuth integration.
+- **Environment Management**: Interface for managing project variables and credentials.
+- **Responsive Settings**: Personalized user profiles and application settings.
+
+## 🛠️ Tech Stack
+
+- **Framework**: [Next.js](https://nextjs.org/) (App Router)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Components**: [Radix UI](https://www.radix-ui.com/) & [Shadcn UI](https://ui.shadcn.com/)
+- **State & Logic**: [React](https://react.dev/), [Lucide Icons](https://lucide.dev/)
+- **Flow Engine**: [@xyflow/react](https://reactflow.dev/)
+
+---
+
+## 🚀 Getting Started
+
+### 1. Environment Configuration
+Create a `.env` file in this directory based on [`.env.example`](file:///d:/axonix/apps/web/.env.example):
+
+```env
+NEXT_PUBLIC_BASE_URL=http://localhost:3000
+NEXT_PUBLIC_API_URL=http://localhost:8080/api/v1
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Development
+From the root of the monorepo, run:
+```bash
+pnpm run dev --filter web
+```
+Or run directly from this directory:
+```bash
+pnpm dev
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The application will be available at [http://localhost:3000](http://localhost:3000).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load Inter, a custom Google Font.
+---
 
-## Learn More
+## 📁 Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+- `app/`: Next.js App Router pages and layouts.
+  - `(auth)/`: Authentication routes (Sign-in, Sign-up, Verification).
+  - `(main)/`: Core application routes (Home, Workflows, Settings).
+- `components/`: Local UI components specific to the web portal.
+- `lib/`: Utility functions and services (e.g., `auth-client.ts`).
+- `public/`: Static assets including the project logo and icons.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📄 License
+Maintained by **lwshakib**.

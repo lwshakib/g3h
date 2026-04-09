@@ -13,6 +13,27 @@ Developed by **[lwshakib](https://github.com/lwshakib)**.
 
 Axonix is organized as a monorepo, ensuring high modularity and shared logic across the entire ecosystem.
 
+```mermaid
+graph TD
+    subgraph Applications
+        Web[apps/web<br/>Next.js Portal]
+        Server[apps/server<br/>Express Engine]
+        Docs[apps/docs<br/>Documentation]
+    end
+
+    subgraph Packages
+        UI[packages/ui<br/>Shared Components]
+        Config[packages/*-config<br/>Standardized Configs]
+    end
+
+    DB[(PostgreSQL<br/>Neon)]
+
+    Web <--> Server
+    Server <--> DB
+    Web --- UI
+    Server --- External[External APIs<br/>OAuth / Resend]
+```
+
 ### 📱 Applications
 - **[web](file:///d:/axonix/apps/web)**: The primary frontend built with Next.js (App Router). Features a visual workflow builder, authentication dashboards, and real-time execution monitoring.
 - **[server](file:///d:/axonix/apps/server)**: The core backend engine using Node.js/Express. It handles authentication, data persistence (Postgres), and the workflow execution sequence.
