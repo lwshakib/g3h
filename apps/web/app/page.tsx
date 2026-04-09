@@ -25,6 +25,7 @@ import {
   Link as LinkIcon,
   ArrowRight
 } from "lucide-react";
+import { Logo } from "@/components/Logo";
 
 export default function LandingPage() {
   const scrollProgressRef = useRef<HTMLDivElement>(null);
@@ -115,8 +116,8 @@ export default function LandingPage() {
       <nav className="fixed top-0 left-0 z-50 w-full bg-black/80 backdrop-blur-xl border-b border-white/5">
         <div className="md:px-10 lg:px-16 flex md:h-20 w-full h-16 pr-6 pl-6 items-center">
           <div className="flex items-center gap-4">
-            <div className="w-2 h-2 bg-cyan-500 animate-pulse"></div>
-            <a href="#home" className="font-orbitron text-sm md:text-base tracking-[0.08em] text-white/90 hover:text-cyan-400 transition-colors">Axonix Agent Automation</a>
+            <Logo className="w-8 h-8 text-cyan-500" />
+            <a href="#home" className="font-orbitron text-sm md:text-base tracking-[0.08em] text-white/90 hover:text-cyan-400 transition-colors">Axonix</a>
           </div>
 
           <div className="ml-auto flex items-center gap-6 md:gap-10">
@@ -126,7 +127,7 @@ export default function LandingPage() {
               <a href="#licensing" className="text-xs font-orbitron tracking-[0.08em] text-neutral-500 hover:text-cyan-400 transition-colors">Pricing</a>
             </div>
 
-            <a href="#contact" className="font-orbitron text-xs tracking-[0.08em] border border-cyan-500/30 text-cyan-400 bg-cyan-500/5 px-6 py-2.5 md:py-3 transition-all duration-300 relative group overflow-hidden rounded-none inline-flex items-center justify-center">
+            <a href="/home/workflows" className="font-orbitron text-xs tracking-[0.08em] border border-cyan-500/30 text-cyan-400 bg-cyan-500/5 px-6 py-2.5 md:py-3 transition-all duration-300 relative group overflow-hidden rounded-none inline-flex items-center justify-center">
               <div className="absolute inset-0 w-full h-full bg-cyan-400 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-0"></div>
               <span className="relative z-10 group-hover:text-black transition-colors duration-300">Get started</span>
             </a>
@@ -156,13 +157,13 @@ export default function LandingPage() {
             </p>
 
             <div className="mt-8 flex flex-col sm:flex-row items-start gap-4 pointer-events-auto">
-              <a href="#contact" className="group relative inline-flex items-center gap-3 border border-cyan-400 bg-cyan-400/10 text-cyan-400 font-orbitron font-normal text-xs tracking-[0.08em] px-6 py-3 transition-all duration-300 hover:bg-cyan-400 hover:text-black hover:shadow-[0_0_40px_rgba(0,255,255,0.4)] rounded-none">
+              <a href="/home/workflows" className="group relative inline-flex items-center gap-3 border border-cyan-400 bg-cyan-400/10 text-cyan-400 font-orbitron font-normal text-xs tracking-[0.08em] px-6 py-3 transition-all duration-300 hover:bg-cyan-400 hover:text-black hover:shadow-[0_0_40px_rgba(0,255,255,0.4)] rounded-none">
                 <span>Start building</span>
                 <ArrowRight className="w-4 h-4" />
                 <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-white/50 group-hover:border-black/50"></div>
                 <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-white/50 group-hover:border-black/50"></div>
               </a>
-              <a href="#experiments" className="group relative inline-flex items-center gap-3 border border-white/10 bg-transparent text-white font-orbitron font-normal text-xs tracking-[0.08em] px-6 py-3 transition-all duration-300 hover:border-white/30 hover:bg-white/5 rounded-none">
+              <a href="/home/workflows" className="group relative inline-flex items-center gap-3 border border-white/10 bg-transparent text-white font-orbitron font-normal text-xs tracking-[0.08em] px-6 py-3 transition-all duration-300 hover:border-white/30 hover:bg-white/5 rounded-none">
                 <span>Explore workflows</span>
                 <Radar className="w-4 h-4" />
               </a>
@@ -780,8 +781,8 @@ export default function LandingPage() {
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
             <div>
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-2 h-2 bg-cyan-500 animate-pulse"></div>
-                <span className="font-orbitron text-sm md:text-base tracking-[0.08em] text-white/90">Axonix Agent Automation</span>
+                <Logo className="w-8 h-8 text-cyan-500" />
+                <span className="font-orbitron text-sm md:text-base tracking-[0.08em] text-white/90">Axonix</span>
               </div>
               <p className="text-xs text-neutral-500 font-mono">Design workflows. Connect agents. Run automation.</p>
             </div>
