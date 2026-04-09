@@ -107,6 +107,28 @@ type WorkflowNodeData = {
     value: string;
     valueType?: "fixed" | "expression";
   }>;
+  sendHeaders?: boolean;
+  headersMode?: "fields" | "json";
+  headersSpecifierType?: "fixed" | "expression";
+  headersJson?: string;
+  headersJsonType?: "fixed" | "expression";
+  headers?: Array<{
+    id: string;
+    name: string;
+    value: string;
+    valueType?: "fixed" | "expression";
+  }>;
+  sendBody?: boolean;
+  bodyMode?: "fields" | "json";
+  bodySpecifierType?: "fixed" | "expression";
+  bodyJson?: string;
+  bodyJsonType?: "fixed" | "expression";
+  bodyFields?: Array<{
+    id: string;
+    name: string;
+    value: string;
+    valueType?: "fixed" | "expression";
+  }>;
 };
 
 type NodeRunStatus = "initial" | "loading" | "success" | "error";
@@ -126,6 +148,25 @@ const getUnconfiguredNodes = (workflowNodes: Node[]): Node[] =>
     if (!node.type || node.type === "initialPlus") return false;
     return !isNodeConfigured(node.type, (node.data ?? {}) as WorkflowNodeData);
   });
+
+const getExpressionPaths = (value: unknown, prefix = ""): string[] => {
+  if (value === null || value === undefined) return [];
+  if (Array.isArray(value)) {
+    if (value.length === 0) return [prefix || "items"];
+    return getExpressionPaths(value[0], prefix ? `${prefix}[0]` : "[0]");
+  }
+  if (typeof value === "object") {
+    const entries = Object.entries(value as Record<string, unknown>);
+    if (entries.length === 0) return [prefix || "object"];
+    return entries.flatMap(([key, child]) =>
+      getExpressionPaths(child, prefix ? `${prefix}.${key}` : key)
+    );
+  }
+  return [prefix || "value"];
+};
+
+const appendExpression = (current: string, path: string): string =>
+  `${current}${current.trim().length ? " " : ""}{{ $json.${path} }}`;
 
 function NodeConfigIndicator({
   configured,
@@ -1436,6 +1477,28 @@ export function WorkflowEditor({
       value: string;
       valueType: "fixed" | "expression";
     }>;
+    sendHeaders: boolean;
+    headersMode: "fields" | "json";
+    headersSpecifierType: "fixed" | "expression";
+    headersJson: string;
+    headersJsonType: "fixed" | "expression";
+    headers: Array<{
+      id: string;
+      name: string;
+      value: string;
+      valueType: "fixed" | "expression";
+    }>;
+    sendBody: boolean;
+    bodyMode: "fields" | "json";
+    bodySpecifierType: "fixed" | "expression";
+    bodyJson: string;
+    bodyJsonType: "fixed" | "expression";
+    bodyFields: Array<{
+      id: string;
+      name: string;
+      value: string;
+      valueType: "fixed" | "expression";
+    }>;
   }>({
     isOpen: false,
     nodeId: null,
@@ -1454,6 +1517,32 @@ export function WorkflowEditor({
     queryParams: [
       {
         id: `qp-${Date.now()}`,
+        name: "",
+        value: "",
+        valueType: "fixed",
+      },
+    ],
+    sendHeaders: false,
+    headersMode: "fields",
+    headersSpecifierType: "fixed",
+    headersJson: "",
+    headersJsonType: "fixed",
+    headers: [
+      {
+        id: `hdr-${Date.now()}`,
+        name: "",
+        value: "",
+        valueType: "fixed",
+      },
+    ],
+    sendBody: false,
+    bodyMode: "json",
+    bodySpecifierType: "fixed",
+    bodyJson: "",
+    bodyJsonType: "fixed",
+    bodyFields: [
+      {
+        id: `body-${Date.now()}`,
         name: "",
         value: "",
         valueType: "fixed",
@@ -1745,6 +1834,10 @@ export function WorkflowEditor({
     () => previousNodeOutput.trim().length > 0,
     [previousNodeOutput]
   );
+  const expressionFieldPaths = React.useMemo(
+    () => getExpressionPaths(parsedPreviousOutput),
+    [parsedPreviousOutput]
+  );
 
   const executeWorkflowNow = async (targetNodeId?: string) => {
     const unconfiguredNodes = getUnconfiguredNodes(nodes);
@@ -1950,6 +2043,48 @@ export function WorkflowEditor({
                 : [
                     {
                       id: `qp-${Date.now()}`,
+                      name: "",
+                      value: "",
+                      valueType: "fixed",
+                    },
+                  ],
+            sendHeaders: Boolean(data.sendHeaders),
+            headersMode: data.headersMode === "json" ? "json" : "fields",
+            headersSpecifierType: data.headersSpecifierType === "expression" ? "expression" : "fixed",
+            headersJson: data.headersJson || "",
+            headersJsonType: data.headersJsonType === "expression" ? "expression" : "fixed",
+            headers:
+              data.headers && data.headers.length > 0
+                ? data.headers.map((item, index) => ({
+                    id: item.id || `hdr-${Date.now()}-${index}`,
+                    name: item.name || "",
+                    value: item.value || "",
+                    valueType: item.valueType === "expression" ? "expression" : "fixed",
+                  }))
+                : [
+                    {
+                      id: `hdr-${Date.now()}`,
+                      name: "",
+                      value: "",
+                      valueType: "fixed",
+                    },
+                  ],
+            sendBody: Boolean(data.sendBody),
+            bodyMode: data.bodyMode === "fields" ? "fields" : "json",
+            bodySpecifierType: data.bodySpecifierType === "expression" ? "expression" : "fixed",
+            bodyJson: data.bodyJson || "",
+            bodyJsonType: data.bodyJsonType === "expression" ? "expression" : "fixed",
+            bodyFields:
+              data.bodyFields && data.bodyFields.length > 0
+                ? data.bodyFields.map((item, index) => ({
+                    id: item.id || `body-${Date.now()}-${index}`,
+                    name: item.name || "",
+                    value: item.value || "",
+                    valueType: item.valueType === "expression" ? "expression" : "fixed",
+                  }))
+                : [
+                    {
+                      id: `body-${Date.now()}`,
                       name: "",
                       value: "",
                       valueType: "fixed",
@@ -2284,6 +2419,31 @@ export function WorkflowEditor({
                           />
                         </div>
                         <div className="rounded-md border border-border bg-card p-3">
+                          <p className="mb-2 text-xs font-medium text-foreground">Input Fields (drag for expression)</p>
+                          {expressionFieldPaths.length > 0 ? (
+                            <div className="flex flex-wrap gap-1.5">
+                              {expressionFieldPaths.map((path) => (
+                                <button
+                                  key={path}
+                                  type="button"
+                                  draggable
+                                  onDragStart={(event) => {
+                                    event.dataTransfer.setData("text/plain", path);
+                                  }}
+                                  className="rounded border border-border bg-background px-2 py-1 text-[11px] text-muted-foreground hover:text-foreground"
+                                  title={`{{ $json.${path} }}`}
+                                >
+                                  {path}
+                                </button>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-[11px] text-muted-foreground">
+                              No previous-node fields available yet. Run previous step first.
+                            </p>
+                          )}
+                        </div>
+                        <div className="rounded-md border border-border bg-card p-3">
                           <div className="mb-3 flex items-center justify-between">
                             <div className="flex items-center gap-2">
                               <Switch
@@ -2483,6 +2643,28 @@ export function WorkflowEditor({
                                         )
                                       );
                                     }}
+                                    onDragOver={(event) => event.preventDefault()}
+                                    onDrop={(event) => {
+                                      event.preventDefault();
+                                      const path = event.dataTransfer.getData("text/plain");
+                                      if (!path) return;
+                                      const nextValue = appendExpression(nodeEditor.queryParamsJson, path);
+                                      setNodeEditor((current) => ({ ...current, queryParamsJson: nextValue }));
+                                      if (!nodeEditor.nodeId) return;
+                                      setNodes((currentNodes) =>
+                                        currentNodes.map((node) =>
+                                          node.id === nodeEditor.nodeId
+                                            ? {
+                                                ...node,
+                                                data: {
+                                                  ...(node.data as WorkflowNodeData),
+                                                  queryParamsJson: nextValue,
+                                                },
+                                              }
+                                            : node
+                                        )
+                                      );
+                                    }}
                                     placeholder={`{\n  "page": "1",\n  "limit": "10"\n}`}
                                     className="h-24 w-full resize-none rounded-md border border-border bg-background p-2 font-mono text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary/50"
                                   />
@@ -2547,7 +2729,7 @@ export function WorkflowEditor({
                                               <button
                                                 type="button"
                                                 aria-label="Delete query parameter"
-                                                className="inline-flex h-6 w-6 items-center justify-center rounded border border-border text-muted-foreground opacity-0 transition-opacity hover:text-red-500 group-hover/param:opacity-100"
+                                                className="inline-flex h-6 w-6 items-center justify-center rounded border border-border text-muted-foreground opacity-0 transition-opacity hover:text-foreground group-hover/param:opacity-100"
                                                 onMouseDown={(event) => {
                                                   event.preventDefault();
                                                   event.stopPropagation();
@@ -2602,6 +2784,32 @@ export function WorkflowEditor({
                                                   onChange={(event) => {
                                                     const nextParams = nodeEditor.queryParams.map((item) =>
                                                       item.id === param.id ? { ...item, name: event.target.value } : item
+                                                    );
+                                                    setNodeEditor((current) => ({ ...current, queryParams: nextParams }));
+                                                    if (!nodeEditor.nodeId) return;
+                                                    setNodes((currentNodes) =>
+                                                      currentNodes.map((node) =>
+                                                        node.id === nodeEditor.nodeId
+                                                          ? {
+                                                              ...node,
+                                                              data: {
+                                                                ...(node.data as WorkflowNodeData),
+                                                                queryParams: nextParams,
+                                                              },
+                                                            }
+                                                          : node
+                                                      )
+                                                    );
+                                                  }}
+                                                  onDragOver={(event) => event.preventDefault()}
+                                                  onDrop={(event) => {
+                                                    event.preventDefault();
+                                                    const path = event.dataTransfer.getData("text/plain");
+                                                    if (!path) return;
+                                                    const nextParams = nodeEditor.queryParams.map((item) =>
+                                                      item.id === param.id
+                                                        ? { ...item, name: appendExpression(item.name, path) }
+                                                        : item
                                                     );
                                                     setNodeEditor((current) => ({ ...current, queryParams: nextParams }));
                                                     if (!nodeEditor.nodeId) return;
@@ -2710,6 +2918,32 @@ export function WorkflowEditor({
                                                       )
                                                     );
                                                   }}
+                                                  onDragOver={(event) => event.preventDefault()}
+                                                  onDrop={(event) => {
+                                                    event.preventDefault();
+                                                    const path = event.dataTransfer.getData("text/plain");
+                                                    if (!path) return;
+                                                    const nextParams = nodeEditor.queryParams.map((item) =>
+                                                      item.id === param.id
+                                                        ? { ...item, value: appendExpression(item.value, path) }
+                                                        : item
+                                                    );
+                                                    setNodeEditor((current) => ({ ...current, queryParams: nextParams }));
+                                                    if (!nodeEditor.nodeId) return;
+                                                    setNodes((currentNodes) =>
+                                                      currentNodes.map((node) =>
+                                                        node.id === nodeEditor.nodeId
+                                                          ? {
+                                                              ...node,
+                                                              data: {
+                                                                ...(node.data as WorkflowNodeData),
+                                                                queryParams: nextParams,
+                                                              },
+                                                            }
+                                                          : node
+                                                      )
+                                                    );
+                                                  }}
                                                   className="h-8 text-xs"
                                                 />
                                               </div>
@@ -2719,6 +2953,409 @@ export function WorkflowEditor({
                                       </Accordion>
                                     ))}
                                   </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                        <div className="rounded-md border border-border bg-card p-3">
+                          <div className="mb-3 flex items-center gap-2">
+                            <Switch
+                              checked={nodeEditor.sendHeaders}
+                              onCheckedChange={(checked) => {
+                                setNodeEditor((current) => ({ ...current, sendHeaders: checked }));
+                                if (!nodeEditor.nodeId) return;
+                                setNodes((currentNodes) =>
+                                  currentNodes.map((node) =>
+                                    node.id === nodeEditor.nodeId
+                                      ? {
+                                          ...node,
+                                          data: { ...(node.data as WorkflowNodeData), sendHeaders: checked },
+                                        }
+                                      : node
+                                  )
+                                );
+                              }}
+                            />
+                            <span className="text-sm font-medium text-foreground">Send Headers</span>
+                          </div>
+                          {nodeEditor.sendHeaders && (
+                            <div className="space-y-2">
+                              <div className="flex items-center justify-end">
+                                <div className="inline-flex items-center rounded-md border border-border bg-muted/30 p-0.5 text-[11px]">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setNodeEditor((current) => ({ ...current, headersSpecifierType: "fixed" }));
+                                      if (!nodeEditor.nodeId) return;
+                                      setNodes((currentNodes) =>
+                                        currentNodes.map((node) =>
+                                          node.id === nodeEditor.nodeId
+                                            ? { ...node, data: { ...(node.data as WorkflowNodeData), headersSpecifierType: "fixed" } }
+                                            : node
+                                        )
+                                      );
+                                    }}
+                                    className={`rounded px-2 py-0.5 ${nodeEditor.headersSpecifierType === "fixed" ? "bg-background text-foreground" : "text-muted-foreground"}`}
+                                  >
+                                    Fixed
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setNodeEditor((current) => ({ ...current, headersSpecifierType: "expression" }));
+                                      if (!nodeEditor.nodeId) return;
+                                      setNodes((currentNodes) =>
+                                        currentNodes.map((node) =>
+                                          node.id === nodeEditor.nodeId
+                                            ? { ...node, data: { ...(node.data as WorkflowNodeData), headersSpecifierType: "expression" } }
+                                            : node
+                                        )
+                                      );
+                                    }}
+                                    className={`rounded px-2 py-0.5 ${nodeEditor.headersSpecifierType === "expression" ? "bg-background text-foreground" : "text-muted-foreground"}`}
+                                  >
+                                    Expression
+                                  </button>
+                                </div>
+                              </div>
+                              <Select
+                                value={nodeEditor.headersMode}
+                                onValueChange={(value: "fields" | "json") => {
+                                  setNodeEditor((current) => ({ ...current, headersMode: value }));
+                                  if (!nodeEditor.nodeId) return;
+                                  setNodes((currentNodes) =>
+                                    currentNodes.map((node) =>
+                                      node.id === nodeEditor.nodeId
+                                        ? { ...node, data: { ...(node.data as WorkflowNodeData), headersMode: value } }
+                                        : node
+                                    )
+                                  );
+                                }}
+                              >
+                                <SelectTrigger className="h-9 w-full bg-background text-xs">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent className="z-[120]">
+                                  <SelectItem value="fields">Using Fields Below</SelectItem>
+                                  <SelectItem value="json">Using JSON</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              {nodeEditor.headersMode === "json" ? (
+                                <textarea
+                                  value={nodeEditor.headersJson}
+                                  onChange={(event) => {
+                                    const nextValue = event.target.value;
+                                    setNodeEditor((current) => ({ ...current, headersJson: nextValue }));
+                                    if (!nodeEditor.nodeId) return;
+                                    setNodes((currentNodes) =>
+                                      currentNodes.map((node) =>
+                                        node.id === nodeEditor.nodeId
+                                          ? { ...node, data: { ...(node.data as WorkflowNodeData), headersJson: nextValue } }
+                                          : node
+                                      )
+                                    );
+                                  }}
+                                  onDragOver={(event) => event.preventDefault()}
+                                  onDrop={(event) => {
+                                    event.preventDefault();
+                                    const path = event.dataTransfer.getData("text/plain");
+                                    if (!path) return;
+                                    const nextValue = appendExpression(nodeEditor.headersJson, path);
+                                    setNodeEditor((current) => ({ ...current, headersJson: nextValue }));
+                                    if (!nodeEditor.nodeId) return;
+                                    setNodes((currentNodes) =>
+                                      currentNodes.map((node) =>
+                                        node.id === nodeEditor.nodeId
+                                          ? { ...node, data: { ...(node.data as WorkflowNodeData), headersJson: nextValue } }
+                                          : node
+                                      )
+                                    );
+                                  }}
+                                  className="h-24 w-full resize-none rounded-md border border-border bg-background p-2 font-mono text-xs text-foreground"
+                                />
+                              ) : (
+                                <div className="space-y-2">
+                                  {nodeEditor.headers.map((header, index) => (
+                                    <div key={header.id} className="rounded-md border border-border p-2">
+                                      <p className="mb-1 text-xs text-muted-foreground">{header.name || `Header ${index + 1}`}</p>
+                                      <Input
+                                        value={header.name}
+                                        onChange={(event) => {
+                                          const nextHeaders = nodeEditor.headers.map((item) =>
+                                            item.id === header.id ? { ...item, name: event.target.value } : item
+                                          );
+                                          setNodeEditor((current) => ({ ...current, headers: nextHeaders }));
+                                          if (!nodeEditor.nodeId) return;
+                                          setNodes((currentNodes) =>
+                                            currentNodes.map((node) =>
+                                              node.id === nodeEditor.nodeId
+                                                ? { ...node, data: { ...(node.data as WorkflowNodeData), headers: nextHeaders } }
+                                                : node
+                                            )
+                                          );
+                                        }}
+                                        placeholder="Name"
+                                        className="mb-1 h-8 text-xs"
+                                      />
+                                      <Input
+                                        value={header.value}
+                                        onChange={(event) => {
+                                          const nextHeaders = nodeEditor.headers.map((item) =>
+                                            item.id === header.id ? { ...item, value: event.target.value } : item
+                                          );
+                                          setNodeEditor((current) => ({ ...current, headers: nextHeaders }));
+                                          if (!nodeEditor.nodeId) return;
+                                          setNodes((currentNodes) =>
+                                            currentNodes.map((node) =>
+                                              node.id === nodeEditor.nodeId
+                                                ? { ...node, data: { ...(node.data as WorkflowNodeData), headers: nextHeaders } }
+                                                : node
+                                            )
+                                          );
+                                        }}
+                                        onDragOver={(event) => event.preventDefault()}
+                                        onDrop={(event) => {
+                                          event.preventDefault();
+                                          const path = event.dataTransfer.getData("text/plain");
+                                          if (!path) return;
+                                          const nextHeaders = nodeEditor.headers.map((item) =>
+                                            item.id === header.id ? { ...item, value: appendExpression(item.value, path) } : item
+                                          );
+                                          setNodeEditor((current) => ({ ...current, headers: nextHeaders }));
+                                          if (!nodeEditor.nodeId) return;
+                                          setNodes((currentNodes) =>
+                                            currentNodes.map((node) =>
+                                              node.id === nodeEditor.nodeId
+                                                ? { ...node, data: { ...(node.data as WorkflowNodeData), headers: nextHeaders } }
+                                                : node
+                                            )
+                                          );
+                                        }}
+                                        placeholder="Value"
+                                        className="h-8 text-xs"
+                                      />
+                                    </div>
+                                  ))}
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                      const nextHeaders = [...nodeEditor.headers, { id: `hdr-${Date.now()}`, name: "", value: "", valueType: "fixed" }];
+                                      setNodeEditor((current) => ({ ...current, headers: nextHeaders }));
+                                      if (!nodeEditor.nodeId) return;
+                                      setNodes((currentNodes) =>
+                                        currentNodes.map((node) =>
+                                          node.id === nodeEditor.nodeId
+                                            ? { ...node, data: { ...(node.data as WorkflowNodeData), headers: nextHeaders } }
+                                            : node
+                                        )
+                                      );
+                                    }}
+                                  >
+                                    Add Header
+                                  </Button>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                        <div className="rounded-md border border-border bg-card p-3">
+                          <div className="mb-3 flex items-center gap-2">
+                            <Switch
+                              checked={nodeEditor.sendBody}
+                              onCheckedChange={(checked) => {
+                                setNodeEditor((current) => ({ ...current, sendBody: checked }));
+                                if (!nodeEditor.nodeId) return;
+                                setNodes((currentNodes) =>
+                                  currentNodes.map((node) =>
+                                    node.id === nodeEditor.nodeId
+                                      ? { ...node, data: { ...(node.data as WorkflowNodeData), sendBody: checked } }
+                                      : node
+                                  )
+                                );
+                              }}
+                            />
+                            <span className="text-sm font-medium text-foreground">Send Body</span>
+                          </div>
+                          {nodeEditor.sendBody && (
+                            <div className="space-y-2">
+                              <div className="flex items-center justify-end">
+                                <div className="inline-flex items-center rounded-md border border-border bg-muted/30 p-0.5 text-[11px]">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setNodeEditor((current) => ({ ...current, bodySpecifierType: "fixed" }));
+                                      if (!nodeEditor.nodeId) return;
+                                      setNodes((currentNodes) =>
+                                        currentNodes.map((node) =>
+                                          node.id === nodeEditor.nodeId
+                                            ? { ...node, data: { ...(node.data as WorkflowNodeData), bodySpecifierType: "fixed" } }
+                                            : node
+                                        )
+                                      );
+                                    }}
+                                    className={`rounded px-2 py-0.5 ${nodeEditor.bodySpecifierType === "fixed" ? "bg-background text-foreground" : "text-muted-foreground"}`}
+                                  >
+                                    Fixed
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setNodeEditor((current) => ({ ...current, bodySpecifierType: "expression" }));
+                                      if (!nodeEditor.nodeId) return;
+                                      setNodes((currentNodes) =>
+                                        currentNodes.map((node) =>
+                                          node.id === nodeEditor.nodeId
+                                            ? { ...node, data: { ...(node.data as WorkflowNodeData), bodySpecifierType: "expression" } }
+                                            : node
+                                        )
+                                      );
+                                    }}
+                                    className={`rounded px-2 py-0.5 ${nodeEditor.bodySpecifierType === "expression" ? "bg-background text-foreground" : "text-muted-foreground"}`}
+                                  >
+                                    Expression
+                                  </button>
+                                </div>
+                              </div>
+                              <Select
+                                value={nodeEditor.bodyMode}
+                                onValueChange={(value: "fields" | "json") => {
+                                  setNodeEditor((current) => ({ ...current, bodyMode: value }));
+                                  if (!nodeEditor.nodeId) return;
+                                  setNodes((currentNodes) =>
+                                    currentNodes.map((node) =>
+                                      node.id === nodeEditor.nodeId
+                                        ? { ...node, data: { ...(node.data as WorkflowNodeData), bodyMode: value } }
+                                        : node
+                                    )
+                                  );
+                                }}
+                              >
+                                <SelectTrigger className="h-9 w-full bg-background text-xs">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent className="z-[120]">
+                                  <SelectItem value="fields">Using Fields Below</SelectItem>
+                                  <SelectItem value="json">Using JSON</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              {nodeEditor.bodyMode === "json" ? (
+                                <textarea
+                                  value={nodeEditor.bodyJson}
+                                  onChange={(event) => {
+                                    const nextValue = event.target.value;
+                                    setNodeEditor((current) => ({ ...current, bodyJson: nextValue }));
+                                    if (!nodeEditor.nodeId) return;
+                                    setNodes((currentNodes) =>
+                                      currentNodes.map((node) =>
+                                        node.id === nodeEditor.nodeId
+                                          ? { ...node, data: { ...(node.data as WorkflowNodeData), bodyJson: nextValue } }
+                                          : node
+                                      )
+                                    );
+                                  }}
+                                  onDragOver={(event) => event.preventDefault()}
+                                  onDrop={(event) => {
+                                    event.preventDefault();
+                                    const path = event.dataTransfer.getData("text/plain");
+                                    if (!path) return;
+                                    const nextValue = appendExpression(nodeEditor.bodyJson, path);
+                                    setNodeEditor((current) => ({ ...current, bodyJson: nextValue }));
+                                    if (!nodeEditor.nodeId) return;
+                                    setNodes((currentNodes) =>
+                                      currentNodes.map((node) =>
+                                        node.id === nodeEditor.nodeId
+                                          ? { ...node, data: { ...(node.data as WorkflowNodeData), bodyJson: nextValue } }
+                                          : node
+                                      )
+                                    );
+                                  }}
+                                  className="h-24 w-full resize-none rounded-md border border-border bg-background p-2 font-mono text-xs text-foreground"
+                                />
+                              ) : (
+                                <div className="space-y-2">
+                                  {nodeEditor.bodyFields.map((field, index) => (
+                                    <div key={field.id} className="rounded-md border border-border p-2">
+                                      <p className="mb-1 text-xs text-muted-foreground">{field.name || `Body Field ${index + 1}`}</p>
+                                      <Input
+                                        value={field.name}
+                                        onChange={(event) => {
+                                          const nextFields = nodeEditor.bodyFields.map((item) =>
+                                            item.id === field.id ? { ...item, name: event.target.value } : item
+                                          );
+                                          setNodeEditor((current) => ({ ...current, bodyFields: nextFields }));
+                                          if (!nodeEditor.nodeId) return;
+                                          setNodes((currentNodes) =>
+                                            currentNodes.map((node) =>
+                                              node.id === nodeEditor.nodeId
+                                                ? { ...node, data: { ...(node.data as WorkflowNodeData), bodyFields: nextFields } }
+                                                : node
+                                            )
+                                          );
+                                        }}
+                                        placeholder="Name"
+                                        className="mb-1 h-8 text-xs"
+                                      />
+                                      <Input
+                                        value={field.value}
+                                        onChange={(event) => {
+                                          const nextFields = nodeEditor.bodyFields.map((item) =>
+                                            item.id === field.id ? { ...item, value: event.target.value } : item
+                                          );
+                                          setNodeEditor((current) => ({ ...current, bodyFields: nextFields }));
+                                          if (!nodeEditor.nodeId) return;
+                                          setNodes((currentNodes) =>
+                                            currentNodes.map((node) =>
+                                              node.id === nodeEditor.nodeId
+                                                ? { ...node, data: { ...(node.data as WorkflowNodeData), bodyFields: nextFields } }
+                                                : node
+                                            )
+                                          );
+                                        }}
+                                        onDragOver={(event) => event.preventDefault()}
+                                        onDrop={(event) => {
+                                          event.preventDefault();
+                                          const path = event.dataTransfer.getData("text/plain");
+                                          if (!path) return;
+                                          const nextFields = nodeEditor.bodyFields.map((item) =>
+                                            item.id === field.id ? { ...item, value: appendExpression(item.value, path) } : item
+                                          );
+                                          setNodeEditor((current) => ({ ...current, bodyFields: nextFields }));
+                                          if (!nodeEditor.nodeId) return;
+                                          setNodes((currentNodes) =>
+                                            currentNodes.map((node) =>
+                                              node.id === nodeEditor.nodeId
+                                                ? { ...node, data: { ...(node.data as WorkflowNodeData), bodyFields: nextFields } }
+                                                : node
+                                            )
+                                          );
+                                        }}
+                                        placeholder="Value"
+                                        className="h-8 text-xs"
+                                      />
+                                    </div>
+                                  ))}
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                      const nextFields = [...nodeEditor.bodyFields, { id: `body-${Date.now()}`, name: "", value: "", valueType: "fixed" }];
+                                      setNodeEditor((current) => ({ ...current, bodyFields: nextFields }));
+                                      if (!nodeEditor.nodeId) return;
+                                      setNodes((currentNodes) =>
+                                        currentNodes.map((node) =>
+                                          node.id === nodeEditor.nodeId
+                                            ? { ...node, data: { ...(node.data as WorkflowNodeData), bodyFields: nextFields } }
+                                            : node
+                                        )
+                                      );
+                                    }}
+                                  >
+                                    Add Body Field
+                                  </Button>
                                 </div>
                               )}
                             </div>
