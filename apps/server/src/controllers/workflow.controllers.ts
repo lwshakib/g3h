@@ -209,21 +209,23 @@ const runWorkflowSequence = async (
             message: response.ok ? "Request succeeded" : "Request failed",
             statusCode: response.status,
             output,
-          errorDetails: response.ok
-            ? undefined
-            : {
-                source: "HTTP Request",
-                code: response.status,
-                fullMessage: `${response.status} - ${output || "Request failed"}`,
-                request: {
-                  method,
-                  url,
-                  headers: {
-                    "content-type": "application/json",
+            ...(response.ok
+              ? {}
+              : {
+                  errorDetails: {
+                    source: "HTTP Request",
+                    code: response.status,
+                    fullMessage: `${response.status} - ${output || "Request failed"}`,
+                    request: {
+                      method,
+                      url,
+                      headers: {
+                        "content-type": "application/json",
+                      },
+                      body: requestInit.body ? String(requestInit.body) : null,
+                    },
                   },
-                  body: requestInit.body ? String(requestInit.body) : null,
-                },
-              },
+                }),
           });
 
           if (!response.ok) {
