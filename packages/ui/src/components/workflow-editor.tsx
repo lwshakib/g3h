@@ -63,6 +63,7 @@ import {
 } from "./ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion";
+import { Switch } from "./ui/switch";
 import { toast } from "sonner";
 
 type WorkflowEditorProps = {
@@ -95,6 +96,17 @@ type WorkflowNodeData = {
   url?: string;
   inputSample?: string;
   outputSample?: string;
+  sendQueryParams?: boolean;
+  queryParamsMode?: "fields" | "json";
+  queryParamsSpecifierType?: "fixed" | "expression";
+  queryParamsJson?: string;
+  queryParamsJsonType?: "fixed" | "expression";
+  queryParams?: Array<{
+    id: string;
+    name: string;
+    value: string;
+    valueType?: "fixed" | "expression";
+  }>;
 };
 
 type NodeRunStatus = "initial" | "loading" | "success" | "error";
@@ -1413,6 +1425,17 @@ export function WorkflowEditor({
     url: string;
     inputSample: string;
     outputSample: string;
+    sendQueryParams: boolean;
+    queryParamsMode: "fields" | "json";
+    queryParamsSpecifierType: "fixed" | "expression";
+    queryParamsJson: string;
+    queryParamsJsonType: "fixed" | "expression";
+    queryParams: Array<{
+      id: string;
+      name: string;
+      value: string;
+      valueType: "fixed" | "expression";
+    }>;
   }>({
     isOpen: false,
     nodeId: null,
@@ -1423,6 +1446,19 @@ export function WorkflowEditor({
     url: "",
     inputSample: '{\n  "key": "value"\n}',
     outputSample: "",
+    sendQueryParams: false,
+    queryParamsMode: "fields",
+    queryParamsSpecifierType: "fixed",
+    queryParamsJson: "",
+    queryParamsJsonType: "fixed",
+    queryParams: [
+      {
+        id: `qp-${Date.now()}`,
+        name: "",
+        value: "",
+        valueType: "fixed",
+      },
+    ],
   });
   const [leftPaneWidth, setLeftPaneWidth] = React.useState(0.3);
   const [centerPaneWidth, setCenterPaneWidth] = React.useState(0.4);
@@ -1897,6 +1933,28 @@ export function WorkflowEditor({
             url: data.url || "",
             inputSample: data.inputSample || '{\n  "key": "value"\n}',
             outputSample: data.outputSample || "",
+            sendQueryParams: Boolean(data.sendQueryParams),
+            queryParamsMode: data.queryParamsMode === "json" ? "json" : "fields",
+            queryParamsSpecifierType:
+              data.queryParamsSpecifierType === "expression" ? "expression" : "fixed",
+            queryParamsJson: data.queryParamsJson || "",
+            queryParamsJsonType: data.queryParamsJsonType === "expression" ? "expression" : "fixed",
+            queryParams:
+              data.queryParams && data.queryParams.length > 0
+                ? data.queryParams.map((item, index) => ({
+                    id: item.id || `qp-${Date.now()}-${index}`,
+                    name: item.name || "",
+                    value: item.value || "",
+                    valueType: item.valueType === "expression" ? "expression" : "fixed",
+                  }))
+                : [
+                    {
+                      id: `qp-${Date.now()}`,
+                      name: "",
+                      value: "",
+                      valueType: "fixed",
+                    },
+                  ],
           });
         },
         getNodeStatus: (nodeId: string) => nodeStatuses[nodeId] ?? "initial",
@@ -2224,6 +2282,387 @@ export function WorkflowEditor({
                             }}
                             placeholder="https://api.example.com/resource"
                           />
+                        </div>
+                        <div className="rounded-md border border-border bg-card p-3">
+                          <div className="mb-3 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <Switch
+                                checked={nodeEditor.sendQueryParams}
+                                onCheckedChange={(checked) => {
+                                  setNodeEditor((current) => ({ ...current, sendQueryParams: checked }));
+                                  if (!nodeEditor.nodeId) return;
+                                  setNodes((currentNodes) =>
+                                    currentNodes.map((node) =>
+                                      node.id === nodeEditor.nodeId
+                                        ? {
+                                            ...node,
+                                            data: {
+                                              ...(node.data as WorkflowNodeData),
+                                              sendQueryParams: checked,
+                                            },
+                                          }
+                                        : node
+                                    )
+                                  );
+                                }}
+                              />
+                              <span className="text-sm font-medium text-foreground">Send Query Parameters</span>
+                            </div>
+                          </div>
+
+                          {nodeEditor.sendQueryParams && (
+                            <div className="space-y-3">
+                              <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                  <label className="text-xs font-medium text-foreground">Specify Query Parameters</label>
+                                  <div className="inline-flex items-center rounded-md border border-border bg-muted/30 p-0.5 text-[11px]">
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setNodeEditor((current) => ({ ...current, queryParamsSpecifierType: "fixed" }));
+                                        if (!nodeEditor.nodeId) return;
+                                        setNodes((currentNodes) =>
+                                          currentNodes.map((node) =>
+                                            node.id === nodeEditor.nodeId
+                                              ? {
+                                                  ...node,
+                                                  data: {
+                                                    ...(node.data as WorkflowNodeData),
+                                                    queryParamsSpecifierType: "fixed",
+                                                  },
+                                                }
+                                              : node
+                                          )
+                                        );
+                                      }}
+                                      className={`rounded px-2 py-0.5 ${
+                                        nodeEditor.queryParamsSpecifierType === "fixed"
+                                          ? "bg-background text-foreground"
+                                          : "text-muted-foreground"
+                                      }`}
+                                    >
+                                      Fixed
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setNodeEditor((current) => ({ ...current, queryParamsSpecifierType: "expression" }));
+                                        if (!nodeEditor.nodeId) return;
+                                        setNodes((currentNodes) =>
+                                          currentNodes.map((node) =>
+                                            node.id === nodeEditor.nodeId
+                                              ? {
+                                                  ...node,
+                                                  data: {
+                                                    ...(node.data as WorkflowNodeData),
+                                                    queryParamsSpecifierType: "expression",
+                                                  },
+                                                }
+                                              : node
+                                          )
+                                        );
+                                      }}
+                                      className={`rounded px-2 py-0.5 ${
+                                        nodeEditor.queryParamsSpecifierType === "expression"
+                                          ? "bg-background text-foreground"
+                                          : "text-muted-foreground"
+                                      }`}
+                                    >
+                                      Expression
+                                    </button>
+                                  </div>
+                                </div>
+                                <Select
+                                  value={nodeEditor.queryParamsMode}
+                                  onValueChange={(value: "fields" | "json") => {
+                                    setNodeEditor((current) => ({ ...current, queryParamsMode: value }));
+                                    if (!nodeEditor.nodeId) return;
+                                    setNodes((currentNodes) =>
+                                      currentNodes.map((node) =>
+                                        node.id === nodeEditor.nodeId
+                                          ? {
+                                              ...node,
+                                              data: {
+                                                ...(node.data as WorkflowNodeData),
+                                                queryParamsMode: value,
+                                              },
+                                            }
+                                          : node
+                                      )
+                                    );
+                                  }}
+                                >
+                                  <SelectTrigger className="h-9 w-full bg-background text-xs">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent className="z-[120]">
+                                    <SelectItem value="fields">Using Fields Below</SelectItem>
+                                    <SelectItem value="json">Using JSON</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+
+                              {nodeEditor.queryParamsMode === "json" ? (
+                                <div className="space-y-2">
+                                  <div className="flex items-center justify-between">
+                                    <label className="text-xs font-medium text-foreground">JSON</label>
+                                    <div className="inline-flex items-center rounded-md border border-border bg-muted/30 p-0.5 text-[11px]">
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setNodeEditor((current) => ({ ...current, queryParamsJsonType: "fixed" }));
+                                          if (!nodeEditor.nodeId) return;
+                                          setNodes((currentNodes) =>
+                                            currentNodes.map((node) =>
+                                              node.id === nodeEditor.nodeId
+                                                ? {
+                                                    ...node,
+                                                    data: {
+                                                      ...(node.data as WorkflowNodeData),
+                                                      queryParamsJsonType: "fixed",
+                                                    },
+                                                  }
+                                                : node
+                                            )
+                                          );
+                                        }}
+                                        className={`rounded px-2 py-0.5 ${
+                                          nodeEditor.queryParamsJsonType === "fixed"
+                                            ? "bg-background text-foreground"
+                                            : "text-muted-foreground"
+                                        }`}
+                                      >
+                                        Fixed
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setNodeEditor((current) => ({ ...current, queryParamsJsonType: "expression" }));
+                                          if (!nodeEditor.nodeId) return;
+                                          setNodes((currentNodes) =>
+                                            currentNodes.map((node) =>
+                                              node.id === nodeEditor.nodeId
+                                                ? {
+                                                    ...node,
+                                                    data: {
+                                                      ...(node.data as WorkflowNodeData),
+                                                      queryParamsJsonType: "expression",
+                                                    },
+                                                  }
+                                                : node
+                                            )
+                                          );
+                                        }}
+                                        className={`rounded px-2 py-0.5 ${
+                                          nodeEditor.queryParamsJsonType === "expression"
+                                            ? "bg-background text-foreground"
+                                            : "text-muted-foreground"
+                                        }`}
+                                      >
+                                        Expression
+                                      </button>
+                                    </div>
+                                  </div>
+                                  <textarea
+                                    value={nodeEditor.queryParamsJson}
+                                    onChange={(event) => {
+                                      const nextValue = event.target.value;
+                                      setNodeEditor((current) => ({ ...current, queryParamsJson: nextValue }));
+                                      if (!nodeEditor.nodeId) return;
+                                      setNodes((currentNodes) =>
+                                        currentNodes.map((node) =>
+                                          node.id === nodeEditor.nodeId
+                                            ? {
+                                                ...node,
+                                                data: {
+                                                  ...(node.data as WorkflowNodeData),
+                                                  queryParamsJson: nextValue,
+                                                },
+                                              }
+                                            : node
+                                        )
+                                      );
+                                    }}
+                                    placeholder={`{\n  "page": "1",\n  "limit": "10"\n}`}
+                                    className="h-24 w-full resize-none rounded-md border border-border bg-background p-2 font-mono text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary/50"
+                                  />
+                                </div>
+                              ) : (
+                                <div className="space-y-2">
+                                  <div className="flex items-center justify-between">
+                                    <p className="text-xs font-medium text-foreground">Query Parameters</p>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const nextParams = [
+                                          ...nodeEditor.queryParams,
+                                          {
+                                            id: `qp-${Date.now()}`,
+                                            name: "",
+                                            value: "",
+                                            valueType: "fixed" as const,
+                                          },
+                                        ];
+                                        setNodeEditor((current) => ({ ...current, queryParams: nextParams }));
+                                        if (!nodeEditor.nodeId) return;
+                                        setNodes((currentNodes) =>
+                                          currentNodes.map((node) =>
+                                            node.id === nodeEditor.nodeId
+                                              ? {
+                                                  ...node,
+                                                  data: {
+                                                    ...(node.data as WorkflowNodeData),
+                                                    queryParams: nextParams,
+                                                  },
+                                                }
+                                              : node
+                                          )
+                                        );
+                                      }}
+                                      className="inline-flex h-6 w-6 items-center justify-center rounded border border-border text-muted-foreground hover:text-foreground"
+                                      aria-label="Add query parameter"
+                                    >
+                                      <PlusIcon className="h-3.5 w-3.5" />
+                                    </button>
+                                  </div>
+
+                                  <div className="space-y-2">
+                                    {nodeEditor.queryParams.map((param, index) => (
+                                      <Accordion key={param.id} type="single" collapsible defaultValue={param.id} className="rounded-md border border-border px-3">
+                                        <AccordionItem value={param.id} className="border-none">
+                                          <AccordionTrigger className="py-2 text-sm">
+                                            {param.name?.trim() ? param.name : `Query Parameter ${index + 1}`}
+                                          </AccordionTrigger>
+                                          <AccordionContent>
+                                            <div className="space-y-3">
+                                              <div className="space-y-1">
+                                                <label className="text-xs font-medium text-foreground">Name</label>
+                                                <Input
+                                                  value={param.name}
+                                                  onChange={(event) => {
+                                                    const nextParams = nodeEditor.queryParams.map((item) =>
+                                                      item.id === param.id ? { ...item, name: event.target.value } : item
+                                                    );
+                                                    setNodeEditor((current) => ({ ...current, queryParams: nextParams }));
+                                                    if (!nodeEditor.nodeId) return;
+                                                    setNodes((currentNodes) =>
+                                                      currentNodes.map((node) =>
+                                                        node.id === nodeEditor.nodeId
+                                                          ? {
+                                                              ...node,
+                                                              data: {
+                                                                ...(node.data as WorkflowNodeData),
+                                                                queryParams: nextParams,
+                                                              },
+                                                            }
+                                                          : node
+                                                      )
+                                                    );
+                                                  }}
+                                                  className="h-8 text-xs"
+                                                />
+                                              </div>
+                                              <div className="space-y-1">
+                                                <div className="flex items-center justify-between">
+                                                  <label className="text-xs font-medium text-foreground">Value</label>
+                                                  <div className="inline-flex items-center rounded-md border border-border bg-muted/30 p-0.5 text-[11px]">
+                                                    <button
+                                                      type="button"
+                                                      onClick={() => {
+                                                        const nextParams = nodeEditor.queryParams.map((item) =>
+                                                          item.id === param.id ? { ...item, valueType: "fixed" as const } : item
+                                                        );
+                                                        setNodeEditor((current) => ({ ...current, queryParams: nextParams }));
+                                                        if (!nodeEditor.nodeId) return;
+                                                        setNodes((currentNodes) =>
+                                                          currentNodes.map((node) =>
+                                                            node.id === nodeEditor.nodeId
+                                                              ? {
+                                                                  ...node,
+                                                                  data: {
+                                                                    ...(node.data as WorkflowNodeData),
+                                                                    queryParams: nextParams,
+                                                                  },
+                                                                }
+                                                              : node
+                                                          )
+                                                        );
+                                                      }}
+                                                      className={`rounded px-2 py-0.5 ${
+                                                        (param.valueType ?? "fixed") === "fixed"
+                                                          ? "bg-background text-foreground"
+                                                          : "text-muted-foreground"
+                                                      }`}
+                                                    >
+                                                      Fixed
+                                                    </button>
+                                                    <button
+                                                      type="button"
+                                                      onClick={() => {
+                                                        const nextParams = nodeEditor.queryParams.map((item) =>
+                                                          item.id === param.id ? { ...item, valueType: "expression" as const } : item
+                                                        );
+                                                        setNodeEditor((current) => ({ ...current, queryParams: nextParams }));
+                                                        if (!nodeEditor.nodeId) return;
+                                                        setNodes((currentNodes) =>
+                                                          currentNodes.map((node) =>
+                                                            node.id === nodeEditor.nodeId
+                                                              ? {
+                                                                  ...node,
+                                                                  data: {
+                                                                    ...(node.data as WorkflowNodeData),
+                                                                    queryParams: nextParams,
+                                                                  },
+                                                                }
+                                                              : node
+                                                          )
+                                                        );
+                                                      }}
+                                                      className={`rounded px-2 py-0.5 ${
+                                                        (param.valueType ?? "fixed") === "expression"
+                                                          ? "bg-background text-foreground"
+                                                          : "text-muted-foreground"
+                                                      }`}
+                                                    >
+                                                      Expression
+                                                    </button>
+                                                  </div>
+                                                </div>
+                                                <Input
+                                                  value={param.value}
+                                                  onChange={(event) => {
+                                                    const nextParams = nodeEditor.queryParams.map((item) =>
+                                                      item.id === param.id ? { ...item, value: event.target.value } : item
+                                                    );
+                                                    setNodeEditor((current) => ({ ...current, queryParams: nextParams }));
+                                                    if (!nodeEditor.nodeId) return;
+                                                    setNodes((currentNodes) =>
+                                                      currentNodes.map((node) =>
+                                                        node.id === nodeEditor.nodeId
+                                                          ? {
+                                                              ...node,
+                                                              data: {
+                                                                ...(node.data as WorkflowNodeData),
+                                                                queryParams: nextParams,
+                                                              },
+                                                            }
+                                                          : node
+                                                      )
+                                                    );
+                                                  }}
+                                                  className="h-8 text-xs"
+                                                />
+                                              </div>
+                                            </div>
+                                          </AccordionContent>
+                                        </AccordionItem>
+                                      </Accordion>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
