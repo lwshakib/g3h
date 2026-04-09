@@ -122,7 +122,7 @@ export default function LandingPage() {
 
           <div className="ml-auto flex items-center gap-6 md:gap-10">
             <div className="hidden md:flex items-center gap-10">
-              <a href="#experiments" className="text-xs font-orbitron tracking-[0.08em] text-neutral-500 hover:text-cyan-400 transition-colors">Workflows</a>
+              <a href="#workflows" className="text-xs font-orbitron tracking-[0.08em] text-neutral-500 hover:text-cyan-400 transition-colors">Workflows</a>
               <a href="#system" className="text-xs font-orbitron tracking-[0.08em] text-neutral-500 hover:text-cyan-400 transition-colors">Platform</a>
               <a href="#licensing" className="text-xs font-orbitron tracking-[0.08em] text-neutral-500 hover:text-cyan-400 transition-colors">Pricing</a>
             </div>
@@ -181,8 +181,8 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Experiments Section */}
-        <section id="experiments" className="py-16 md:py-24 px-6 md:px-12 lg:px-24 w-full border-b border-white/5 bg-black relative">
+        {/* Workflows Section */}
+        <section id="workflows" className="py-16 md:py-24 px-6 md:px-12 lg:px-24 w-full border-b border-white/5 bg-black relative">
           <div className="max-w-7xl mx-auto">
             <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-6 reveal-on-scroll" style={{ ["--reveal-delay" as any]: "0ms" }}>
               <div className="">
@@ -267,8 +267,8 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Demo Reel Section / Agent Workspace Dashboard */}
-        <section className="md:py-24 md:px-12 overflow-hidden bg-neutral-950/30 w-full border-white/5 border-b pt-16 pr-6 pb-16 pl-6 relative" id="demo-reel">
+        {/* Interface Section / Agent Workspace Dashboard */}
+        <section className="md:py-24 md:px-12 overflow-hidden bg-neutral-950/30 w-full border-white/5 border-b pt-16 pr-6 pb-16 pl-6 relative" id="system">
           <div className="max-w-[1300px] mx-auto">
             <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4 reveal-on-scroll border-b border-white/10 pb-6" style={{ ["--reveal-delay" as any]: "0ms" }}>
               <div className="">
@@ -772,6 +772,72 @@ export default function LandingPage() {
                 </div>
               </div>
 
+            </div>
+          </div>
+        </section>
+
+        {/* Pricing Section */}
+        <section id="licensing" className="py-20 md:py-32 px-6 md:px-12 lg:px-24 bg-black w-full relative overflow-hidden border-b border-white/5">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,_rgba(6,182,212,0.05),_transparent_40%)] pointer-events-none"></div>
+          
+          <div className="max-w-7xl mx-auto relative z-10">
+            <div className="text-center mb-16 md:mb-24 reveal-on-scroll">
+              <p className="font-orbitron text-xs md:text-sm uppercase tracking-[0.4em] text-cyan-500 mb-4 inline-flex items-center gap-3">
+                <span className="w-10 h-[1px] bg-cyan-500"></span> System access
+              </p>
+              <h2 className="text-3xl md:text-6xl font-normal tracking-tighter text-white font-orbitron uppercase mb-6 drop-shadow-2xl">
+                Licensing <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-white/40">Tiers.</span>
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-1">
+              {/* Plan 1: Starter */}
+              <div className="group border border-white/5 bg-neutral-950/20 backdrop-blur-sm p-8 md:p-10 flex flex-col justify-between reveal-on-scroll hover:border-white/20 transition-all duration-500 relative" style={{ ["--reveal-delay" as any]: "0ms" }}>
+                <div className="absolute top-0 right-0 w-16 h-16 border-t border-r border-white/10 group-hover:border-white/30 transition-colors"></div>
+                <div>
+                  <div className="text-xs font-mono text-cyan-500/60 uppercase tracking-[0.2em] mb-4">[ Tier 01 ]</div>
+                  <h3 className="text-2xl font-normal text-white font-orbitron uppercase mb-2">Starter</h3>
+                  <div className="text-4xl font-normal text-white mb-8">$0<span className="text-sm text-neutral-500 font-light ml-2 uppercase tracking-widest">/ Month</span></div>
+                  <ul className="space-y-4 mb-12">
+                    <li className="flex items-center gap-3 text-sm text-neutral-400 font-light"><div className="w-1 h-1 bg-cyan-500"></div> 3 active agent workflows</li>
+                    <li className="flex items-center gap-3 text-sm text-neutral-400 font-light"><div className="w-1 h-1 bg-cyan-500"></div> Basic LLM integrations</li>
+                    <li className="flex items-center gap-3 text-sm text-neutral-400 font-light"><div className="w-1 h-1 bg-cyan-500"></div> Community support</li>
+                  </ul>
+                </div>
+                <a href="/home/workflows" className="w-full py-4 text-center border border-white/10 text-white font-orbitron text-xs uppercase tracking-[0.2em] hover:bg-white hover:text-black transition-all">Current Plan</a>
+              </div>
+
+              {/* Plan 2: Professional (Featured) */}
+              <div className="group border-x border-cyan-500/30 bg-neutral-900/40 backdrop-blur-md p-8 md:p-10 flex flex-col justify-between reveal-on-scroll scale-100 md:scale-110 z-20 shadow-[0_0_100px_rgba(6,182,212,0.1)] relative" style={{ ["--reveal-delay" as any]: "100ms" }}>
+                <div className="absolute -top-1 left-1/2 -translate-x-1/2 bg-cyan-500 px-4 py-1 text-[10px] font-orbitron text-black uppercase tracking-[0.2em]">Enforcement Level: High</div>
+                <div>
+                  <div className="text-xs font-mono text-cyan-400 uppercase tracking-[0.2em] mb-4">[ Tier 02 ]</div>
+                  <h3 className="text-2xl font-normal text-white font-orbitron uppercase mb-2">Power</h3>
+                  <div className="text-4xl font-normal text-white mb-8">$49<span className="text-sm text-neutral-500 font-light ml-2 uppercase tracking-widest">/ Month</span></div>
+                  <ul className="space-y-4 mb-12">
+                    <li className="flex items-center gap-3 text-sm text-white font-light"><div className="w-1.5 h-1.5 bg-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.8)]"></div> Unlimited workflows</li>
+                    <li className="flex items-center gap-3 text-sm text-white font-light"><div className="w-1.5 h-1.5 bg-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.8)]"></div> Advanced reasoning nodes</li>
+                    <li className="flex items-center gap-3 text-sm text-white font-light"><div className="w-1.5 h-1.5 bg-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.8)]"></div> Priority execution</li>
+                  </ul>
+                </div>
+                <a href="/home/workflows" className="w-full py-4 text-center bg-cyan-500 text-black font-orbitron text-xs uppercase tracking-[0.2em] hover:bg-cyan-400 shadow-[0_0_30px_rgba(6,182,212,0.4)] transition-all">Authorize Access</a>
+              </div>
+
+              {/* Plan 3: Enterprise */}
+              <div className="group border border-white/5 bg-neutral-950/20 backdrop-blur-sm p-8 md:p-10 flex flex-col justify-between reveal-on-scroll hover:border-white/20 transition-all duration-500 relative" style={{ ["--reveal-delay" as any]: "200ms" }}>
+                <div className="absolute top-0 left-0 w-16 h-16 border-t border-l border-white/10 group-hover:border-white/30 transition-colors"></div>
+                <div>
+                  <div className="text-xs font-mono text-cyan-500/60 uppercase tracking-[0.2em] mb-4">[ Tier 03 ]</div>
+                  <h3 className="text-2xl font-normal text-white font-orbitron uppercase mb-2">Corporate</h3>
+                  <div className="text-4xl font-normal text-white mb-8">Custom</div>
+                  <ul className="space-y-4 mb-12">
+                    <li className="flex items-center gap-3 text-sm text-neutral-400 font-light"><div className="w-1 h-1 bg-cyan-500"></div> Dedicated node clusters</li>
+                    <li className="flex items-center gap-3 text-sm text-neutral-400 font-light"><div className="w-1 h-1 bg-cyan-500"></div> SOC2 & InfoSec compliance</li>
+                    <li className="flex items-center gap-3 text-sm text-neutral-400 font-light"><div className="w-1 h-1 bg-cyan-500"></div> 24/7 technical escort</li>
+                  </ul>
+                </div>
+                <a href="mailto:hello@axonix.ai" className="w-full py-4 text-center border border-white/10 text-white font-orbitron text-xs uppercase tracking-[0.2em] hover:bg-white hover:text-black transition-all">Inquire Within</a>
+              </div>
             </div>
           </div>
         </section>
