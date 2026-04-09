@@ -62,6 +62,7 @@ import {
   SelectValue,
 } from "./ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion";
 import { toast } from "sonner";
 
 type WorkflowEditorProps = {
@@ -429,6 +430,101 @@ function OutputTabsPanel({
         <TabsContent value="json" className="mt-0 h-full min-w-0 overflow-hidden">
           <div className="h-full overflow-auto rounded-md bg-background/40 p-3 font-mono text-xs text-foreground">
             <pre className="max-w-full whitespace-pre-wrap break-words">{prettyJsonOutput || "{}"}</pre>
+          </div>
+        </TabsContent>
+      </div>
+    </Tabs>
+  );
+}
+
+function InputTabsPanel({
+  parsedInput,
+  prettyJsonInput,
+  hasInput,
+  isExecuting,
+  onExecutePreviousStep,
+  previousNodeType,
+}: {
+  parsedInput: unknown | null;
+  prettyJsonInput: string;
+  hasInput: boolean;
+  isExecuting: boolean;
+  onExecutePreviousStep: () => void;
+  previousNodeType?: string;
+}) {
+  const [activeTab, setActiveTab] = React.useState("schema");
+  const itemCount = getOutputItemCount(parsedInput);
+  const isPreviousTrigger =
+    previousNodeType === "manualTrigger" ||
+    previousNodeType === "manual-trigger" ||
+    previousNodeType === "webhookTrigger" ||
+    previousNodeType === "webhook-trigger" ||
+    previousNodeType === "scheduleTrigger" ||
+    previousNodeType === "schedule-trigger";
+
+  if (isPreviousTrigger) {
+    return (
+      <div className="h-full min-w-0 overflow-auto rounded-md border border-border bg-card p-3">
+        <Accordion type="single" collapsible defaultValue="trigger-input">
+          <AccordionItem value="trigger-input" className="border-border">
+            <AccordionTrigger className="py-2 text-sm">When clicking "Execute workflow"</AccordionTrigger>
+            <AccordionContent className="text-xs text-muted-foreground">
+              No fields. Node executed, but no items were sent from trigger output.
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </div>
+    );
+  }
+
+  if (!hasInput) {
+    return (
+      <div className="flex h-full min-w-0 items-center justify-center overflow-hidden rounded-md border border-border bg-card p-4">
+        <Button onClick={onExecutePreviousStep} disabled={isExecuting}>
+          {isExecuting ? "Running..." : "Execute previous step"}
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <Tabs
+      value={activeTab}
+      onValueChange={setActiveTab}
+      className="h-full min-w-0 overflow-hidden rounded-md border border-border bg-card"
+    >
+      <div className="flex min-w-0 items-center justify-between border-b border-border px-2 py-1.5">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-semibold tracking-[0.18em] text-foreground/80">INPUT</span>
+          <InfoIcon className="h-3.5 w-3.5 text-muted-foreground" />
+        </div>
+        <TabsList className="h-8 rounded-md bg-muted p-0.5">
+          <TabsTrigger value="schema" className="h-7 px-3 text-xs">
+            Schema
+          </TabsTrigger>
+          <TabsTrigger value="table" className="h-7 px-3 text-xs">
+            Table
+          </TabsTrigger>
+          <TabsTrigger value="json" className="h-7 px-3 text-xs">
+            JSON
+          </TabsTrigger>
+        </TabsList>
+      </div>
+
+      <div className="border-b border-border px-3 py-1.5 text-xs text-muted-foreground">
+        {itemCount} item{itemCount === 1 ? "" : "s"}
+      </div>
+
+      <div className="h-[calc(100%-74px)] min-w-0 overflow-hidden p-2">
+        <TabsContent value="schema" className="mt-0 h-full min-w-0 overflow-hidden">
+          <OutputSchemaTab parsedOutput={parsedInput} />
+        </TabsContent>
+        <TabsContent value="table" className="mt-0 h-full min-w-0 overflow-hidden">
+          <OutputTableTab parsedOutput={parsedInput} />
+        </TabsContent>
+        <TabsContent value="json" className="mt-0 h-full min-w-0 overflow-hidden">
+          <div className="h-full overflow-auto rounded-md bg-background/40 p-3 font-mono text-xs text-foreground">
+            <pre className="max-w-full whitespace-pre-wrap break-words">{prettyJsonInput || "{}"}</pre>
           </div>
         </TabsContent>
       </div>
@@ -1586,6 +1682,33 @@ export function WorkflowEditor({
     () => (nodeEditor.outputSample?.trim()?.length ?? 0) > 0,
     [nodeEditor.outputSample]
   );
+  const previousNode = React.useMemo(() => {
+    if (!nodeEditor.nodeId) return null;
+    const incomingEdge = edges.find((edge) => edge.target === nodeEditor.nodeId);
+    if (!incomingEdge?.source) return null;
+    return nodes.find((node) => node.id === incomingEdge.source) ?? null;
+  }, [edges, nodeEditor.nodeId, nodes]);
+  const previousNodeData = (previousNode?.data ?? {}) as WorkflowNodeData;
+  const previousNodeOutput = previousNodeData.outputSample ?? "";
+  const parsedPreviousOutput = React.useMemo(() => {
+    const raw = previousNodeOutput.trim();
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw) as unknown;
+    } catch {
+      return null;
+    }
+  }, [previousNodeOutput]);
+  const prettyPreviousJsonOutput = React.useMemo(() => {
+    if (parsedPreviousOutput !== null) {
+      return JSON.stringify(parsedPreviousOutput, null, 2);
+    }
+    return previousNodeOutput;
+  }, [parsedPreviousOutput, previousNodeOutput]);
+  const hasPreviousOutput = React.useMemo(
+    () => previousNodeOutput.trim().length > 0,
+    [previousNodeOutput]
+  );
 
   const executeWorkflowNow = async (targetNodeId?: string) => {
     const unconfiguredNodes = getUnconfiguredNodes(nodes);
@@ -2017,28 +2140,22 @@ export function WorkflowEditor({
                   >
                     <div className="border-r border-border p-4">
                       <p className="mb-3 text-xs font-semibold text-muted-foreground">Input</p>
-                      <textarea
-                        value={nodeEditor.inputSample}
-                        onChange={(event) => {
-                          const nextValue = event.target.value;
-                          setNodeEditor((current) => ({ ...current, inputSample: nextValue }));
-                          if (!nodeEditor.nodeId) return;
-                          setNodes((currentNodes) =>
-                            currentNodes.map((node) =>
-                              node.id === nodeEditor.nodeId
-                                ? {
-                                    ...node,
-                                    data: {
-                                      ...(node.data as WorkflowNodeData),
-                                      inputSample: nextValue,
-                                    },
-                                  }
-                                : node
-                            )
-                          );
-                        }}
-                        className="h-[calc(100%-22px)] w-full resize-none rounded-md border border-border bg-card p-3 font-mono text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary/50"
-                      />
+                      {previousNode ? (
+                        <div className="h-[calc(100%-22px)]">
+                          <InputTabsPanel
+                            parsedInput={parsedPreviousOutput}
+                            prettyJsonInput={prettyPreviousJsonOutput}
+                            hasInput={hasPreviousOutput}
+                            isExecuting={isExecuting}
+                            previousNodeType={previousNode.type}
+                            onExecutePreviousStep={() => executeWorkflowNow(previousNode.id)}
+                          />
+                        </div>
+                      ) : (
+                        <div className="flex h-[calc(100%-22px)] items-center justify-center rounded-md border border-border bg-card p-3 text-center text-xs text-muted-foreground">
+                          No previous node connected to provide input.
+                        </div>
+                      )}
                     </div>
 
                     <div
