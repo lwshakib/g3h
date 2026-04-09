@@ -64,14 +64,18 @@ const runWorkflowSequence = async (
   };
 
   const visited = new Set<string>();
-  let cursorId: string | undefined = manualTrigger.id;
+  const queued = new Set<string>([manualTrigger.id]);
+  const queue: string[] = [manualTrigger.id];
 
-  while (cursorId) {
-    if (visited.has(cursorId)) break;
-    visited.add(cursorId);
+  while (queue.length > 0) {
+    const currentNodeId = queue.shift();
+    if (!currentNodeId || visited.has(currentNodeId)) continue;
+    visited.add(currentNodeId);
 
-    const node = nodeById.get(cursorId);
-    if (!node) break;
+    const node = nodeById.get(currentNodeId);
+    if (!node) continue;
+
+    let canContinueBranch = true;
 
     if (node.type === "manualTrigger" || node.type === "manual-trigger") {
       emit({
@@ -98,54 +102,56 @@ const runWorkflowSequence = async (
           status: "error",
           message: "Missing URL",
         });
-        break;
-      }
+        canContinueBranch = false;
+      } else {
+        emit({
+          nodeId: node.id,
+          label: node.data?.label || "HTTP Request",
+          status: "running",
+          message: `${method} ${url}`,
+        });
 
-      emit({
-        nodeId: node.id,
-        label: node.data?.label || "HTTP Request",
-        status: "running",
-        message: `${method} ${url}`,
-      });
-
-      try {
-        const requestInit: RequestInit = {
-          method,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        };
-
-        if (method !== "GET" && method !== "DELETE") {
-          requestInit.body = payload ?? null;
-        }
-
-        const response = await fetch(url, requestInit);
-        const rawBody = await response.text();
-        let output = rawBody;
         try {
-          output = JSON.stringify(JSON.parse(rawBody), null, 2);
-        } catch {
-          // Keep non-JSON response bodies as-is.
-        }
-        emit({
-          nodeId: node.id,
-          label: node.data?.label || "HTTP Request",
-          status: response.ok ? "success" : "error",
-          message: response.ok ? "Request succeeded" : "Request failed",
-          statusCode: response.status,
-          output,
-        });
+          const requestInit: RequestInit = {
+            method,
+            headers: {
+              "Content-Type": "application/json",
+            },
+          };
 
-        if (!response.ok) break;
-      } catch (error: any) {
-        emit({
-          nodeId: node.id,
-          label: node.data?.label || "HTTP Request",
-          status: "error",
-          message: error?.message || "Request failed",
-        });
-        break;
+          if (method !== "GET" && method !== "DELETE") {
+            requestInit.body = payload ?? null;
+          }
+
+          const response = await fetch(url, requestInit);
+          const rawBody = await response.text();
+          let output = rawBody;
+          try {
+            output = JSON.stringify(JSON.parse(rawBody), null, 2);
+          } catch {
+            // Keep non-JSON response bodies as-is.
+          }
+          emit({
+            nodeId: node.id,
+            label: node.data?.label || "HTTP Request",
+            status: response.ok ? "success" : "error",
+            message: response.ok ? "Request succeeded" : "Request failed",
+            statusCode: response.status,
+            output,
+          });
+
+          if (!response.ok) {
+            canContinueBranch = false;
+          }
+        } catch (error: any) {
+          emit({
+            nodeId: node.id,
+            label: node.data?.label || "HTTP Request",
+            status: "error",
+            message: error?.message || "Request failed",
+          });
+          canContinueBranch = false;
+        }
       }
     } else {
       emit({
@@ -156,8 +162,14 @@ const runWorkflowSequence = async (
       });
     }
 
-    const nextEdge: WorkflowEdge | undefined = outgoing.get(cursorId)?.[0];
-    cursorId = nextEdge?.target;
+    if (!canContinueBranch) continue;
+
+    const nextEdges = outgoing.get(currentNodeId) ?? [];
+    for (const edge of nextEdges) {
+      if (!edge.target || visited.has(edge.target) || queued.has(edge.target)) continue;
+      queue.push(edge.target);
+      queued.add(edge.target);
+    }
   }
 
   return statuses;

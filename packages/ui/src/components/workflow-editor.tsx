@@ -737,7 +737,6 @@ function ManualTriggerNode({ id, data }: NodeProps<Node<WorkflowNodeData>>) {
     >
       <NodeTopToolbar onDelete={() => deleteNodeAndConnections(id, setNodes, setEdges, getNodes)} />
       <div className="flex items-center justify-center">
-        <div className="relative flex h-[94px] w-[94px] items-center justify-center rounded-[24px] border border-[#3a3a3a] bg-[#1f1f1f] shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
         <div
           className="relative flex h-[94px] w-[94px] items-center justify-center rounded-[24px] border border-[#3a3a3a] bg-[#1f1f1f] shadow-[0_0_0_1px_rgba(255,255,255,0.02)]"
           style={TRIGGER_NODE_BORDER_STYLE}
