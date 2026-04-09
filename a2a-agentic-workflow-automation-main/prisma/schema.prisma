@@ -1,0 +1,176 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum NodeType {
+  INITIAL
+  MANUAL_TRIGGER
+  HTTP_REQUEST
+  GOOGLE_FROM_TRIGGER
+  GEMINI
+  ANTHROPIC
+  OPENAI
+  STRIPE_TRIGGER
+  DISCORD
+  SLACK
+  TAVILY
+}
+enum ExecutionStatus {
+  RUNNING
+  SUCCESS
+  ERROR
+}
+
+model User {
+  id            String    @id
+  name          String
+  email         String
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+  workflows Workflow[]
+  credentials Credential[]
+
+  @@unique([email])
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+
+
+model Workflow {
+  id        String   @id @default(uuid())
+  userId   String   @unique
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  description String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  nodes Node[]
+  connections Connection[]
+  executions Execution[]
+}
+
+model Node {
+  id        String   @id @default(uuid())
+  workflowId String
+  workflow Workflow @relation(fields: [workflowId], references: [id])
+  name      String
+  type      NodeType
+  data      Json
+  position  Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  sourceConnections Connection[] @relation("SourceConnections")
+  targetConnections Connection[] @relation("TargetConnections")
+}
+
+model Connection {
+  id        String   @id @default(uuid())
+  workflowId String
+  workflow Workflow @relation(fields: [workflowId], references: [id])
+  sourceNodeId String
+  sourceNode Node @relation("SourceConnections", fields: [sourceNodeId], references: [id], onDelete: Cascade)
+  targetNodeId String
+  targetNode Node @relation("TargetConnections", fields: [targetNodeId], references: [id], onDelete: Cascade)
+  sourceOutput String
+  targetInput String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model Credential {
+  id        String   @id @default(uuid())
+  userId   String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  description String?
+  nodeType  NodeType
+  apiKey    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  
+  @@unique([userId, name])
+  @@index([userId, nodeType])
+}
+
+
+
+model Execution {
+  id        String   @id @default(uuid())
+  workflowId String
+  workflow Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  status    ExecutionStatus @default(RUNNING)
+  startedAt DateTime @default(now())
+  completedAt DateTime?
+  error     String?
+  result    Json? // Store the final context/result
+  triggerType String? // e.g., "manual", "webhook", "stripe", "google-form"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  
+  @@index([workflowId])
+  @@index([status])
+  @@index([startedAt])
+}
