@@ -7,7 +7,7 @@ import { SendMailEnum } from "../constants.js";
  */
 interface SendEmailOptions {
   to: string;
-  url: string;
+  url?: string;
   token?: string;
   user: {
     name: string;
@@ -62,13 +62,38 @@ export class EmailService {
         `;
         break;
 
+      case SendMailEnum.WELCOME_EMAIL:
+        subject = "Welcome to Axonix";
+        html = `
+          <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee;">
+            <h2 style="color: #111;">Welcome, ${user.name}!</h2>
+            <p>Your Axonix account has been created successfully.</p>
+            <p>We're glad to have you on board. You can now start building workflows and automations.</p>
+            ${url ? `<a href="${url}" style="display: inline-block; padding: 12px 24px; background-color: #111; color: #fff; text-decoration: none; font-weight: bold; margin-top: 10px;">Open Axonix</a>` : ""}
+          </div>
+        `;
+        break;
+
+      case SendMailEnum.SIGN_IN_ALERT:
+        subject = "New sign-in to your Axonix account";
+        html = `
+          <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee;">
+            <h2 style="color: #111;">Sign-in notice</h2>
+            <p>Hello ${user.name || user.email},</p>
+            <p>We detected a new sign-in to your Axonix account (${user.email}).</p>
+            <p>If this was you, no action is needed.</p>
+            <p>If this wasn't you, please reset your password immediately.</p>
+          </div>
+        `;
+        break;
+
       default:
         throw new Error(`[EmailService] Unrecognized email type: ${type}`);
     }
 
     try {
       const { data, error } = await this.resend.emails.send({
-        from: "Axonix <onboarding@resend.dev>", // Default Resend domain for testing
+        from: "Axonix <onboarding@lwshakib.site>", // Default Resend domain for testing
         to: [to],
         subject,
         html,

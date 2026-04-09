@@ -105,6 +105,7 @@ class PassportService {
 
               let account = await postgresService.findAccount("google", profile.id);
               let user = null;
+              let isNewSocialAccount = false;
 
               if (account) {
                 user = await postgresService.findUserById(account.userId);
@@ -131,9 +132,13 @@ class PassportService {
                   accessToken: _accessToken,
                   refreshToken: _refreshToken,
                 });
+                isNewSocialAccount = true;
               }
 
-              return next(null, user);
+              return next(null, {
+                ...user,
+                isNewSocialAccount,
+              });
             } catch (error) {
               next(error);
             }
@@ -158,6 +163,7 @@ class PassportService {
 
               let account = await postgresService.findAccount("github", profile.id);
               let user = null;
+              let isNewSocialAccount = false;
 
               if (account) {
                 user = await postgresService.findUserById(account.userId);
@@ -184,9 +190,13 @@ class PassportService {
                   accessToken: _accessToken,
                   refreshToken: _refreshToken,
                 });
+                isNewSocialAccount = true;
               }
 
-              return next(null, user);
+              return next(null, {
+                ...user,
+                isNewSocialAccount,
+              });
             } catch (error) {
               next(error);
             }

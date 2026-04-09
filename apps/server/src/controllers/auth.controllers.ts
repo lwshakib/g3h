@@ -1,5 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { WEB_URL } from "../envs.js";
+import { SendMailEnum } from "../constants.js";
+import { sendEmail } from "../services/email.services.js";
 import logger from "../logger/winston.logger.js";
 import { auth, passportService } from "../services/auth.services.js";
 import { postgresService } from "../services/postgres.services.js";
@@ -20,6 +22,7 @@ export const googleCallback = async (req: any, res: Response) => {
     const user: any = req.user;
     const { state } = req.query;
     const session = await postgresService.createSession(user.id, req.headers["user-agent"], req.ip);
+    const isNewSocialAccount = Boolean(user?.isNewSocialAccount);
 
     let callbackURL = `${WEB_URL}/workflows`;
     if (state) {
@@ -32,6 +35,33 @@ export const googleCallback = async (req: any, res: Response) => {
 
     const redirectUrl = new URL(callbackURL);
     redirectUrl.searchParams.set("token", session.token);
+
+    // Social login email notifications:
+    // - always send sign-in alert
+    // - send welcome email only when social account is newly created
+    try {
+      if (isNewSocialAccount) {
+        await sendEmail(SendMailEnum.WELCOME_EMAIL, {
+          to: user.email,
+          user: {
+            name: user.name || "there",
+            email: user.email,
+          },
+          url: `${WEB_URL}/home/workflows`,
+        });
+      }
+
+      await sendEmail(SendMailEnum.SIGN_IN_ALERT, {
+        to: user.email,
+        user: {
+          name: user.name || "there",
+          email: user.email,
+        },
+      });
+    } catch (emailError) {
+      logger.error("Failed to send social login email notifications:", emailError);
+    }
+
     res.redirect(redirectUrl.toString());
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });
@@ -54,6 +84,7 @@ export const githubCallback = async (req: any, res: Response) => {
     const user: any = req.user;
     const { state } = req.query;
     const session = await postgresService.createSession(user.id, req.headers["user-agent"], req.ip);
+    const isNewSocialAccount = Boolean(user?.isNewSocialAccount);
 
     let callbackURL = `${WEB_URL}/workflows`;
     if (state) {
@@ -66,6 +97,33 @@ export const githubCallback = async (req: any, res: Response) => {
 
     const redirectUrl = new URL(callbackURL);
     redirectUrl.searchParams.set("token", session.token);
+
+    // Social login email notifications:
+    // - always send sign-in alert
+    // - send welcome email only when social account is newly created
+    try {
+      if (isNewSocialAccount) {
+        await sendEmail(SendMailEnum.WELCOME_EMAIL, {
+          to: user.email,
+          user: {
+            name: user.name || "there",
+            email: user.email,
+          },
+          url: `${WEB_URL}/home/workflows`,
+        });
+      }
+
+      await sendEmail(SendMailEnum.SIGN_IN_ALERT, {
+        to: user.email,
+        user: {
+          name: user.name || "there",
+          email: user.email,
+        },
+      });
+    } catch (emailError) {
+      logger.error("Failed to send social login email notifications:", emailError);
+    }
+
     res.redirect(redirectUrl.toString());
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });
@@ -104,6 +162,17 @@ export const register = async (req: Request, res: Response) => {
       token: verification.value,
     });
 
+    // Best-effort welcome email; does not block account creation response.
+    try {
+      await sendEmail(SendMailEnum.WELCOME_EMAIL, {
+        to: email,
+        user: { name, email },
+        url: `${WEB_URL}/home/workflows`,
+      });
+    } catch (emailError) {
+      logger.error("Failed to send welcome email:", emailError);
+    }
+
     res.json({
       success: true,
       message: "Init_Identity_Success | Verification Broadcasted",
@@ -132,6 +201,19 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
         user,
         sessionToken: session.token,
       });
+
+      // Best-effort sign-in alert email; do not fail login if this errors.
+      try {
+        await sendEmail(SendMailEnum.SIGN_IN_ALERT, {
+          to: user.email,
+          user: {
+            name: user.name || "there",
+            email: user.email,
+          },
+        });
+      } catch (emailError) {
+        logger.error("Failed to send sign-in alert email:", emailError);
+      }
     } catch (error: any) {
       res.status(500).json({ success: false, message: error.message });
     }

@@ -12,4 +12,6 @@ export enum UserRoleEnum {
 export enum SendMailEnum {
   VERIFY_EMAIL = "VERIFY_EMAIL",
   RESET_PASSWORD = "RESET_PASSWORD",
+  WELCOME_EMAIL = "WELCOME_EMAIL",
+  SIGN_IN_ALERT = "SIGN_IN_ALERT",
 }
