@@ -14,6 +14,7 @@ const Github = ({ className }: { className?: string }) => (
 )
 
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
@@ -63,13 +64,8 @@ export const Navbar = () => {
     >
       <div className="flex items-center justify-between px-6 py-3">
         <Link href="/" className="flex shrink-0 items-center gap-2">
-          <Image
-            src="/logo.svg"
-            alt="logo"
-            width={94}
-            height={18}
-            className="dark:invert"
-          />
+          <Logo className="size-6 text-primary" />
+          <span className="font-semibold text-xl tracking-tight font-orbitron">G3H</span>
         </Link>
 
         {/* Desktop Navigation */}

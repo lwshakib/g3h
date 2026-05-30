@@ -1,4 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google"
+import { Toaster } from "sonner";
+import { AuthHandler } from "@/components/AuthHandler";
 
 import "@workspace/ui/globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
@@ -29,7 +31,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <AuthHandler />
           {children}
+          <Toaster position="bottom-right" closeButton richColors />
         </ThemeProvider>
       </body>
     </html>
