@@ -4,6 +4,7 @@ import React, { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2, XCircle, CheckCircle2 } from "lucide-react";
+import { Button } from "@workspace/ui/components/button";
 
 /**
  * Handle Verification Protocol Core
@@ -77,12 +78,12 @@ function VerifyContent() {
       </div>
 
       {status === "error" && (
-        <button 
+        <Button 
           onClick={() => router.push("/sign-up")}
-          className="w-full bg-zinc-950 dark:bg-zinc-100 text-white dark:text-black py-3.5 transition-all duration-300 font-semibold text-sm rounded-xl hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          className="w-full"
         >
           Return to Sign Up
-        </button>
+        </Button>
       )}
     </div>
   );

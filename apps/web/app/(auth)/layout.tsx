@@ -67,7 +67,7 @@ export default function AuthLayout({
 
             {/* Bottom row of floating card */}
             <div className="flex justify-between items-center mt-2">
-              <div className="text-xs font-semibold uppercase tracking-wider text-zinc-400 font-sans">
+              <div className="text-xs font-semibold tracking-wider text-zinc-400 font-sans">
                 Active Developers
               </div>
               

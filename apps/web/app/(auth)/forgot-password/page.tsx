@@ -6,6 +6,7 @@ import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { ShieldAlert, ArrowLeft, Loader2, Mail } from "lucide-react";
 import Link from "next/link";
+import { Button } from "@workspace/ui/components/button";
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
@@ -42,7 +43,7 @@ export default function ForgotPasswordPage() {
   return (
     <div className="w-full space-y-6">
       <div className="flex items-center gap-4 mb-4">
-        <Link href="/sign-in" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider">
+        <Link href="/sign-in" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1.5 text-xs font-semibold tracking-wider">
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Sign In</span>
         </Link>
@@ -61,7 +62,7 @@ export default function ForgotPasswordPage() {
       {!submitted ? (
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-2">
-            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Email Address*</label>
+            <label className="text-xs font-semibold tracking-wider text-muted-foreground">Email Address*</label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input
@@ -76,10 +77,10 @@ export default function ForgotPasswordPage() {
             </div>
           </div>
 
-          <button
+          <Button
             type="submit"
             disabled={loading}
-            className="w-full bg-zinc-950 dark:bg-zinc-100 text-white dark:text-black py-4 transition-all duration-300 font-semibold text-sm rounded-xl hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            className="w-full"
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">
@@ -89,19 +90,21 @@ export default function ForgotPasswordPage() {
             ) : (
               <span>Send Reset Link</span>
             )}
-          </button>
+          </Button>
         </form>
       ) : (
         <div className="bg-emerald-500/10 border border-emerald-500/20 p-6 rounded-xl text-center">
           <p className="text-sm font-sans text-emerald-600 dark:text-emerald-400 mb-4">
             Recovery instructions sent to **{email}**. Please follow the link in your email to reset your password.
           </p>
-          <Link
-            href="/sign-in"
-            className="inline-block border border-border bg-background px-6 py-2.5 text-xs font-semibold uppercase tracking-wider rounded-xl hover:bg-accent transition-colors"
+          <Button
+            asChild
+            variant="outline"
           >
-            Go back
-          </Link>
+            <Link href="/sign-in">
+              Go back
+            </Link>
+          </Button>
         </div>
       )}
     </div>

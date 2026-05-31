@@ -6,6 +6,7 @@ import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { Lock, Loader2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { Button } from "@workspace/ui/components/button";
 
 function ResetPasswordForm() {
   const router = useRouter();
@@ -59,12 +60,14 @@ function ResetPasswordForm() {
         <p className="text-sm text-muted-foreground font-sans">
           No secure override token detected in the link url.
         </p>
-        <Link 
-          href="/forgot-password" 
-          className="w-full inline-block bg-zinc-950 dark:bg-zinc-100 text-white dark:text-black py-3.5 transition-all font-semibold text-sm rounded-xl hover:opacity-90 cursor-pointer"
+        <Button 
+          asChild
+          className="w-full"
         >
-          Request Reset Link
-        </Link>
+          <Link href="/forgot-password">
+            Request Reset Link
+          </Link>
+        </Button>
       </div>
     );
   }
@@ -72,7 +75,7 @@ function ResetPasswordForm() {
   return (
     <div className="w-full space-y-6">
       <div className="flex items-center gap-4 mb-4">
-        <Link href="/sign-in" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider">
+        <Link href="/sign-in" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1.5 text-xs font-semibold tracking-wider">
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Sign In</span>
         </Link>
@@ -91,7 +94,7 @@ function ResetPasswordForm() {
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="space-y-4">
           <div className="space-y-2">
-            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">New Password*</label>
+            <label className="text-xs font-semibold tracking-wider text-muted-foreground">New Password*</label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input
@@ -107,7 +110,7 @@ function ResetPasswordForm() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Confirm Password*</label>
+            <label className="text-xs font-semibold tracking-wider text-muted-foreground">Confirm Password*</label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input
@@ -123,10 +126,10 @@ function ResetPasswordForm() {
           </div>
         </div>
 
-        <button
+        <Button
           type="submit"
           disabled={loading}
-          className="w-full bg-zinc-950 dark:bg-zinc-100 text-white dark:text-black py-4 transition-all duration-300 font-semibold text-sm rounded-xl hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          className="w-full"
         >
           {loading ? (
             <span className="flex items-center justify-center gap-2">
@@ -136,7 +139,7 @@ function ResetPasswordForm() {
           ) : (
             <span>Confirm Reset</span>
           )}
-        </button>
+        </Button>
       </form>
     </div>
   );

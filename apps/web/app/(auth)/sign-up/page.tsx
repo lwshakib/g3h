@@ -6,6 +6,7 @@ import { Mail, Lock, User, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
+import { Button } from "@workspace/ui/components/button";
 
 function GoogleIcon() {
   return (
@@ -89,7 +90,8 @@ export default function SignUpPage() {
 
       <div className="flex flex-col gap-6">
         <div className="grid grid-cols-2 gap-3">
-          <button 
+          <Button 
+            variant="outline"
             onClick={async () => {
               await authClient.signIn.social({
                 provider: "google",
@@ -97,12 +99,13 @@ export default function SignUpPage() {
               });
             }}
             disabled={loading}
-            className="inline-flex items-center justify-center gap-2 border border-border bg-background py-3 text-xs font-semibold uppercase tracking-wider hover:bg-accent hover:text-accent-foreground transition-colors text-center rounded-xl cursor-pointer disabled:opacity-50"
+            className="gap-2"
           >
             <GoogleIcon />
             <span>Google</span>
-          </button>
-          <button 
+          </Button>
+          <Button 
+            variant="outline"
             onClick={async () => {
               await authClient.signIn.social({
                 provider: "github",
@@ -110,23 +113,23 @@ export default function SignUpPage() {
               });
             }}
             disabled={loading}
-            className="inline-flex items-center justify-center gap-2 border border-border bg-background py-3 text-xs font-semibold uppercase tracking-wider hover:bg-accent hover:text-accent-foreground transition-colors text-center rounded-xl cursor-pointer disabled:opacity-50"
+            className="gap-2"
           >
             <GitHubIcon />
             <span>GitHub</span>
-          </button>
+          </Button>
         </div>
 
         <div className="flex items-center gap-3">
           <div className="h-px flex-1 bg-border"></div>
-          <span className="text-[10px] font-sans font-medium uppercase tracking-[0.2em] text-muted-foreground">Or continue with Email</span>
+          <span className="text-[10px] font-sans font-medium tracking-[0.2em] text-muted-foreground">Or continue with Email</span>
           <div className="h-px flex-1 bg-border"></div>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           {/* Name Field */}
           <div className="space-y-2">
-            <label htmlFor="name" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Full Name*</label>
+            <label htmlFor="name" className="text-xs font-semibold tracking-wider text-muted-foreground">Full Name*</label>
             <div className="relative">
               <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input
@@ -144,7 +147,7 @@ export default function SignUpPage() {
 
           {/* Email Field */}
           <div className="space-y-2">
-            <label htmlFor="email" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Email Address*</label>
+            <label htmlFor="email" className="text-xs font-semibold tracking-wider text-muted-foreground">Email Address*</label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input
@@ -162,7 +165,7 @@ export default function SignUpPage() {
 
           {/* Password Field */}
           <div className="space-y-2">
-            <label htmlFor="password" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Password*</label>
+            <label htmlFor="password" className="text-xs font-semibold tracking-wider text-muted-foreground">Password*</label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input
@@ -180,7 +183,7 @@ export default function SignUpPage() {
 
           {/* Confirm Password Field */}
           <div className="space-y-2">
-            <label htmlFor="confirmPassword" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Confirm Password*</label>
+            <label htmlFor="confirmPassword" className="text-xs font-semibold tracking-wider text-muted-foreground">Confirm Password*</label>
             <div className="relative">
               <ShieldCheck className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input
@@ -197,13 +200,13 @@ export default function SignUpPage() {
           </div>
 
           {/* Submit Button */}
-          <button
+          <Button
             type="submit"
             disabled={loading}
-            className="w-full bg-zinc-950 dark:bg-zinc-100 text-white dark:text-black py-4 transition-all duration-300 font-semibold text-sm rounded-xl hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            className="w-full"
           >
             {loading ? "Creating account..." : "Sign Up"}
-          </button>
+          </Button>
         </form>
 
         <p className="text-xs text-muted-foreground text-center font-medium">
