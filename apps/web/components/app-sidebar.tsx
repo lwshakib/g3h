@@ -61,16 +61,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <div className="flex flex-col group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:gap-4 px-2 py-2">
+            <div className="flex flex-col group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:gap-4 pl-2 pr-0 py-2">
               {/* Expanded Branding */}
               <div className="flex h-12 items-center justify-between group-data-[collapsible=icon]:hidden w-full">
                 <div className="flex items-center gap-2">
-                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg">
-                    <Logo className="size-6 text-sidebar-foreground" />
-                  </div>
-                  <span className="truncate font-semibold text-sidebar-foreground">Axonix</span>
+                  <Logo className="size-6 text-sidebar-foreground" />
+                  <span className="truncate font-semibold text-sidebar-foreground">G3H</span>
                 </div>
-                
+
                 <div className="flex items-center gap-1">
                   <SidebarMenuButton size="sm" className="h-8 w-8 text-sidebar-foreground/70" tooltip="New">
                     <Plus className="size-4" />
@@ -81,7 +79,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <SidebarTrigger className="h-8 w-8 text-sidebar-foreground/70 hover:text-sidebar-foreground" />
                 </div>
               </div>
-              
+
               {/* Collapsed Vertical Stack */}
               <div className="hidden group-data-[collapsible=icon]:flex flex-col items-center gap-2 py-2">
                 <SidebarMenuButton size="sm" className="h-8 w-8 text-sidebar-foreground/70" tooltip="New">

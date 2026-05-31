@@ -19,10 +19,13 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@workspace/ui/components/sidebar"
+import { usePathname } from "next/navigation"
 import { authClient } from "@/lib/auth-client"
 
 export function NavSettings() {
   const { isMobile } = useSidebar()
+  const pathname = usePathname()
+  const isActive = pathname.startsWith("/settings")
 
   const handleSignOut = async () => {
     await authClient.signOut()
@@ -33,7 +36,7 @@ export function NavSettings() {
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <SidebarMenuButton tooltip="Settings">
+            <SidebarMenuButton tooltip="Settings" isActive={isActive}>
               <Settings className="size-4" />
               <span>Settings</span>
               <ChevronRight className="ml-auto size-4" />

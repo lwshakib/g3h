@@ -14,8 +14,8 @@ const fontMono = Geist_Mono({
 })
 
 export const metadata = {
-  title: "G3H - Node-Based Workflow Platform",
-  description: "Build and automate workflows with our powerful node-based workflow engine. Connect, automate, and scale your processes seamlessly.",
+  title: "G3H | Advanced Node-Based Workflow Automation Platform",
+  description: "G3H is a professional, high-performance node-based workflow automation engine. Seamlessly connect services, design visual logic pipelines, and scale your operations with ease.",
   icons: {
     icon: [
       {
