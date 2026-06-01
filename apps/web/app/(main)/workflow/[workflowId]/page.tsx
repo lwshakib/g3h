@@ -21,8 +21,16 @@ const getSessionToken = () => {
   if (typeof document === "undefined") return null
   const value = `; ${document.cookie}`
   const parts = value.split(`; axonix_session_token=`)
-  if (parts.length === 2) return parts.pop()?.split(";").shift() ?? null
-  return null
+  const token = parts.length === 2 ? parts.pop()?.split(";").shift() ?? null : null
+  return token
+}
+
+const getBackendBaseUrl = () => {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL
+  if (!baseUrl) {
+    throw new Error("NEXT_PUBLIC_API_URL is not configured")
+  }
+  return baseUrl.replace(/\/+$/, "")
 }
 
 export default function WorkflowByIdPage({ params }: WorkflowPageProps) {
@@ -204,8 +212,7 @@ export default function WorkflowByIdPage({ params }: WorkflowPageProps) {
 
       try {
         const streamUrl = new URL(
-          `/api/workflow/${workflowId}/execute/stream`,
-          window.location.origin
+          `${getBackendBaseUrl()}/workflow/${workflowId}/execute/stream`
         )
         streamUrl.searchParams.set("token", token)
         if (options?.targetNodeId) {
