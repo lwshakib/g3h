@@ -32,6 +32,9 @@
     "vaul": "^1.1.2",
     "zod": "^4.4.3"
   },
+  "peerDependencies": {
+    "react-hook-form": "^7.76.1"
+  },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@turbo/gen": "^2.9.15",
@@ -41,6 +44,7 @@
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
     "eslint": "^9",
+    "react-hook-form": "^7.76.1",
     "tailwindcss": "^4",
     "typescript": "^5"
   },

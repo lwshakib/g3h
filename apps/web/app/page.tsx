@@ -1,13 +1,13 @@
 import { Background } from "@/components/background"
-import { Navbar } from "@/components/blocks/navbar"
-import { Hero } from "@/components/blocks/hero"
-import { Logos } from "@/components/blocks/logos"
-import { Features } from "@/components/blocks/features"
-import { ResourceAllocation } from "@/components/blocks/resource-allocation"
-import { Testimonials } from "@/components/blocks/testimonials"
-import { Pricing } from "@/components/blocks/pricing"
-import { FAQ } from "@/components/blocks/faq"
-import { Footer } from "@/components/blocks/footer"
+import { Navbar } from "@/components/landing-page/navbar"
+import { Hero } from "@/components/landing-page/hero"
+import { Logos } from "@/components/landing-page/logos"
+import { Features } from "@/components/landing-page/features"
+import { ResourceAllocation } from "@/components/landing-page/resource-allocation"
+import { Testimonials } from "@/components/landing-page/testimonials"
+import { Pricing } from "@/components/landing-page/pricing"
+import { FAQ } from "@/components/landing-page/faq"
+import { Footer } from "@/components/landing-page/footer"
 
 export default function Home() {
   return (

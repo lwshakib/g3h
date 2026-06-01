@@ -34,7 +34,7 @@ const Linkedin = ({ className }: { className?: string }) => (
   </svg>
 )
 
-import { ContactForm } from "@/components/blocks/contact-form"
+import { ContactForm } from "@/components/landing-page/contact-form"
 import { DashedLine } from "@/components/dashed-line"
 
 const contactInfo = [
