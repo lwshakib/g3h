@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image from "next/image"
 
 import {
   ArrowRight,
@@ -6,10 +6,10 @@ import {
   ChartNoAxesColumn,
   CircleDot,
   Diamond,
-} from "lucide-react";
+} from "lucide-react"
 
-import { DashedLine } from "@/components/dashed-line";
-import { Button } from "@/components/ui/button";
+import { DashedLine } from "@/components/dashed-line"
+import { Button } from "@/components/ui/button"
 
 const features = [
   {
@@ -32,7 +32,7 @@ const features = [
     description: "Track scope, velocity, and progress over time.",
     icon: ChartNoAxesColumn,
   },
-];
+]
 
 export const Hero = () => {
   return (
@@ -40,11 +40,11 @@ export const Hero = () => {
       <div className="container flex flex-col justify-between gap-8 md:gap-14 lg:flex-row lg:gap-20">
         {/* Left side - Main content */}
         <div className="flex-1">
-          <h1 className="text-foreground max-w-160 text-3xl tracking-tight md:text-4xl lg:text-5xl xl:whitespace-nowrap">
+          <h1 className="max-w-160 text-3xl tracking-tight text-foreground md:text-4xl lg:text-5xl xl:whitespace-nowrap">
             Mainline Next.js template
           </h1>
 
-          <p className="text-muted-foreground text-1xl mt-5 md:text-3xl">
+          <p className="text-1xl mt-5 text-muted-foreground md:text-3xl">
             Mainline is an open-source website template built with shadcn/ui,
             Tailwind 4 & Next.js
           </p>
@@ -57,7 +57,7 @@ export const Hero = () => {
             </Button>
             <Button
               variant="outline"
-              className="from-background h-auto gap-2 bg-linear-to-r to-transparent shadow-md"
+              className="h-auto gap-2 bg-linear-to-r from-background to-transparent shadow-md"
               asChild
             >
               <a
@@ -82,20 +82,20 @@ export const Hero = () => {
             className="absolute top-0 lg:hidden"
           />
           {features.map((feature) => {
-            const Icon = feature.icon;
+            const Icon = feature.icon
             return (
               <div key={feature.title} className="flex gap-2.5 lg:gap-5">
-                <Icon className="text-foreground mt-1 size-4 shrink-0 lg:size-5" />
+                <Icon className="mt-1 size-4 shrink-0 text-foreground lg:size-5" />
                 <div>
-                  <h2 className="font-text text-foreground font-semibold">
+                  <h2 className="font-text font-semibold text-foreground">
                     {feature.title}
                   </h2>
-                  <p className="text-muted-foreground max-w-76 text-sm">
+                  <p className="max-w-76 text-sm text-muted-foreground">
                     {feature.description}
                   </p>
                 </div>
               </div>
-            );
+            )
           })}
         </div>
       </div>
@@ -111,5 +111,5 @@ export const Hero = () => {
         </div>
       </div>
     </section>
-  );
-};
+  )
+}

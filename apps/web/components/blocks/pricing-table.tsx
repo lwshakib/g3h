@@ -1,24 +1,24 @@
-"use client";
+"use client"
 
-import { useState } from "react";
+import { useState } from "react"
 
-import { Check, ChevronsUpDown, X } from "lucide-react";
+import { Check, ChevronsUpDown, X } from "lucide-react"
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+} from "@/components/ui/collapsible"
 
 interface FeatureSection {
-  category: string;
+  category: string
   features: {
-    name: string;
-    free: true | false | null | string;
-    startup: true | false | null | string;
-    enterprise: true | false | null | string;
-  }[];
+    name: string
+    free: true | false | null | string
+    startup: true | false | null | string
+    enterprise: true | false | null | string
+  }[]
 }
 
 const pricingPlans = [
@@ -43,7 +43,7 @@ const pricingPlans = [
       variant: "outline" as const,
     },
   },
-];
+]
 
 const comparisonFeatures: FeatureSection[] = [
   {
@@ -139,17 +139,17 @@ const comparisonFeatures: FeatureSection[] = [
       },
     ],
   },
-];
+]
 
 const renderFeatureValue = (value: true | false | null | string) => {
   if (value === true) {
-    return <Check className="size-5" />;
+    return <Check className="size-5" />
   }
   if (value === false) {
-    return <X className="size-5" />;
+    return <X className="size-5" />
   }
   if (value === null) {
-    return null;
+    return null
   }
   // String value
   return (
@@ -157,11 +157,11 @@ const renderFeatureValue = (value: true | false | null | string) => {
       <Check className="size-4" />
       <span className="text-muted-foreground">{value}</span>
     </div>
-  );
-};
+  )
+}
 
 export const PricingTable = () => {
-  const [selectedPlan, setSelectedPlan] = useState(1); // Default to Startup plan
+  const [selectedPlan, setSelectedPlan] = useState(1) // Default to Startup plan
 
   return (
     <section className="pb-28 lg:py-32">
@@ -173,24 +173,24 @@ export const PricingTable = () => {
         <FeatureSections selectedPlan={selectedPlan} />
       </div>
     </section>
-  );
-};
+  )
+}
 
 const PlanHeaders = ({
   selectedPlan,
   onPlanChange,
 }: {
-  selectedPlan: number;
-  onPlanChange: (index: number) => void;
+  selectedPlan: number
+  onPlanChange: (index: number) => void
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false)
   const plan = pricingPlans[selectedPlan] || {
     name: "Startup",
     button: {
       text: "Get started",
       variant: "outline" as const,
     },
-  };
+  }
 
   return (
     <div className="">
@@ -199,17 +199,12 @@ const PlanHeaders = ({
         <Collapsible open={isOpen} onOpenChange={setIsOpen} className="">
           <div className="flex items-center justify-between border-b py-4">
             <CollapsibleTrigger className="flex items-center gap-2">
-              <h3 className="text-2xl font-semibold">
-                {plan.name}
-              </h3>
+              <h3 className="text-2xl font-semibold">{plan.name}</h3>
               <ChevronsUpDown
                 className={`size-5 transition-transform ${isOpen ? "rotate-180" : ""}`}
               />
             </CollapsibleTrigger>
-            <Button
-              variant={plan.button.variant}
-              className="w-fit"
-            >
+            <Button variant={plan.button.variant} className="w-fit">
               {plan.button.text}
             </Button>
           </div>
@@ -222,13 +217,13 @@ const PlanHeaders = ({
                     variant="secondary"
                     key={index}
                     onClick={() => {
-                      onPlanChange(index);
-                      setIsOpen(false);
+                      onPlanChange(index)
+                      setIsOpen(false)
                     }}
                   >
                     {p.name}
                   </Button>
-                ),
+                )
             )}
           </CollapsibleContent>
         </Collapsible>
@@ -248,20 +243,20 @@ const PlanHeaders = ({
         ))}
       </div>
     </div>
-  );
-};
+  )
+}
 
 const FeatureSections = ({ selectedPlan }: { selectedPlan: number }) => (
   <>
     {comparisonFeatures.map((section, sectionIndex) => (
       <div key={sectionIndex} className="">
-        <div className="border-primary/40 border-b py-4">
+        <div className="border-b border-primary/40 py-4">
           <h3 className="text-lg font-semibold">{section.category}</h3>
         </div>
         {section.features.map((feature, featureIndex) => (
           <div
             key={featureIndex}
-            className="text-foreground grid grid-cols-2 font-medium max-md:border-b md:grid-cols-4"
+            className="grid grid-cols-2 font-medium text-foreground max-md:border-b md:grid-cols-4"
           >
             <span className="inline-flex items-center py-4">
               {feature.name}
@@ -272,7 +267,7 @@ const FeatureSections = ({ selectedPlan }: { selectedPlan: number }) => (
                 {renderFeatureValue(
                   ([feature.free, feature.startup, feature.enterprise][
                     selectedPlan
-                  ] as string | boolean | null) ?? null,
+                  ] as string | boolean | null) ?? null
                 )}
               </div>
             </div>
@@ -286,7 +281,7 @@ const FeatureSections = ({ selectedPlan }: { selectedPlan: number }) => (
                   >
                     {renderFeatureValue(value)}
                   </div>
-                ),
+                )
               )}
             </div>
           </div>
@@ -294,4 +289,4 @@ const FeatureSections = ({ selectedPlan }: { selectedPlan: number }) => (
       </div>
     ))}
   </>
-);
+)

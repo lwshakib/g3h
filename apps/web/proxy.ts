@@ -1,13 +1,13 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import { auth } from '@/lib/auth';
+import { NextResponse } from "next/server"
+import type { NextRequest } from "next/server"
+import { auth } from "@/lib/auth"
 
 /**
  * An array of routes that are accessible to the public
  * These routes do not require authentication
  * @type {string[]}
  */
-export const publicRoutes = ['/'];
+export const publicRoutes = ["/"]
 
 /**
  * An array of routes that are used for authentication
@@ -15,100 +15,100 @@ export const publicRoutes = ['/'];
  * @type {string[]}
  */
 export const authRoutes = [
-  '/sign-in',
-  '/sign-up',
-  '/forgot-password',
-  '/reset-password',
-];
+  "/sign-in",
+  "/sign-up",
+  "/forgot-password",
+  "/reset-password",
+]
 
 /**
  * The prefix for API authentication routes
  * Routes that start with this prefix are used for API authentication purposes
  * @type {string}
  */
-export const apiAuthPrefix = '/api/auth';
+export const apiAuthPrefix = "/api/auth"
 
 /**
  * The default redirect path after logging in
  * @type {string}
  */
-export const DEFAULT_LOGIN_REDIRECT = '/home/workflows';
+export const DEFAULT_LOGIN_REDIRECT = "/home/workflows"
 
 /**
  * Proxy function that acts as middleware to handle route protection and session handling.
  */
 export default async function proxy(request: NextRequest) {
-  const { nextUrl } = request;
-  const tokenFromQuery = nextUrl.searchParams.get("token");
+  const { nextUrl } = request
+  const tokenFromQuery = nextUrl.searchParams.get("token")
 
   // Allow OAuth callback token bootstrap before private-route guard kicks in.
   if (tokenFromQuery) {
-    const cleanUrl = nextUrl.clone();
-    cleanUrl.searchParams.delete("token");
+    const cleanUrl = nextUrl.clone()
+    cleanUrl.searchParams.delete("token")
 
-    const response = NextResponse.redirect(cleanUrl);
+    const response = NextResponse.redirect(cleanUrl)
     response.cookies.set("axonix_session_token", tokenFromQuery, {
       path: "/",
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
       maxAge: 60 * 60 * 24 * 30,
       httpOnly: false,
-    });
+    })
 
-    return response;
+    return response
   }
 
   // Get session using custom server auth utility (which matches the better-auth API shape)
   const session = await auth.api.getSession({
     headers: request.headers,
-  });
+  })
 
-  const isLoggedIn = !!session;
+  const isLoggedIn = !!session
 
-  const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
-  const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
-  const isAuthRoute = authRoutes.includes(nextUrl.pathname);
+  const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix)
+  const isPublicRoute = publicRoutes.includes(nextUrl.pathname)
+  const isAuthRoute = authRoutes.includes(nextUrl.pathname)
 
   // 1. Allow all API auth routes
   if (isApiAuthRoute) {
-    return NextResponse.next();
+    return NextResponse.next()
   }
 
   // 2. Handle Auth Routes (sign-in, sign-up)
   if (isAuthRoute) {
     if (isLoggedIn) {
       // Redirect logged-in users away from auth routes
-      return NextResponse.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
+      return NextResponse.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl))
     }
-    return NextResponse.next();
+    return NextResponse.next()
   }
 
   // 3. Handle Private Routes
   if (!isLoggedIn && !isPublicRoute) {
     // Redirect unauthenticated users to sign-in
-    return NextResponse.redirect(new URL('/sign-in', nextUrl));
+    return NextResponse.redirect(new URL("/sign-in", nextUrl))
   }
 
   // 4. Pass session user info if authenticated
   if (isLoggedIn && session?.user) {
-    const requestHeaders = new Headers(request.headers);
-    requestHeaders.set('x-user', JSON.stringify(session.user));
+    const requestHeaders = new Headers(request.headers)
+    requestHeaders.set("x-user", JSON.stringify(session.user))
 
     return NextResponse.next({
       request: {
         headers: requestHeaders,
       },
-    });
+    })
   }
 
-  return NextResponse.next();
+  return NextResponse.next()
 }
 
 export const config = {
   matcher: [
     // Skip Next.js internals and all static files, unless found in search params
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
     // Always run for API routes
-    '/(api|trpc)(.*)',
+    "/(api|trpc)(.*)",
   ],
-};
+}

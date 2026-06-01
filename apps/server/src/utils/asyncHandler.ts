@@ -1,4 +1,4 @@
-import type { Request, Response, NextFunction, RequestHandler } from "express";
+import type { Request, Response, NextFunction, RequestHandler } from "express"
 
 /**
  * Higher-order function that wraps async route handlers to catch errors.
@@ -13,7 +13,7 @@ const asyncHandler =
     ) => Promise<T>
   ): RequestHandler =>
   (req, res, next) => {
-    Promise.resolve(requestHandler(req, res, next)).catch(next);
-  };
+    Promise.resolve(requestHandler(req, res, next)).catch(next)
+  }
 
-export { asyncHandler };
+export { asyncHandler }

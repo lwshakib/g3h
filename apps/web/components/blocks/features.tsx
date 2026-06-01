@@ -1,11 +1,11 @@
-import Image from "next/image";
-import Link from "next/link";
+import Image from "next/image"
+import Link from "next/link"
 
-import { ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react"
 
-import { DashedLine } from "../dashed-line";
+import { DashedLine } from "../dashed-line"
 
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card"
 
 const items = [
   {
@@ -20,7 +20,7 @@ const items = [
     title: "Build momentum and healthy habits",
     image: "/features/overview-card.svg",
   },
-];
+]
 
 export const Features = () => {
   return (
@@ -29,7 +29,7 @@ export const Features = () => {
         {/* Top dashed line with text */}
         <div className="relative flex items-center justify-center">
           <DashedLine className="text-muted-foreground" />
-          <span className="bg-muted text-muted-foreground absolute px-3 font-mono text-sm font-medium tracking-wide max-md:hidden">
+          <span className="absolute bg-muted px-3 font-mono text-sm font-medium tracking-wide text-muted-foreground max-md:hidden">
             MEASURE TWICE. CUT ONCE.
           </span>
         </div>
@@ -39,7 +39,7 @@ export const Features = () => {
           <h2 className="text-2xl tracking-tight md:text-4xl lg:text-5xl">
             Made for modern product teams
           </h2>
-          <p className="text-muted-foreground leading-snug">
+          <p className="leading-snug text-muted-foreground">
             Mainline is built on the habits that make the best product teams
             successful: staying focused, moving quickly, and always aiming for
             high-quality work.
@@ -59,7 +59,7 @@ export const Features = () => {
                       fill
                       className="object-cover object-left-top ps-4 pt-2"
                     />
-                    <div className="from-background absolute inset-0 z-10 bg-linear-to-t via-transparent to-transparent" />
+                    <div className="absolute inset-0 z-10 bg-linear-to-t from-background via-transparent to-transparent" />
                   </div>
 
                   <Link
@@ -68,7 +68,7 @@ export const Features = () => {
                       "group flex items-center justify-between gap-4 pe-4 pt-4 md:pe-6 md:pt-6"
                     }
                   >
-                    <h3 className="font-display max-w-60 text-2xl leading-tight font-bold tracking-tight">
+                    <h3 className="max-w-60 font-display text-2xl leading-tight font-bold tracking-tight">
                       {item.title}
                     </h3>
                     <div className="rounded-full border p-2">
@@ -92,5 +92,5 @@ export const Features = () => {
         </Card>
       </div>
     </section>
-  );
-};
+  )
+}

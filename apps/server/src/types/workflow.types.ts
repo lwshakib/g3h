@@ -10,10 +10,10 @@ export const NODE_TYPES = [
   "DISCORD",
   "SLACK",
   "TAVILY",
-] as const;
+] as const
 
-export type NodeType = (typeof NODE_TYPES)[number];
+export type NodeType = (typeof NODE_TYPES)[number]
 
-export const EXECUTION_STATUSES = ["RUNNING", "SUCCESS", "ERROR"] as const;
+export const EXECUTION_STATUSES = ["RUNNING", "SUCCESS", "ERROR"] as const
 
-export type ExecutionStatus = (typeof EXECUTION_STATUSES)[number];
+export type ExecutionStatus = (typeof EXECUTION_STATUSES)[number]

@@ -1,11 +1,15 @@
-import { DeleteBucketCommand, ListObjectsV2Command, DeleteObjectsCommand } from "@aws-sdk/client-s3"
+import {
+  DeleteBucketCommand,
+  ListObjectsV2Command,
+  DeleteObjectsCommand,
+} from "@aws-sdk/client-s3"
 import { s3Service } from "../services/s3.services.js"
 import { AWS_S3_BUCKET_NAME } from "../envs.js"
 import logger from "../logger/winston.logger.js"
 
 /**
  * Script to programmatically delete the storage bucket and its contents.
- * 
+ *
  * ⚠️ WARNING: THIS WILL PERMANENTLY DELETE ALL BUCKET OBJECTS.
  */
 async function teardownBucket() {
@@ -16,13 +20,17 @@ async function teardownBucket() {
     logger.info(`[BucketTeardown] Starting teardown for bucket: ${bucket}...`)
 
     // 1. Empty Bucket First (Required before deletion)
-    const listObjects = await client.send(new ListObjectsV2Command({
-      Bucket: bucket,
-    }))
+    const listObjects = await client.send(
+      new ListObjectsV2Command({
+        Bucket: bucket,
+      })
+    )
 
     if (listObjects.Contents && listObjects.Contents.length > 0) {
-      logger.info(`[BucketTeardown] Found ${listObjects.Contents.length} objects. Deleting...`)
-      
+      logger.info(
+        `[BucketTeardown] Found ${listObjects.Contents.length} objects. Deleting...`
+      )
+
       const deleteParams = {
         Bucket: bucket,
         Delete: {
@@ -37,14 +45,17 @@ async function teardownBucket() {
     }
 
     // 2. Delete Bucket
-    await client.send(new DeleteBucketCommand({
-      Bucket: bucket,
-    }))
+    await client.send(
+      new DeleteBucketCommand({
+        Bucket: bucket,
+      })
+    )
     logger.info(`[BucketTeardown] 💥 Bucket "${bucket}" destroyed.`)
-
   } catch (error: any) {
     if (error.name === "NoSuchBucket") {
-      logger.warn(`[BucketTeardown] ℹ️ Bucket "${bucket}" does not exist. Skipping teardown.`)
+      logger.warn(
+        `[BucketTeardown] ℹ️ Bucket "${bucket}" does not exist. Skipping teardown.`
+      )
     } else {
       logger.error(`[BucketTeardown] ❌ Failed to teardown bucket:`, error)
       process.exit(1)

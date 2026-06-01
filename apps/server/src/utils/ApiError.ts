@@ -9,10 +9,10 @@
 /* import { errorHandler } from "../middlewares/error.middlewares.js"; */
 
 export class ApiError extends Error {
-  readonly statusCode: number;
-  readonly data: null;
-  readonly success: false;
-  readonly errors: unknown[];
+  readonly statusCode: number
+  readonly data: null
+  readonly success: false
+  readonly errors: unknown[]
 
   constructor(
     statusCode: number,
@@ -20,18 +20,18 @@ export class ApiError extends Error {
     errors: unknown[] = [],
     stack: string = ""
   ) {
-    super(message);
+    super(message)
 
-    this.statusCode = statusCode;
-    this.data = null;
-    this.success = false;
-    this.errors = errors;
+    this.statusCode = statusCode
+    this.data = null
+    this.success = false
+    this.errors = errors
 
     if (stack) {
-      this.stack = stack;
+      this.stack = stack
     } else {
       // Maintain proper stack trace (V8 environments)
-      Error.captureStackTrace(this, this.constructor);
+      Error.captureStackTrace(this, this.constructor)
     }
   }
 }

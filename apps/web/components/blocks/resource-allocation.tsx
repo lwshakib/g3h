@@ -1,8 +1,8 @@
-import Image from "next/image";
+import Image from "next/image"
 
-import { DashedLine } from "../dashed-line";
+import { DashedLine } from "../dashed-line"
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils"
 
 const topItems = [
   {
@@ -58,7 +58,7 @@ const topItems = [
       "flex-1 [&>.title-container]:mb-5 md:[&>.title-container]:mb-8 md:[&>.title-container]:translate-x-2 xl:[&>.title-container]:translate-x-4 [&>.title-container]:translate-x-0",
     fade: [],
   },
-];
+]
 
 const bottomItems = [
   {
@@ -109,7 +109,7 @@ const bottomItems = [
       "[&>.title-container]:mb-5 md:[&>.title-container]:mb-8 xl:[&>.image-container]:translate-x-6 [&>.image-container]:translate-x-2",
     fade: ["bottom"],
   },
-];
+]
 
 export const ResourceAllocation = () => {
   return (
@@ -157,13 +157,13 @@ export const ResourceAllocation = () => {
         />
       </div>
     </section>
-  );
-};
+  )
+}
 
 interface ItemProps {
-  item: (typeof topItems)[number] | (typeof bottomItems)[number];
-  isLast?: boolean;
-  className?: string;
+  item: (typeof topItems)[number] | (typeof bottomItems)[number]
+  isLast?: boolean
+  className?: string
 }
 
 const Item = ({ item, isLast, className }: ItemProps) => {
@@ -172,7 +172,7 @@ const Item = ({ item, isLast, className }: ItemProps) => {
       className={cn(
         "relative flex flex-col justify-between px-0 py-6 md:px-6 md:py-8",
         className,
-        item.className,
+        item.className
       )}
     >
       <div className="title-container text-balance">
@@ -181,7 +181,7 @@ const Item = ({ item, isLast, className }: ItemProps) => {
       </div>
 
       {item.fade.includes("bottom") && (
-        <div className="from-muted/80 absolute inset-0 z-10 bg-linear-to-t via-transparent to-transparent md:hidden" />
+        <div className="absolute inset-0 z-10 bg-linear-to-t from-muted/80 via-transparent to-transparent md:hidden" />
       )}
       {item.images.length > 4 ? (
         <div className="relative overflow-hidden">
@@ -191,7 +191,7 @@ const Item = ({ item, isLast, className }: ItemProps) => {
               {item.images.slice(0, 4).map((image, j) => (
                 <div
                   key={j}
-                  className="bg-background grid aspect-square size-16 place-items-center rounded-2xl p-2 lg:size-20"
+                  className="grid aspect-square size-16 place-items-center rounded-2xl bg-background p-2 lg:size-20"
                 >
                   <Image
                     src={image.src}
@@ -200,7 +200,7 @@ const Item = ({ item, isLast, className }: ItemProps) => {
                     height={image.height}
                     className="object-contain object-left-top"
                   />
-                  <div className="from-muted/80 absolute inset-y-0 right-0 z-10 w-16 bg-linear-to-l to-transparent" />
+                  <div className="absolute inset-y-0 right-0 z-10 w-16 bg-linear-to-l from-muted/80 to-transparent" />
                 </div>
               ))}
             </div>
@@ -209,7 +209,7 @@ const Item = ({ item, isLast, className }: ItemProps) => {
               {item.images.slice(4).map((image, j) => (
                 <div
                   key={j}
-                  className="bg-background grid aspect-square size-16 place-items-center rounded-2xl lg:size-20"
+                  className="grid aspect-square size-16 place-items-center rounded-2xl bg-background lg:size-20"
                 >
                   <Image
                     src={image.src}
@@ -218,7 +218,7 @@ const Item = ({ item, isLast, className }: ItemProps) => {
                     height={image.height}
                     className="object-contain object-left-top"
                   />
-                  <div className="from-muted absolute inset-y-0 bottom-0 left-0 z-10 w-14 bg-linear-to-r to-transparent" />
+                  <div className="absolute inset-y-0 bottom-0 left-0 z-10 w-14 bg-linear-to-r from-muted to-transparent" />
                 </div>
               ))}
             </div>
@@ -252,5 +252,5 @@ const Item = ({ item, isLast, className }: ItemProps) => {
         </>
       )}
     </div>
-  );
-};
+  )
+}

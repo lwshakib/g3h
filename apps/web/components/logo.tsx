@@ -1,4 +1,4 @@
-import React from "react";
+import React from "react"
 
 export function Logo({ className, ...props }: React.SVGProps<SVGSVGElement>) {
   return (
@@ -18,5 +18,5 @@ export function Logo({ className, ...props }: React.SVGProps<SVGSVGElement>) {
         fill="currentColor"
       />
     </svg>
-  );
+  )
 }

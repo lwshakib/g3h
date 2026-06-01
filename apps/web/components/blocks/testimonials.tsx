@@ -1,19 +1,19 @@
-import Image from "next/image";
+import Image from "next/image"
 
-import { ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react"
 
-import { DashedLine } from "../dashed-line";
+import { DashedLine } from "../dashed-line"
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@/components/ui/carousel";
-import { cn } from "@/lib/utils";
+} from "@/components/ui/carousel"
+import { cn } from "@/lib/utils"
 
 const items = [
   {
@@ -72,14 +72,14 @@ const items = [
     company: "Mercury Finance",
     image: "/testimonials/kundo-marta.webp",
   },
-];
+]
 
 export const Testimonials = ({
   className,
   dashedLineClassName,
 }: {
-  className?: string;
-  dashedLineClassName?: string;
+  className?: string
+  dashedLineClassName?: string
 }) => {
   return (
     <>
@@ -89,7 +89,7 @@ export const Testimonials = ({
             <h2 className="text-2xl tracking-tight md:text-4xl lg:text-5xl">
               Trusted by product builders
             </h2>
-            <p className="text-muted-foreground max-w-md leading-snug">
+            <p className="max-w-md leading-snug text-muted-foreground">
               Mainline is built on the habits that make the best product teams
               successful: staying focused, moving quickly, and always aiming for
               high-quality work.
@@ -113,7 +113,7 @@ export const Testimonials = ({
                     key={index}
                     className="xl:basis-1/3.5 grow basis-4/5 sm:basis-3/5 md:basis-2/5 lg:basis-[28%] 2xl:basis-[24%]"
                   >
-                    <Card className="bg-muted h-full overflow-hidden border-none">
+                    <Card className="h-full overflow-hidden border-none bg-muted">
                       <CardContent className="flex h-full flex-col p-0">
                         <div className="relative h-[288px] lg:h-[328px]">
                           <Image
@@ -128,10 +128,10 @@ export const Testimonials = ({
                             {testimonial.quote}
                           </blockquote>
                           <div className="space-y-0.5">
-                            <div className="text-primary font-semibold">
+                            <div className="font-semibold text-primary">
                               {testimonial.author}, {testimonial.role}
                             </div>
-                            <div className="text-muted-foreground text-sm">
+                            <div className="text-sm text-muted-foreground">
                               {testimonial.company}
                             </div>
                           </div>
@@ -142,8 +142,8 @@ export const Testimonials = ({
                 ))}
               </CarouselContent>
               <div className="mt-8 flex gap-3">
-                <CarouselPrevious className="bg-muted hover:bg-muted/80 static size-14.5 translate-x-0 translate-y-0 transition-colors [&>svg]:size-6 lg:[&>svg]:size-8" />
-                <CarouselNext className="bg-muted hover:bg-muted/80 static size-14.5 translate-x-0 translate-y-0 transition-colors [&>svg]:size-6 lg:[&>svg]:size-8" />
+                <CarouselPrevious className="static size-14.5 translate-x-0 translate-y-0 bg-muted transition-colors hover:bg-muted/80 [&>svg]:size-6 lg:[&>svg]:size-8" />
+                <CarouselNext className="static size-14.5 translate-x-0 translate-y-0 bg-muted transition-colors hover:bg-muted/80 [&>svg]:size-6 lg:[&>svg]:size-8" />
               </div>
             </Carousel>
           </div>
@@ -154,5 +154,5 @@ export const Testimonials = ({
         className={cn("mx-auto max-w-[80%]", dashedLineClassName)}
       />
     </>
-  );
-};
+  )
+}

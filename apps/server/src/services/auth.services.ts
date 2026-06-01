@@ -1,7 +1,7 @@
-import passport from "passport";
-import { Strategy as GitHubStrategy } from "passport-github2";
-import { Strategy as GoogleStrategy } from "passport-google-oauth20";
-import { Strategy as LocalStrategy } from "passport-local";
+import passport from "passport"
+import { Strategy as GitHubStrategy } from "passport-github2"
+import { Strategy as GoogleStrategy } from "passport-google-oauth20"
+import { Strategy as LocalStrategy } from "passport-local"
 import {
   GITHUB_CALLBACK_URL,
   GITHUB_CLIENT_ID,
@@ -10,10 +10,10 @@ import {
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
   WEB_URL,
-} from "../envs.js";
-import { SendMailEnum } from "../constants.js";
-import { sendEmail } from "./email.services.js";
-import { postgresService } from "./postgres.services.js";
+} from "../envs.js"
+import { SendMailEnum } from "../constants.js"
+import { sendEmail } from "./email.services.js"
+import { postgresService } from "./postgres.services.js"
 
 /**
  * Interface and structure for the centralized Auth service.
@@ -38,14 +38,22 @@ export const auth = {
 
   // --- Email Verification Configuration ---
   emailVerification: {
-    sendVerificationEmail: async ({ user, url, token }: { user: any; url: string; token: string }) => {
-      console.log(`[AuthService] Initiating VERIFY_EMAIL for ${user.email}`);
+    sendVerificationEmail: async ({
+      user,
+      url,
+      token,
+    }: {
+      user: any
+      url: string
+      token: string
+    }) => {
+      console.log(`[AuthService] Initiating VERIFY_EMAIL for ${user.email}`)
       await sendEmail(SendMailEnum.VERIFY_EMAIL, {
         to: user.email,
         url,
         token,
         user,
-      });
+      })
     },
   },
 
@@ -53,41 +61,51 @@ export const auth = {
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
-    sendResetPassword: async ({ user, url, token }: { user: any; url: string; token: string }) => {
-      console.log(`[AuthService] Initiating RESET_PASSWORD for ${user.email}`);
+    sendResetPassword: async ({
+      user,
+      url,
+      token,
+    }: {
+      user: any
+      url: string
+      token: string
+    }) => {
+      console.log(`[AuthService] Initiating RESET_PASSWORD for ${user.email}`)
       await sendEmail(SendMailEnum.RESET_PASSWORD, {
         to: user.email,
         url,
         token,
         user,
-      });
+      })
     },
     onPasswordReset: async ({ user }: { user: any }) => {
-      console.log(`[AuthService] Password for user ${user.email} has been successfully reset.`);
+      console.log(
+        `[AuthService] Password for user ${user.email} has been successfully reset.`
+      )
     },
   },
-};
+}
 
 /**
  * Passport Implementation linked to PostgreSQL via DbService.
  */
 class PassportService {
-  public passport = passport;
+  public passport = passport
 
   constructor() {
-    this.initializeStrategies();
+    this.initializeStrategies()
   }
 
   private initializeStrategies() {
-    this.passport.serializeUser((user: any, next) => next(null, user.id));
+    this.passport.serializeUser((user: any, next) => next(null, user.id))
     this.passport.deserializeUser(async (id: string, next) => {
       try {
-        const user = await postgresService.findUserById(id);
-        next(null, user);
+        const user = await postgresService.findUserById(id)
+        next(null, user)
       } catch (err) {
-        next(err);
+        next(err)
       }
-    });
+    })
 
     // Google Strategy
     if (auth.socialProviders.google.enabled) {
@@ -100,29 +118,32 @@ class PassportService {
           },
           async (_accessToken, _refreshToken, profile, next) => {
             try {
-              const email = profile.emails?.[0]?.value;
-              if (!email) throw new Error("Google profile missing email");
+              const email = profile.emails?.[0]?.value
+              if (!email) throw new Error("Google profile missing email")
 
-              let account = await postgresService.findAccount("google", profile.id);
-              let user = null;
-              let isNewSocialAccount = false;
+              let account = await postgresService.findAccount(
+                "google",
+                profile.id
+              )
+              let user = null
+              let isNewSocialAccount = false
 
               if (account) {
-                user = await postgresService.findUserById(account.userId);
+                user = await postgresService.findUserById(account.userId)
               } else {
-                user = await postgresService.findUserByEmail(email);
+                user = await postgresService.findUserByEmail(email)
                 if (!user) {
                   user = await postgresService.createUser({
                     name: profile.displayName,
                     email,
                     image: profile.photos?.[0]?.value || null,
-                  });
+                  })
                 }
-                
+
                 // Ensure email is verified for social accounts
                 if (!user.emailVerified) {
-                  await postgresService.verifyUserEmail(user.id);
-                  user.emailVerified = true;
+                  await postgresService.verifyUserEmail(user.id)
+                  user.emailVerified = true
                 }
 
                 await postgresService.createAccount({
@@ -131,20 +152,20 @@ class PassportService {
                   accountId: profile.id,
                   accessToken: _accessToken,
                   refreshToken: _refreshToken,
-                });
-                isNewSocialAccount = true;
+                })
+                isNewSocialAccount = true
               }
 
               return next(null, {
                 ...user,
                 isNewSocialAccount,
-              });
+              })
             } catch (error) {
-              next(error);
+              next(error)
             }
           }
         )
-      );
+      )
     }
 
     // GitHub Strategy
@@ -156,31 +177,39 @@ class PassportService {
             clientSecret: auth.socialProviders.github.clientSecret,
             callbackURL: auth.socialProviders.github.callbackURL,
           },
-          async (_accessToken: string, _refreshToken: string, profile: any, next: any) => {
+          async (
+            _accessToken: string,
+            _refreshToken: string,
+            profile: any,
+            next: any
+          ) => {
             try {
-              const email = profile.emails?.[0]?.value;
-              if (!email) throw new Error("GitHub profile missing email");
+              const email = profile.emails?.[0]?.value
+              if (!email) throw new Error("GitHub profile missing email")
 
-              let account = await postgresService.findAccount("github", profile.id);
-              let user = null;
-              let isNewSocialAccount = false;
+              let account = await postgresService.findAccount(
+                "github",
+                profile.id
+              )
+              let user = null
+              let isNewSocialAccount = false
 
               if (account) {
-                user = await postgresService.findUserById(account.userId);
+                user = await postgresService.findUserById(account.userId)
               } else {
-                user = await postgresService.findUserByEmail(email);
+                user = await postgresService.findUserByEmail(email)
                 if (!user) {
                   user = await postgresService.createUser({
                     name: profile.displayName || profile.username,
                     email,
                     image: profile.photos?.[0]?.value || null,
-                  });
+                  })
                 }
 
                 // Ensure email is verified for social accounts
                 if (!user.emailVerified) {
-                  await postgresService.verifyUserEmail(user.id);
-                  user.emailVerified = true;
+                  await postgresService.verifyUserEmail(user.id)
+                  user.emailVerified = true
                 }
 
                 await postgresService.createAccount({
@@ -189,20 +218,20 @@ class PassportService {
                   accountId: profile.id,
                   accessToken: _accessToken,
                   refreshToken: _refreshToken,
-                });
-                isNewSocialAccount = true;
+                })
+                isNewSocialAccount = true
               }
 
               return next(null, {
                 ...user,
                 isNewSocialAccount,
-              });
+              })
             } catch (error) {
-              next(error);
+              next(error)
             }
           }
         )
-      );
+      )
     }
 
     // Local Strategy for Email/Password
@@ -211,24 +240,39 @@ class PassportService {
         { usernameField: "email" },
         async (email: string, password, next: any) => {
           try {
-            const user = await postgresService.findUserByEmail(email);
-            if (!user) return next(null, false, { message: "Security Breach: Identity not found." });
+            const user = await postgresService.findUserByEmail(email)
+            if (!user)
+              return next(null, false, {
+                message: "Security Breach: Identity not found.",
+              })
 
-            const account = await postgresService.findAccount("credentials", email);
-            if (!account || !account.password) return next(null, false, { message: "Security Breach: Missing protocol credentials." });
+            const account = await postgresService.findAccount(
+              "credentials",
+              email
+            )
+            if (!account || !account.password)
+              return next(null, false, {
+                message: "Security Breach: Missing protocol credentials.",
+              })
 
-            const isValid = await postgresService.validatePassword(password, account.password);
-            if (!isValid) return next(null, false, { message: "Security Breach: Invalid secure protocol." });
+            const isValid = await postgresService.validatePassword(
+              password,
+              account.password
+            )
+            if (!isValid)
+              return next(null, false, {
+                message: "Security Breach: Invalid secure protocol.",
+              })
 
-            return next(null, user);
+            return next(null, user)
           } catch (error) {
-            next(error);
+            next(error)
           }
         }
       )
-    );
+    )
   }
 }
 
-export const passportService = new PassportService();
-export const authHandler = passportService.passport;
+export const passportService = new PassportService()
+export const authHandler = passportService.passport

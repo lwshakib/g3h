@@ -1,14 +1,14 @@
-"use client";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Check } from "lucide-react";
-import { motion } from "motion/react";
-import { useAction } from "next-safe-action/hooks";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
+"use client"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Check } from "lucide-react"
+import { motion } from "motion/react"
+import { useAction } from "next-safe-action/hooks"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
 
-import { serverAction } from "@/actions/server-action";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { serverAction } from "@/actions/server-action"
+import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   Form,
   FormControl,
@@ -16,19 +16,19 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { formSchema } from "@/lib/form-schema";
+} from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
+import { formSchema } from "@/lib/form-schema"
 
-type Schema = z.infer<typeof formSchema>;
+type Schema = z.infer<typeof formSchema>
 
 export function ContactForm() {
   const form = useForm<Schema>({
@@ -41,21 +41,21 @@ export function ContactForm() {
       message: "",
       agree: false,
     } as unknown as Schema,
-  });
+  })
   const formAction = useAction(serverAction, {
     onSuccess: () => {
       // TODO: show success message
-      form.reset();
+      form.reset()
     },
     onError: () => {
       // TODO: show error message
     },
-  });
+  })
   const handleSubmit = form.handleSubmit(async (data: Schema) => {
-    formAction.execute(data);
-  });
+    formAction.execute(data)
+  })
 
-  const { isExecuting, hasSucceeded } = formAction;
+  const { isExecuting, hasSucceeded } = formAction
   if (hasSucceeded) {
     return (
       <div className="w-full gap-2 rounded-md border p-2 sm:p-5 md:p-8">
@@ -81,12 +81,12 @@ export function ContactForm() {
           <h2 className="mb-2 text-center text-2xl font-bold text-pretty">
             Thank you
           </h2>
-          <p className="text-muted-foreground text-center text-lg text-pretty">
+          <p className="text-center text-lg text-pretty text-muted-foreground">
             Form submitted successfully, we will get back to you soon
           </p>
         </motion.div>
       </div>
-    );
+    )
   }
 
   return (
@@ -107,8 +107,8 @@ export function ContactForm() {
                   type="text"
                   value={field.value}
                   onChange={(e) => {
-                    const val = e.target.value;
-                    field.onChange(val);
+                    const val = e.target.value
+                    field.onChange(val)
                   }}
                   placeholder="First and last name"
                 />
@@ -130,8 +130,8 @@ export function ContactForm() {
                   type="text"
                   value={field.value}
                   onChange={(e) => {
-                    const val = e.target.value;
-                    field.onChange(val);
+                    const val = e.target.value
+                    field.onChange(val)
                   }}
                   placeholder="me@company.com"
                 />
@@ -153,8 +153,8 @@ export function ContactForm() {
                   type="text"
                   value={field.value}
                   onChange={(e) => {
-                    const val = e.target.value;
-                    field.onChange(val);
+                    const val = e.target.value
+                    field.onChange(val)
                   }}
                   placeholder="Company name"
                 />
@@ -175,7 +175,7 @@ export function ContactForm() {
               { value: "2-10", label: "2-10" },
               { value: "11-50", label: "11-50" },
               { value: "51-500", label: "51-500" },
-            ];
+            ]
             return (
               <FormItem className="w-full">
                 <FormLabel>Number of employees </FormLabel>
@@ -196,7 +196,7 @@ export function ContactForm() {
 
                 <FormMessage />
               </FormItem>
-            );
+            )
           }}
         />
 
@@ -247,5 +247,5 @@ export function ContactForm() {
         </div>
       </form>
     </Form>
-  );
+  )
 }

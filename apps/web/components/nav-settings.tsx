@@ -1,11 +1,6 @@
 "use client"
 
-import {
-  ChevronRight,
-  LogOut,
-  Settings,
-  User,
-} from "lucide-react"
+import { ChevronRight, LogOut, Settings, User } from "lucide-react"
 
 import {
   DropdownMenu,
@@ -49,12 +44,15 @@ export function NavSettings() {
             sideOffset={4}
           >
             <DropdownMenuItem asChild>
-              <a href="/settings/personal" className="flex w-full items-center cursor-pointer">
+              <a
+                href="/settings/personal"
+                className="flex w-full cursor-pointer items-center"
+              >
                 <User className="mr-2 size-4" />
                 <span>Personal</span>
               </a>
             </DropdownMenuItem>
-            <DropdownMenuItem 
+            <DropdownMenuItem
               className="cursor-pointer"
               onClick={handleSignOut}
             >

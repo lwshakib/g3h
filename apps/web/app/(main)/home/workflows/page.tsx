@@ -2,12 +2,7 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
-import { 
-  Search, 
-  Filter, 
-  MoreVertical, 
-  User,
-} from "lucide-react"
+import { Search, Filter, MoreVertical, User } from "lucide-react"
 
 import { Input } from "@workspace/ui/components/input"
 import {
@@ -67,11 +62,14 @@ export default function WorkflowsPage() {
       }
 
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/workflow`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/workflow`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
 
         if (!response.ok) {
           throw new Error("Failed to load workflows")
@@ -105,8 +103,15 @@ export default function WorkflowsPage() {
       setVisibleCount((prev) => Math.max(prev, 20))
     }
 
-    window.addEventListener("workflow:created", onWorkflowCreated as EventListener)
-    return () => window.removeEventListener("workflow:created", onWorkflowCreated as EventListener)
+    window.addEventListener(
+      "workflow:created",
+      onWorkflowCreated as EventListener
+    )
+    return () =>
+      window.removeEventListener(
+        "workflow:created",
+        onWorkflowCreated as EventListener
+      )
   }, [])
 
   React.useEffect(() => {
@@ -136,14 +141,17 @@ export default function WorkflowsPage() {
     if (!token) return
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/workflow`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ name: `${workflow.name} Copy` }),
-      })
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/workflow`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ name: `${workflow.name} Copy` }),
+        }
+      )
 
       if (!response.ok) {
         throw new Error("Failed to duplicate workflow")
@@ -165,18 +173,23 @@ export default function WorkflowsPage() {
     if (!token) return
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/workflow/${workflow.id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/workflow/${workflow.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
 
       if (!response.ok) {
         throw new Error("Failed to delete workflow")
       }
 
-      setAllWorkflows((current) => current.filter((item) => item.id !== workflow.id))
+      setAllWorkflows((current) =>
+        current.filter((item) => item.id !== workflow.id)
+      )
     } catch (error) {
       console.error("[WorkflowsPage] Failed to delete workflow:", error)
     }
@@ -186,15 +199,15 @@ export default function WorkflowsPage() {
     <div className="space-y-6">
       {/* Search & Filter Bar */}
       <div className="flex items-center justify-end gap-3">
-        <div className="relative w-full max-w-sm group">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground group-focus-within:text-foreground transition-colors" />
-          <Input 
-            placeholder="Search" 
-            className="pl-10 h-10 bg-muted/5 border-muted-foreground/10 focus-visible:ring-1 focus-visible:ring-primary/50" 
+        <div className="group relative w-full max-w-sm">
+          <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-foreground" />
+          <Input
+            placeholder="Search"
+            className="h-10 border-muted-foreground/10 bg-muted/5 pl-10 focus-visible:ring-1 focus-visible:ring-primary/50"
           />
         </div>
         <Select defaultValue="updated">
-          <SelectTrigger className="w-[180px] h-10 bg-muted/5 border-muted-foreground/10">
+          <SelectTrigger className="h-10 w-[180px] border-muted-foreground/10 bg-muted/5">
             <SelectValue placeholder="Sort by" />
           </SelectTrigger>
           <SelectContent>
@@ -203,7 +216,11 @@ export default function WorkflowsPage() {
             <SelectItem value="created">Sort by created</SelectItem>
           </SelectContent>
         </Select>
-        <Button variant="outline" size="icon" className="h-10 w-10 bg-muted/5 border-muted-foreground/10">
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-10 w-10 border-muted-foreground/10 bg-muted/5"
+        >
           <Filter className="size-4" />
         </Button>
       </div>
@@ -211,25 +228,36 @@ export default function WorkflowsPage() {
       {/* Workflow List */}
       <div className="space-y-3">
         {isLoading && (
-          <div className="text-sm text-muted-foreground">Loading workflows...</div>
+          <div className="text-sm text-muted-foreground">
+            Loading workflows...
+          </div>
         )}
         {!isLoading && allWorkflows.length === 0 && (
-          <div className="text-sm text-muted-foreground">No workflows yet. Click Create workflow.</div>
+          <div className="text-sm text-muted-foreground">
+            No workflows yet. Click Create workflow.
+          </div>
         )}
         {workflows.map((wf) => (
-          <div 
-            key={wf.id} 
-            className="flex items-center justify-between p-4 rounded-xl border border-muted-foreground/10 bg-muted/5 hover:bg-muted/10 transition-all group cursor-pointer"
+          <div
+            key={wf.id}
+            className="group flex cursor-pointer items-center justify-between rounded-xl border border-muted-foreground/10 bg-muted/5 p-4 transition-all hover:bg-muted/10"
             onClick={() => router.push(`/workflow/${wf.id}`)}
           >
             <div className="space-y-1">
-              <h3 className="font-semibold text-[15px] group-hover:text-primary transition-colors">{wf.name}</h3>
-              <p className="text-xs text-muted-foreground flex items-center gap-2">
-                Last updated {formatDate(wf.updatedAt)} <span className="h-4 w-px bg-muted-foreground/30 mx-1" /> Created {formatDate(wf.createdAt)}
+              <h3 className="text-[15px] font-semibold transition-colors group-hover:text-primary">
+                {wf.name}
+              </h3>
+              <p className="flex items-center gap-2 text-xs text-muted-foreground">
+                Last updated {formatDate(wf.updatedAt)}{" "}
+                <span className="mx-1 h-4 w-px bg-muted-foreground/30" />{" "}
+                Created {formatDate(wf.createdAt)}
               </p>
             </div>
             <div className="flex items-center gap-3">
-              <Badge variant="secondary" className="bg-muted/20 text-muted-foreground flex items-center gap-1 px-2.5 py-1 font-normal border-none">
+              <Badge
+                variant="secondary"
+                className="flex items-center gap-1 border-none bg-muted/20 px-2.5 py-1 font-normal text-muted-foreground"
+              >
                 <User className="size-3" />
                 <span className="text-[11px] font-medium">Personal</span>
               </Badge>
@@ -244,7 +272,10 @@ export default function WorkflowsPage() {
                     <MoreVertical className="size-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+                <DropdownMenuContent
+                  align="end"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <DropdownMenuItem
                     onClick={(e) => {
                       e.stopPropagation()
@@ -281,7 +312,9 @@ export default function WorkflowsPage() {
       <div className="pt-6 text-sm text-muted-foreground">
         <div ref={sentinelRef} className="h-2 w-full" />
         {!isLoading && workflows.length < allWorkflows.length && (
-          <p className="mt-2 text-xs text-muted-foreground">Scroll to load more...</p>
+          <p className="mt-2 text-xs text-muted-foreground">
+            Scroll to load more...
+          </p>
         )}
       </div>
     </div>

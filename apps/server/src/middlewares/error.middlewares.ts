@@ -3,10 +3,10 @@ import type {
   Response,
   NextFunction,
   ErrorRequestHandler,
-} from "express";
-import logger from "../logger/winston.logger.js";
-import { ApiError } from "../utils/ApiError.js";
-import { asyncHandler } from "../utils/asyncHandler.js";
+} from "express"
+import logger from "../logger/winston.logger.js"
+import { ApiError } from "../utils/ApiError.js"
+import { asyncHandler } from "../utils/asyncHandler.js"
 
 /**
  * This middleware is responsible for catching errors from any request handler
@@ -18,32 +18,32 @@ const errorHandler: ErrorRequestHandler = (
   res: Response,
   _next: NextFunction
 ) => {
-  let error: ApiError;
+  let error: ApiError
 
   // Normalize any thrown value into an ApiError instance
   if (err instanceof ApiError) {
-    error = err;
+    error = err
   } else {
     // Best-effort extraction from unknown error shapes
     const maybeErr = err as Partial<{
-      statusCode: number;
-      message: string;
-      errors: unknown[];
-      stack: string;
-    }>;
+      statusCode: number
+      message: string
+      errors: unknown[]
+      stack: string
+    }>
 
     // Preserve original behavior:
     // - If a statusCode exists on the error, default to 400
     // - Otherwise, use 500
-    const statusCode = maybeErr?.statusCode ? 400 : 500;
-    const message = maybeErr?.message ?? "Something went wrong";
+    const statusCode = maybeErr?.statusCode ? 400 : 500
+    const message = maybeErr?.message ?? "Something went wrong"
 
     error = new ApiError(
       statusCode,
       message,
       maybeErr?.errors ?? [],
       maybeErr?.stack
-    );
+    )
   }
 
   // Shape the response; include stack only in development
@@ -51,11 +51,11 @@ const errorHandler: ErrorRequestHandler = (
     ...error,
     message: error.message,
     ...(process.env.NODE_ENV === "development" ? { stack: error.stack } : {}),
-  };
+  }
 
-  logger.error(`${error.message}`);
+  logger.error(`${error.message}`)
 
-  return res.status(error.statusCode).json(response);
-};
+  return res.status(error.statusCode).json(response)
+}
 
-export { errorHandler };
+export { errorHandler }

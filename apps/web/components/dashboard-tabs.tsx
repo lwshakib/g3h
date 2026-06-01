@@ -17,18 +17,20 @@ export function DashboardTabs() {
   const pathname = usePathname()
 
   return (
-    <div className="px-6 mt-8 flex items-center border-b border-muted-foreground/10 space-x-8 h-12">
+    <div className="mt-8 flex h-12 items-center space-x-8 border-b border-muted-foreground/10 px-6">
       {tabs.map((tab) => {
-        const isActive = pathname === tab.href || (tab.href === "/home/workflows" && pathname === "/home")
-        
+        const isActive =
+          pathname === tab.href ||
+          (tab.href === "/home/workflows" && pathname === "/home")
+
         return (
           <Link
             key={tab.name}
             href={tab.href}
             className={cn(
-              "text-sm font-medium h-full flex items-center border-b-2 transition-all relative px-1",
-              isActive 
-                ? "border-primary text-foreground" 
+              "relative flex h-full items-center border-b-2 px-1 text-sm font-medium transition-all",
+              isActive
+                ? "border-primary text-foreground"
                 : "border-transparent text-muted-foreground hover:text-foreground"
             )}
           >

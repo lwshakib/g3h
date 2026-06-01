@@ -1,4 +1,4 @@
-import defineApp from "../../helpers/define-app.js";
+import defineApp from "../../helpers/define-app.js"
 
 export default defineApp({
   name: "HTTP Request",
@@ -11,7 +11,8 @@ export default defineApp({
   primaryColor: "#64748b",
   auth: {
     type: "none",
-    instructions: "No connection required. Configure method and URL directly in the node.",
+    instructions:
+      "No connection required. Configure method and URL directly in the node.",
   },
   triggers: [],
   actions: [
@@ -21,4 +22,4 @@ export default defineApp({
       description: "Execute an HTTP request with configured method and URL.",
     },
   ],
-});
+})

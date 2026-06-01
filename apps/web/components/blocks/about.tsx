@@ -1,8 +1,8 @@
-import Image from "next/image";
-import Link from "next/link";
+import Image from "next/image"
+import Link from "next/link"
 
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 const About = () => {
   return (
@@ -48,14 +48,14 @@ const About = () => {
         />
       </div>
     </section>
-  );
-};
+  )
+}
 
-export default About;
+export default About
 
 interface ImageSectionProps {
-  images: { src: string; alt: string }[];
-  className?: string;
+  images: { src: string; alt: string }[]
+  className?: string
 }
 
 export function ImageSection({ images, className }: ImageSectionProps) {
@@ -75,16 +75,16 @@ export function ImageSection({ images, className }: ImageSectionProps) {
         </div>
       ))}
     </div>
-  );
+  )
 }
 
 interface TextSectionProps {
-  title?: string;
-  paragraphs: string[];
+  title?: string
+  paragraphs: string[]
   ctaButton?: {
-    href: string;
-    text: string;
-  };
+    href: string
+    text: string
+  }
 }
 
 export function TextSection({
@@ -94,8 +94,8 @@ export function TextSection({
 }: TextSectionProps) {
   return (
     <section className="flex-1 space-y-4 text-lg md:space-y-6">
-      {title && <h2 className="text-foreground text-4xl">{title}</h2>}
-      <div className="text-muted-foreground max-w-xl space-y-6">
+      {title && <h2 className="text-4xl text-foreground">{title}</h2>}
+      <div className="max-w-xl space-y-6 text-muted-foreground">
         {paragraphs.map((paragraph, index) => (
           <p key={index}>{paragraph}</p>
         ))}
@@ -108,5 +108,5 @@ export function TextSection({
         </div>
       )}
     </section>
-  );
+  )
 }

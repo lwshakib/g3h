@@ -1,4 +1,4 @@
-import { DashedLine } from "@/components/dashed-line";
+import { DashedLine } from "@/components/dashed-line"
 
 const stats = [
   {
@@ -17,7 +17,7 @@ const stats = [
     value: "1.5K",
     label: "Connections per minute",
   },
-];
+]
 
 export function AboutHero() {
   return (
@@ -28,11 +28,11 @@ export function AboutHero() {
             Democratising quality software
           </h1>
 
-          <p className="text-muted-foreground mt-5 text-2xl md:text-3xl lg:text-4xl">
+          <p className="mt-5 text-2xl text-muted-foreground md:text-3xl lg:text-4xl">
             Mainline is bringing modern software to life with AI magic.
           </p>
 
-          <p className="text-muted-foreground mt-8 hidden max-w-lg space-y-6 text-lg text-balance md:block lg:mt-12">
+          <p className="mt-8 hidden max-w-lg space-y-6 text-lg text-balance text-muted-foreground md:block lg:mt-12">
             At Mainline, we are dedicated to transforming the way teams plan,
             execute, and deliver projects. Our mission is to provide our
             customers with an unbeatable edge over delays, inefficiencies, and
@@ -71,5 +71,5 @@ export function AboutHero() {
         </div>
       </div>
     </section>
-  );
+  )
 }

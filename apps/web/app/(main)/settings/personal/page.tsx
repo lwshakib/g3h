@@ -9,7 +9,13 @@ import {
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@workspace/ui/components/select"
 import { authClient } from "@/lib/auth-client"
 import { Loader2, Camera } from "lucide-react"
 import { toast } from "sonner"
@@ -29,9 +35,14 @@ export default function PersonalSettingsPage() {
   const [firstName, setFirstName] = React.useState("")
   const [lastName, setLastName] = React.useState("")
   const fileInputRef = React.useRef<HTMLInputElement>(null)
-  
+
   const user = session?.user
-  const initials = user?.name?.split(" ").map((n: string) => n[0]).join("").toUpperCase() || "PR"
+  const initials =
+    user?.name
+      ?.split(" ")
+      .map((n: string) => n[0])
+      .join("")
+      .toUpperCase() || "PR"
 
   // Synchronize input states when user data is loaded
   React.useEffect(() => {
@@ -75,7 +86,7 @@ export default function PersonalSettingsPage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           contentType: file.type,
@@ -102,7 +113,7 @@ export default function PersonalSettingsPage() {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           image: `${apiUrl.replace("/api", "")}/${path}`,
@@ -145,7 +156,7 @@ export default function PersonalSettingsPage() {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           name: combinedName,
@@ -169,44 +180,51 @@ export default function PersonalSettingsPage() {
 
   if (isPending) {
     return (
-      <div className="flex items-center justify-center h-[50vh]">
+      <div className="flex h-[50vh] items-center justify-center">
         <Loader2 className="size-8 animate-spin text-muted-foreground" />
       </div>
     )
   }
 
   return (
-    <div className="flex-1 p-10 max-w-5xl mx-auto space-y-16 py-12">
+    <div className="mx-auto max-w-5xl flex-1 space-y-16 p-10 py-12">
       {/* Hidden File Input */}
-      <input 
-        type="file" 
-        ref={fileInputRef} 
-        className="hidden" 
-        accept="image/*" 
-        onChange={handleFileChange} 
+      <input
+        type="file"
+        ref={fileInputRef}
+        className="hidden"
+        accept="image/*"
+        onChange={handleFileChange}
       />
 
       {/* Header section with User Profile in Top Right */}
       <div className="flex items-start justify-between">
-        <h1 className="text-3xl font-semibold tracking-tight">Personal Settings</h1>
+        <h1 className="text-3xl font-semibold tracking-tight">
+          Personal Settings
+        </h1>
         <div className="flex items-center gap-3">
           <div className="text-right">
-            <p className="text-sm font-medium leading-none">{user?.name || "Professor"}</p>
-            <p className="text-xs text-muted-foreground mt-1">Owner</p>
+            <p className="text-sm leading-none font-medium">
+              {user?.name || "Professor"}
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">Owner</p>
           </div>
-          <div className="relative group cursor-pointer" onClick={handleAvatarClick}>
-            <Avatar className="h-10 w-10 ring-2 ring-background ring-offset-2 ring-offset-muted group-hover:opacity-80 transition-all">
+          <div
+            className="group relative cursor-pointer"
+            onClick={handleAvatarClick}
+          >
+            <Avatar className="h-10 w-10 ring-2 ring-background ring-offset-2 ring-offset-muted transition-all group-hover:opacity-80">
               <AvatarImage src={user?.image} alt={user?.name} />
-              <AvatarFallback className="bg-gradient-to-tr from-pink-400 to-indigo-500 text-white font-bold">
+              <AvatarFallback className="bg-gradient-to-tr from-pink-400 to-indigo-500 font-bold text-white">
                 {initials}
               </AvatarFallback>
             </Avatar>
             {isUploading ? (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-full">
+              <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/20">
                 <Loader2 className="size-4 animate-spin text-white" />
               </div>
             ) : (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
+              <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
                 <Camera className="size-4 text-white" />
               </div>
             )}
@@ -216,58 +234,102 @@ export default function PersonalSettingsPage() {
 
       {/* Basic Information */}
       <section className="space-y-8">
-        <h2 className="text-sm font-semibold text-muted-foreground/70 tracking-tight text-[11px]">Basic Information</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+        <h2 className="text-sm text-[11px] font-semibold tracking-tight text-muted-foreground/70">
+          Basic Information
+        </h2>
+        <div className="grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2">
           <div className="space-y-2.5">
-            <Label htmlFor="firstName" className="text-[13px] font-medium text-foreground/90">First Name <span className="text-destructive">*</span></Label>
-            <Input 
-              id="firstName" 
-              value={firstName} 
+            <Label
+              htmlFor="firstName"
+              className="text-[13px] font-medium text-foreground/90"
+            >
+              First Name <span className="text-destructive">*</span>
+            </Label>
+            <Input
+              id="firstName"
+              value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
-              className="bg-muted/10 border-muted-foreground/10 focus-visible:ring-1 focus-visible:ring-sidebar-primary h-11" 
+              className="h-11 border-muted-foreground/10 bg-muted/10 focus-visible:ring-1 focus-visible:ring-sidebar-primary"
             />
           </div>
           <div className="space-y-2.5">
-            <Label htmlFor="lastName" className="text-[13px] font-medium text-foreground/90">Last Name <span className="text-destructive">*</span></Label>
-            <Input 
-              id="lastName" 
-              value={lastName} 
+            <Label
+              htmlFor="lastName"
+              className="text-[13px] font-medium text-foreground/90"
+            >
+              Last Name <span className="text-destructive">*</span>
+            </Label>
+            <Input
+              id="lastName"
+              value={lastName}
               onChange={(e) => setLastName(e.target.value)}
-              className="bg-muted/10 border-muted-foreground/10 focus-visible:ring-1 focus-visible:ring-sidebar-primary h-11" 
+              className="h-11 border-muted-foreground/10 bg-muted/10 focus-visible:ring-1 focus-visible:ring-sidebar-primary"
             />
           </div>
           <div className="space-y-2.5 md:col-span-2">
-            <Label htmlFor="email" className="text-[13px] font-medium text-foreground/90">Email <span className="text-destructive">*</span></Label>
-            <Input id="email" defaultValue={user?.email} className="bg-muted/10 border-muted-foreground/10 focus-visible:ring-1 focus-visible:ring-sidebar-primary h-11" readOnly disabled />
+            <Label
+              htmlFor="email"
+              className="text-[13px] font-medium text-foreground/90"
+            >
+              Email <span className="text-destructive">*</span>
+            </Label>
+            <Input
+              id="email"
+              defaultValue={user?.email}
+              className="h-11 border-muted-foreground/10 bg-muted/10 focus-visible:ring-1 focus-visible:ring-sidebar-primary"
+              readOnly
+              disabled
+            />
           </div>
         </div>
       </section>
 
       {/* Security */}
       <section className="space-y-8">
-        <h2 className="text-sm font-semibold text-muted-foreground/70 tracking-tight text-[11px]">Security</h2>
+        <h2 className="text-sm text-[11px] font-semibold tracking-tight text-muted-foreground/70">
+          Security
+        </h2>
         <div className="space-y-6">
           <div className="space-y-2">
-            <p className="text-[13px] font-medium text-foreground/90">Password</p>
-            <button className="text-[13px] text-primary/90 hover:text-primary hover:underline transition-all">Change password</button>
+            <p className="text-[13px] font-medium text-foreground/90">
+              Password
+            </p>
+            <button className="text-[13px] text-primary/90 transition-all hover:text-primary hover:underline">
+              Change password
+            </button>
           </div>
           <div className="space-y-3">
-            <p className="text-[13px] font-medium text-foreground/90">Two-factor authentication (2FA)</p>
-            <p className="text-[13px] text-muted-foreground leading-relaxed">
-              Two-factor authentication is currently disabled. <button className="text-primary/90 hover:underline font-medium">Learn more</button>
+            <p className="text-[13px] font-medium text-foreground/90">
+              Two-factor authentication (2FA)
             </p>
-            <Button variant="outline" size="sm" className="bg-muted/5 border-muted-foreground/20 hover:bg-muted/20 text-[12px] h-9 px-4 mt-2">Enable 2FA</Button>
+            <p className="text-[13px] leading-relaxed text-muted-foreground">
+              Two-factor authentication is currently disabled.{" "}
+              <button className="font-medium text-primary/90 hover:underline">
+                Learn more
+              </button>
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-2 h-9 border-muted-foreground/20 bg-muted/5 px-4 text-[12px] hover:bg-muted/20"
+            >
+              Enable 2FA
+            </Button>
           </div>
         </div>
       </section>
 
       {/* Personalisation */}
       <section className="space-y-8">
-        <h2 className="text-sm font-semibold text-muted-foreground/70 tracking-tight text-[11px]">Personalisation</h2>
+        <h2 className="text-sm text-[11px] font-semibold tracking-tight text-muted-foreground/70">
+          Personalisation
+        </h2>
         <div className="space-y-3">
-          <Label className="text-[13px] font-medium text-foreground/90">Theme</Label>
+          <Label className="text-[13px] font-medium text-foreground/90">
+            Theme
+          </Label>
           <Select defaultValue="system">
-            <SelectTrigger className="max-w-xs bg-muted/10 border-muted-foreground/10 h-11">
+            <SelectTrigger className="h-11 max-w-xs border-muted-foreground/10 bg-muted/10">
               <SelectValue placeholder="Select a theme" />
             </SelectTrigger>
             <SelectContent>
@@ -281,9 +343,9 @@ export default function PersonalSettingsPage() {
 
       {/* Final Action Button */}
       <div className="pt-10">
-        <Button 
-          size="lg" 
-          className="px-10 h-12 rounded-md transition-all shadow-sm flex items-center gap-2"
+        <Button
+          size="lg"
+          className="flex h-12 items-center gap-2 rounded-md px-10 shadow-sm transition-all"
           onClick={handleSave}
           disabled={isSaving}
         >

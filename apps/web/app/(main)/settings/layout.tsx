@@ -1,10 +1,7 @@
 "use client"
 
 import * as React from "react"
-import {
-  ArrowLeft,
-  User,
-} from "lucide-react"
+import { ArrowLeft, User } from "lucide-react"
 
 import {
   Sidebar,
@@ -16,9 +13,7 @@ import {
   SidebarProvider,
 } from "@workspace/ui/components/sidebar"
 
-const settingsNav = [
-  { title: "Personal", icon: User, isActive: true },
-]
+const settingsNav = [{ title: "Personal", icon: User, isActive: true }]
 
 export default function SettingsLayout({
   children,
@@ -27,17 +22,20 @@ export default function SettingsLayout({
 }) {
   return (
     <SidebarProvider>
-      <div className="flex h-svh w-full bg-background overflow-hidden relative">
+      <div className="relative flex h-svh w-full overflow-hidden bg-background">
         <Sidebar className="w-64 border-r bg-sidebar">
-          <SidebarHeader className="h-14 px-2 py-4 border-none">
+          <SidebarHeader className="h-14 border-none px-2 py-4">
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton 
+                <SidebarMenuButton
                   asChild
-                  className="hover:bg-transparent active:bg-transparent focus-visible:ring-0 data-[active=true]:bg-transparent"
+                  className="hover:bg-transparent focus-visible:ring-0 active:bg-transparent data-[active=true]:bg-transparent"
                 >
-                  <a href="/home/workflows" className="flex items-center gap-2 group">
-                    <ArrowLeft className="size-4 group-hover:-translate-x-0.5 transition-transform" />
+                  <a
+                    href="/home/workflows"
+                    className="group flex items-center gap-2"
+                  >
+                    <ArrowLeft className="size-4 transition-transform group-hover:-translate-x-0.5" />
                     <span>Settings</span>
                   </a>
                 </SidebarMenuButton>
@@ -48,7 +46,7 @@ export default function SettingsLayout({
             <SidebarMenu>
               {settingsNav.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton 
+                  <SidebarMenuButton
                     asChild
                     isActive={item.isActive}
                     tooltip={item.title}
@@ -63,9 +61,7 @@ export default function SettingsLayout({
             </SidebarMenu>
           </SidebarContent>
         </Sidebar>
-        <main className="flex-1 overflow-y-auto bg-background">
-          {children}
-        </main>
+        <main className="flex-1 overflow-y-auto bg-background">{children}</main>
       </div>
     </SidebarProvider>
   )

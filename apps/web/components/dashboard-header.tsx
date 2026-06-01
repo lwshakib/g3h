@@ -31,10 +31,11 @@ export function DashboardHeader() {
   const pathname = usePathname()
   const router = useRouter()
   const [isCreating, setIsCreating] = React.useState(false)
-  
+
   // Find current action based on path
-  const currentAction = actions.find(a => pathname.includes(a.href)) ?? actions[0]!
-  const otherActions = actions.filter(a => a.label !== currentAction.label)
+  const currentAction =
+    actions.find((a) => pathname.includes(a.href)) ?? actions[0]!
+  const otherActions = actions.filter((a) => a.label !== currentAction.label)
 
   const createWorkflow = async () => {
     if (isCreating) return
@@ -43,14 +44,17 @@ export function DashboardHeader() {
 
     try {
       setIsCreating(true)
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/workflow`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
-        },
-        body: JSON.stringify({ name: "My Workflow" }),
-      })
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/workflow`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ name: "My Workflow" }),
+        }
+      )
 
       if (!response.ok) {
         throw new Error("Create workflow failed")
@@ -83,15 +87,15 @@ export function DashboardHeader() {
     <div className="flex items-center justify-between px-6 py-4">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Overview</h1>
-        <p className="text-sm text-muted-foreground mt-1">
+        <p className="mt-1 text-sm text-muted-foreground">
           All the workflows, credentials and data tables you have access to
         </p>
       </div>
-      
-      <div className="group flex items-center rounded-md bg-primary text-primary-foreground shadow-sm hover:shadow-md transition-all overflow-hidden">
-        <Button 
+
+      <div className="group flex items-center overflow-hidden rounded-md bg-primary text-primary-foreground shadow-sm transition-all hover:shadow-md">
+        <Button
           variant="ghost"
-          className="rounded-none h-10 px-4 text-sm font-semibold text-primary-foreground hover:bg-primary/85 hover:text-primary-foreground active:bg-primary/75 active:text-primary-foreground whitespace-nowrap transition-colors"
+          className="h-10 rounded-none px-4 text-sm font-semibold whitespace-nowrap text-primary-foreground transition-colors hover:bg-primary/85 hover:text-primary-foreground active:bg-primary/75 active:text-primary-foreground"
           onClick={() => {
             if (currentAction.href === "/home/workflows") {
               void createWorkflow()
@@ -106,7 +110,7 @@ export function DashboardHeader() {
             <Button
               variant="ghost"
               size="icon"
-              className="rounded-none h-10 w-10 px-0 border-l border-primary-foreground/15 text-primary-foreground hover:bg-primary/85 hover:text-primary-foreground active:bg-primary/75 active:text-primary-foreground data-[state=open]:bg-primary/85 data-[state=open]:text-primary-foreground transition-colors"
+              className="h-10 w-10 rounded-none border-l border-primary-foreground/15 px-0 text-primary-foreground transition-colors hover:bg-primary/85 hover:text-primary-foreground active:bg-primary/75 active:text-primary-foreground data-[state=open]:bg-primary/85 data-[state=open]:text-primary-foreground"
             >
               <ChevronDown className="size-4" />
             </Button>

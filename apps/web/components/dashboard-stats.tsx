@@ -18,18 +18,25 @@ const stats = [
   { label: "Prod. executions", value: "0" },
   { label: "Failed prod. executions", value: "0" },
   { label: "Failure rate", value: "0%" },
-  { label: "Time saved", value: "--", info: "Statistical estimation of time saved" },
+  {
+    label: "Time saved",
+    value: "--",
+    info: "Statistical estimation of time saved",
+  },
   { label: "Run time (avg.)", value: "0s" },
 ]
 
 export function DashboardStats() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 px-6 py-2">
+    <div className="grid grid-cols-1 gap-4 px-6 py-2 md:grid-cols-3 lg:grid-cols-5">
       <TooltipProvider>
         {stats.map((stat) => (
-          <Card key={stat.label} className="bg-muted/10 border-muted-foreground/10 shadow-none hover:bg-muted/20 transition-all cursor-pointer">
-            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-              <CardTitle className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.05em]">
+          <Card
+            key={stat.label}
+            className="cursor-pointer border-muted-foreground/10 bg-muted/10 shadow-none transition-all hover:bg-muted/20"
+          >
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-[11px] font-semibold tracking-[0.05em] text-muted-foreground uppercase">
                 {stat.label}
               </CardTitle>
               {stat.info && (

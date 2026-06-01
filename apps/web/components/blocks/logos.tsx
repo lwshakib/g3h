@@ -1,17 +1,17 @@
-import Image from "next/image";
-import Link from "next/link";
+import Image from "next/image"
+import Link from "next/link"
 
-import Marquee from "react-fast-marquee";
+import Marquee from "react-fast-marquee"
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils"
 
 type Company = {
-  name: string;
-  logo: string;
-  width: number;
-  height: number;
-  href: string;
-};
+  name: string
+  logo: string
+  width: number
+  height: number
+  href: string
+}
 
 export const Logos = () => {
   const topRowCompanies = [
@@ -43,7 +43,7 @@ export const Logos = () => {
       height: 27,
       href: "https://descript.com",
     },
-  ];
+  ]
 
   const bottomRowCompanies = [
     {
@@ -81,10 +81,10 @@ export const Logos = () => {
       height: 28,
       href: "https://arc.com",
     },
-  ];
+  ]
 
   return (
-    <section className="pb-28 lg:pb-32 overflow-hidden">
+    <section className="overflow-hidden pb-28 lg:pb-32">
       <div className="container space-y-10 lg:space-y-16">
         <div className="text-center">
           <h2 className="mb-4 text-xl text-balance md:text-2xl lg:text-3xl">
@@ -109,14 +109,14 @@ export const Logos = () => {
         </div>
       </div>
     </section>
-  );
-};
+  )
+}
 
 type LogoRowProps = {
-  companies: Company[];
-  gridClassName: string;
-  direction?: "left" | "right";
-};
+  companies: Company[]
+  gridClassName: string
+  direction?: "left" | "right"
+}
 
 const LogoRow = ({ companies, gridClassName, direction }: LogoRowProps) => {
   return (
@@ -126,7 +126,7 @@ const LogoRow = ({ companies, gridClassName, direction }: LogoRowProps) => {
         <div
           className={cn(
             "grid items-center justify-items-center gap-x-20 lg:gap-x-28",
-            gridClassName,
+            gridClassName
           )}
         >
           {companies.map((company, index) => (
@@ -165,5 +165,5 @@ const LogoRow = ({ companies, gridClassName, direction }: LogoRowProps) => {
         </Marquee>
       </div>
     </>
-  );
-};
+  )
+}

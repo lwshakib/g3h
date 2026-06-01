@@ -1,12 +1,17 @@
-import { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3"
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+  GetObjectCommand,
+} from "@aws-sdk/client-s3"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import { v4 as uuidv4 } from "uuid"
-import { 
-  AWS_REGION, 
-  AWS_S3_BUCKET_NAME, 
-  AWS_ACCESS_KEY_ID, 
-  AWS_SECRET_ACCESS_KEY, 
-  AWS_ENDPOINT 
+import {
+  AWS_REGION,
+  AWS_S3_BUCKET_NAME,
+  AWS_ACCESS_KEY_ID,
+  AWS_SECRET_ACCESS_KEY,
+  AWS_ENDPOINT,
 } from "../envs.js"
 
 /**
@@ -25,7 +30,9 @@ export class S3Service {
     this.endpoint = AWS_ENDPOINT
 
     if (!this.region || !this.bucket) {
-      throw new Error("S3 Configuration error: AWS_REGION and AWS_S3_BUCKET_NAME must be defined in environment variables.")
+      throw new Error(
+        "S3 Configuration error: AWS_REGION and AWS_S3_BUCKET_NAME must be defined in environment variables."
+      )
     }
 
     this.client = new S3Client({
@@ -40,22 +47,22 @@ export class S3Service {
 
   /**
    * Constructs the internal URL for an object path.
-   * 
+   *
    * @param path - The destination path in the bucket.
    * @returns The public URL of the object.
    */
   _getInternalUrl(path: string): string {
-    const baseUrl = this.endpoint 
-      ? this.endpoint.replace(/\/$/, "") 
+    const baseUrl = this.endpoint
+      ? this.endpoint.replace(/\/$/, "")
       : `https://${this.bucket}.s3.${this.region}.amazonaws.com`
-    
+
     return `${baseUrl}/${path}`
   }
 
   /**
    * Universal asset uploader.
    * Generates a unique path with the bucket prefix and uploads the buffer.
-   * 
+   *
    * @param buffer - File content.
    * @param folder - Destination folder (audio, images, etc).
    * @param extension - File extension without dot (mp3, png, etc).
@@ -65,7 +72,7 @@ export class S3Service {
     buffer,
     folder,
     extension,
-    contentType
+    contentType,
   }: {
     buffer: Buffer
     folder: string
@@ -79,7 +86,7 @@ export class S3Service {
 
   /**
    * Uploads a buffer directly to the bucket from the server.
-   * 
+   *
    * @param buffer - The file content as a Buffer.
    * @param path - The destination path (key) in the bucket.
    * @param contentType - The MIME type of the file.
@@ -98,13 +105,13 @@ export class S3Service {
     })
 
     await this.client.send(command)
-    
+
     return this._getInternalUrl(path)
   }
 
   /**
    * Generates a presigned URL for secure client-side uploading.
-   * 
+   *
    * @param path - The destination path in the bucket.
    * @param contentType - The expected MIME type.
    * @param expiresIn - Expiration time in seconds (default 1 hour).
@@ -126,15 +133,12 @@ export class S3Service {
 
   /**
    * Generates a signed URL for secure client-side downloading/viewing.
-   * 
+   *
    * @param path - The path of the object in the bucket.
    * @param expiresIn - Expiration time in seconds (default 1 hour).
    * @returns The signed GET URL.
    */
-  async getSignedDownloadUrl(
-    path: string,
-    expiresIn = 3600
-  ): Promise<string> {
+  async getSignedDownloadUrl(path: string, expiresIn = 3600): Promise<string> {
     // If the path is already a full URL, return it as-is to avoid double-signing
     if (path.startsWith("http")) {
       return path
@@ -150,7 +154,7 @@ export class S3Service {
 
   /**
    * Deletes an object from the bucket.
-   * 
+   *
    * @param path - The path of the object to delete.
    */
   async deleteFile(path: string): Promise<void> {

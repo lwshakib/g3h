@@ -1,12 +1,12 @@
-import Link from "next/link";
+import Link from "next/link"
 
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
-import { cn } from "@/lib/utils";
+} from "@/components/ui/accordion"
+import { cn } from "@/lib/utils"
 
 const categories = [
   {
@@ -59,16 +59,16 @@ const categories = [
       },
     ],
   },
-];
+]
 
 export const FAQ = ({
   headerTag = "h2",
   className,
   className2,
 }: {
-  headerTag?: "h1" | "h2";
-  className?: string;
-  className2?: string;
+  headerTag?: "h1" | "h2"
+  className?: string
+  className2?: string
 }) => {
   return (
     <section className={cn("py-28 lg:py-32", className)}>
@@ -84,7 +84,7 @@ export const FAQ = ({
                 Got Questions?
               </h2>
             )}
-            <p className="text-muted-foreground max-w-md leading-snug lg:mx-auto">
+            <p className="max-w-md leading-snug text-muted-foreground lg:mx-auto">
               If you can't find what you're looking for,{" "}
               <Link href="/contact" className="underline underline-offset-4">
                 get in touch
@@ -96,7 +96,7 @@ export const FAQ = ({
           <div className="grid gap-6 text-start">
             {categories.map((category, categoryIndex) => (
               <div key={category.title} className="">
-                <h3 className="text-muted-foreground border-b py-4">
+                <h3 className="border-b py-4 text-muted-foreground">
                   {category.title}
                 </h3>
                 <Accordion type="single" collapsible className="w-full">
@@ -115,5 +115,5 @@ export const FAQ = ({
         </div>
       </div>
     </section>
-  );
-};
+  )
+}

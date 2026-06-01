@@ -1,4 +1,4 @@
-import defineApp from "../../helpers/define-app.js";
+import defineApp from "../../helpers/define-app.js"
 
 export default defineApp({
   name: "Manual Trigger",
@@ -19,4 +19,4 @@ export default defineApp({
     },
   ],
   actions: [],
-});
+})

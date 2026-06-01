@@ -1,14 +1,9 @@
 import { AppSidebar } from "@/components/app-sidebar"
-import {
-  SidebarInset,
-  SidebarProvider,
-} from "@workspace/ui/components/sidebar"
+import { SidebarInset, SidebarProvider } from "@workspace/ui/components/sidebar"
 import { DashboardHeader } from "@/components/dashboard-header"
 import { DashboardStats } from "@/components/dashboard-stats"
 import { DashboardTabs } from "@/components/dashboard-tabs"
-import {
-  TooltipProvider,
-} from "@workspace/ui/components/tooltip"
+import { TooltipProvider } from "@workspace/ui/components/tooltip"
 
 export default function HomeLayout({
   children,
@@ -25,9 +20,7 @@ export default function HomeLayout({
             <div className="flex flex-1 flex-col overflow-y-auto">
               <DashboardStats />
               <DashboardTabs />
-              <div className="flex-1 p-6">
-                {children}
-              </div>
+              <div className="flex-1 p-6">{children}</div>
             </div>
           </div>
         </SidebarInset>

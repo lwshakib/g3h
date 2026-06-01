@@ -1,14 +1,14 @@
-import pool from "../services/postgres.services.js";
-import logger from "../logger/winston.logger.js";
+import pool from "../services/postgres.services.js"
+import logger from "../logger/winston.logger.js"
 
 /**
  * Setup script to initialize the complete database schema.
  * includes auth + workflow automation tables.
  */
 async function setup() {
-  const client = await pool.connect();
+  const client = await pool.connect()
   try {
-    logger.info("Starting PostgreSQL complete schema setup...");
+    logger.info("Starting PostgreSQL complete schema setup...")
 
     // Create Role Enum
     await client.query(`
@@ -17,8 +17,8 @@ async function setup() {
       EXCEPTION
         WHEN duplicate_object THEN null;
       END $$;
-    `);
-    logger.info("Enum 'role_enum' verified/created.");
+    `)
+    logger.info("Enum 'role_enum' verified/created.")
 
     // Create User table
     await client.query(`
@@ -32,8 +32,8 @@ async function setup() {
         "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
-    `);
-    logger.info("Table 'user' verified/created.");
+    `)
+    logger.info("Table 'user' verified/created.")
 
     // Create Session table
     await client.query(`
@@ -47,8 +47,8 @@ async function setup() {
         "userAgent" TEXT,
         "userId" VARCHAR(255) NOT NULL REFERENCES "user"(id) ON DELETE CASCADE
       );
-    `);
-    logger.info("Table 'session' verified/created.");
+    `)
+    logger.info("Table 'session' verified/created.")
 
     // Create Account table
     await client.query(`
@@ -67,8 +67,8 @@ async function setup() {
         "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
-    `);
-    logger.info("Table 'account' verified/created.");
+    `)
+    logger.info("Table 'account' verified/created.")
 
     // Create Verification table
     await client.query(`
@@ -80,8 +80,8 @@ async function setup() {
         "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
-    `);
-    logger.info("Table 'verification' verified/created.");
+    `)
+    logger.info("Table 'verification' verified/created.")
 
     // Create Workflow table
     await client.query(`
@@ -94,9 +94,11 @@ async function setup() {
         "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         "userId" VARCHAR(255) NOT NULL REFERENCES "user"(id) ON DELETE CASCADE
       );
-    `);
-    await client.query(`ALTER TABLE workflow ADD COLUMN IF NOT EXISTS description TEXT;`);
-    logger.info("Table 'workflow' verified/created.");
+    `)
+    await client.query(
+      `ALTER TABLE workflow ADD COLUMN IF NOT EXISTS description TEXT;`
+    )
+    logger.info("Table 'workflow' verified/created.")
 
     // Create Node table
     await client.query(`
@@ -110,7 +112,7 @@ async function setup() {
         "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
-    `);
+    `)
     await client.query(`
       DO $$ BEGIN
         ALTER TABLE node
@@ -119,8 +121,8 @@ async function setup() {
         WHEN undefined_table THEN null;
         WHEN undefined_column THEN null;
       END $$;
-    `);
-    logger.info("Table 'node' verified/created.");
+    `)
+    logger.info("Table 'node' verified/created.")
 
     // Create Connection table
     await client.query(`
@@ -134,8 +136,8 @@ async function setup() {
         "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
-    `);
-    logger.info("Table 'connection' verified/created.");
+    `)
+    logger.info("Table 'connection' verified/created.")
 
     // Create Credential table
     await client.query(`
@@ -150,7 +152,7 @@ async function setup() {
         "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         UNIQUE("userId", name)
       );
-    `);
+    `)
     await client.query(`
       DO $$ BEGIN
         ALTER TABLE credential
@@ -159,8 +161,8 @@ async function setup() {
         WHEN undefined_table THEN null;
         WHEN undefined_column THEN null;
       END $$;
-    `);
-    logger.info("Table 'credential' verified/created.");
+    `)
+    logger.info("Table 'credential' verified/created.")
 
     // Create Execution table
     await client.query(`
@@ -176,7 +178,7 @@ async function setup() {
         "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
-    `);
+    `)
     await client.query(`
       DO $$ BEGIN
         ALTER TABLE execution
@@ -185,32 +187,58 @@ async function setup() {
         WHEN undefined_table THEN null;
         WHEN undefined_column THEN null;
       END $$;
-    `);
-    logger.info("Table 'execution' verified/created.");
+    `)
+    logger.info("Table 'execution' verified/created.")
 
     // Add indexes
-    await client.query(`CREATE INDEX IF NOT EXISTS "idx_session_userId" ON session("userId");`);
-    await client.query(`CREATE INDEX IF NOT EXISTS "idx_account_userId" ON account("userId");`);
-    await client.query(`CREATE INDEX IF NOT EXISTS "idx_verification_identifier" ON verification(identifier);`);
-    await client.query(`CREATE INDEX IF NOT EXISTS "idx_workflow_userId" ON workflow("userId");`);
-    await client.query(`CREATE INDEX IF NOT EXISTS "idx_node_workflowId" ON node("workflowId");`);
-    await client.query(`CREATE INDEX IF NOT EXISTS "idx_connection_workflowId" ON connection("workflowId");`);
-    await client.query(`CREATE INDEX IF NOT EXISTS "idx_connection_sourceNodeId" ON connection("sourceNodeId");`);
-    await client.query(`CREATE INDEX IF NOT EXISTS "idx_connection_targetNodeId" ON connection("targetNodeId");`);
-    await client.query(`CREATE INDEX IF NOT EXISTS "idx_credential_userId" ON credential("userId");`);
-    await client.query(`CREATE INDEX IF NOT EXISTS "idx_credential_nodeType" ON credential("nodeType");`);
-    await client.query(`CREATE INDEX IF NOT EXISTS "idx_execution_workflowId" ON execution("workflowId");`);
-    await client.query(`CREATE INDEX IF NOT EXISTS "idx_execution_status" ON execution(status);`);
-    await client.query(`CREATE INDEX IF NOT EXISTS "idx_execution_startedAt" ON execution("startedAt");`);
+    await client.query(
+      `CREATE INDEX IF NOT EXISTS "idx_session_userId" ON session("userId");`
+    )
+    await client.query(
+      `CREATE INDEX IF NOT EXISTS "idx_account_userId" ON account("userId");`
+    )
+    await client.query(
+      `CREATE INDEX IF NOT EXISTS "idx_verification_identifier" ON verification(identifier);`
+    )
+    await client.query(
+      `CREATE INDEX IF NOT EXISTS "idx_workflow_userId" ON workflow("userId");`
+    )
+    await client.query(
+      `CREATE INDEX IF NOT EXISTS "idx_node_workflowId" ON node("workflowId");`
+    )
+    await client.query(
+      `CREATE INDEX IF NOT EXISTS "idx_connection_workflowId" ON connection("workflowId");`
+    )
+    await client.query(
+      `CREATE INDEX IF NOT EXISTS "idx_connection_sourceNodeId" ON connection("sourceNodeId");`
+    )
+    await client.query(
+      `CREATE INDEX IF NOT EXISTS "idx_connection_targetNodeId" ON connection("targetNodeId");`
+    )
+    await client.query(
+      `CREATE INDEX IF NOT EXISTS "idx_credential_userId" ON credential("userId");`
+    )
+    await client.query(
+      `CREATE INDEX IF NOT EXISTS "idx_credential_nodeType" ON credential("nodeType");`
+    )
+    await client.query(
+      `CREATE INDEX IF NOT EXISTS "idx_execution_workflowId" ON execution("workflowId");`
+    )
+    await client.query(
+      `CREATE INDEX IF NOT EXISTS "idx_execution_status" ON execution(status);`
+    )
+    await client.query(
+      `CREATE INDEX IF NOT EXISTS "idx_execution_startedAt" ON execution("startedAt");`
+    )
 
-    logger.info("PostgreSQL complete schema setup completed successfully.");
+    logger.info("PostgreSQL complete schema setup completed successfully.")
   } catch (error) {
-    logger.error("Error during PostgreSQL setup:", error);
-    process.exit(1);
+    logger.error("Error during PostgreSQL setup:", error)
+    process.exit(1)
   } finally {
-    client.release();
-    await pool.end();
+    client.release()
+    await pool.end()
   }
 }
 
-setup();
+setup()
