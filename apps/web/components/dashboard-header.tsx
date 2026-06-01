@@ -112,10 +112,10 @@ export function DashboardHeader() {
         </p>
       </div>
 
-      <div className="flex items-center overflow-hidden rounded-lg border border-primary-foreground/10 bg-primary text-primary-foreground shadow-xs">
+      <div className="flex items-center rounded-lg bg-transparent shadow-xs">
         <Button
-          variant="ghost"
-          className="h-10 rounded-none border-0 px-4 text-xs font-semibold whitespace-nowrap text-primary-foreground hover:bg-primary-foreground/10 active:bg-primary-foreground/15 disabled:opacity-50"
+          variant="default"
+          className="h-10 rounded-l-lg rounded-r-none border-0 px-4 text-xs font-semibold whitespace-nowrap data-[state=open]:bg-primary/80"
           onClick={handleMainAction}
           disabled={isCreating && currentAction.href === "/home/workflows"}
         >
@@ -124,9 +124,9 @@ export function DashboardHeader() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              variant="ghost"
+              variant="default"
               size="icon"
-              className="h-10 w-10 rounded-none border-0 border-l border-primary-foreground/10 px-0 text-primary-foreground hover:bg-primary-foreground/10 active:bg-primary-foreground/15 data-[state=open]:bg-primary-foreground/15"
+              className="h-10 w-10 rounded-l-none rounded-r-lg border-0 px-0 data-[state=open]:bg-primary/80"
             >
               <ChevronDown className="size-4" />
             </Button>
