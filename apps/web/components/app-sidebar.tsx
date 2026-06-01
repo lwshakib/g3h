@@ -58,7 +58,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <div className="flex flex-col py-2 pr-0 pl-2 group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:gap-4">
+            <div className="flex flex-col py-2 pr-0 pl-2 group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:gap-4 group-data-[collapsible=icon]:pl-0">
               {/* Expanded Branding */}
               <div className="flex h-12 w-full items-center justify-between group-data-[collapsible=icon]:hidden">
                 <div className="flex items-center gap-2">

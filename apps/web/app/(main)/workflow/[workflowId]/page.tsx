@@ -299,10 +299,14 @@ export default function WorkflowByIdPage({ params }: WorkflowPageProps) {
   )
 
   return (
-    <div className="flex h-full w-full flex-col">
-      <header className="flex items-center border-b border-muted-foreground/10 px-6 py-4">
-        <h1 className="text-xl font-semibold">{workflowName}</h1>
-      </header>
+    <div className="relative flex h-full w-full flex-col">
+      {isReady && (
+        <div className="absolute top-4 left-4 z-50 rounded-lg border border-border px-3 py-1.5 text-foreground shadow-sm">
+          <span className="text-[11px] font-semibold select-none">
+            {workflowName}
+          </span>
+        </div>
+      )}
       <div className="min-h-0 flex-1">
         {isReady && (
           <WorkflowEditor
