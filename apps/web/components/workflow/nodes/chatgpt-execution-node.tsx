@@ -34,27 +34,27 @@ export function ChatGptExecutionNode({ id, data }: NodeProps) {
         }
       />
       <div className="flex items-center justify-center">
-        <div className="relative flex h-[94px] w-[94px] items-center justify-center rounded-[24px] border border-[#3a3a3a] bg-[#1f1f1f] shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
+        <div className="relative flex h-[94px] w-[94px] items-center justify-center rounded-[24px] border border-border bg-card shadow-sm">
           <NodeStatusBorder status={runStatus} />
           <OpenAiLogoIcon className="h-11 w-11" />
           <NodeConfigIndicator configured={configured} runStatus={runStatus} />
           <Handle
             type="target"
             position={Position.Left}
-            className="!pointer-events-auto !z-[60] !h-[18px] !w-[18px] !border-[#4a4a4a] !bg-[#202020] !shadow-none"
+            className="!pointer-events-auto !z-[60] !h-[18px] !w-[18px] !border-border !bg-muted !shadow-none"
           />
           <Handle
             type="source"
             position={Position.Right}
-            className="!pointer-events-auto !z-[60] !h-[18px] !w-[18px] !border-[#4a4a4a] !bg-[#202020] !shadow-none"
+            className="!pointer-events-auto !z-[60] !h-[18px] !w-[18px] !border-border !bg-muted !shadow-none"
           />
           {showAddAffordance && (
             <>
-              <div className="pointer-events-none absolute top-1/2 right-[-50px] h-px w-[34px] -translate-y-1/2 bg-[#4a4a4a]" />
+              <div className="pointer-events-none absolute top-1/2 right-[-50px] h-px w-[34px] -translate-y-1/2 bg-border" />
               <button
                 type="button"
                 onClick={() => ctx?.openSelector(id, "executions")}
-                className="pointer-events-auto absolute top-1/2 right-[-76px] flex h-[24px] w-[24px] -translate-y-1/2 items-center justify-center rounded-[6px] border border-[#3f3f3f] bg-[#292929] text-[#9a9a9a] hover:text-white"
+                className="pointer-events-auto absolute top-1/2 right-[-76px] flex h-[24px] w-[24px] -translate-y-1/2 items-center justify-center rounded-[6px] border border-border bg-muted text-muted-foreground hover:text-foreground hover:bg-accent"
               >
                 <PlusIcon className="size-3.5 stroke-[2.4]" />
               </button>

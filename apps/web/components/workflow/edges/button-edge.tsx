@@ -69,7 +69,7 @@ export function ButtonEdge({
                 handleClick(event)
                 actions?.onEdgeInsert(id, source, target)
               }}
-              className="pointer-events-auto rounded-md border border-[#3f3f3f] bg-[#1b1b1b] p-1 text-[#cfcfcf] shadow-[0_2px_8px_rgba(0,0,0,0.3)] hover:bg-[#2a2a2a] hover:text-white"
+              className="pointer-events-auto rounded-md border border-border bg-muted p-1 text-muted-foreground shadow-sm hover:bg-accent hover:text-foreground"
             >
               <PlusIcon className="h-3.5 w-3.5" />
             </button>
@@ -79,7 +79,7 @@ export function ButtonEdge({
                 handleClick(event)
                 actions?.onEdgeDelete(id)
               }}
-              className="pointer-events-auto rounded-md border border-[#3f3f3f] bg-[#1b1b1b] p-1 text-[#cfcfcf] shadow-[0_2px_8px_rgba(0,0,0,0.3)] hover:bg-[#2a2a2a] hover:text-white"
+              className="pointer-events-auto rounded-md border border-border bg-muted p-1 text-muted-foreground shadow-sm hover:bg-accent hover:text-foreground"
             >
               <Trash2Icon className="h-3.5 w-3.5" />
             </button>
