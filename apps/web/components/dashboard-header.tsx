@@ -3,6 +3,7 @@
 import * as React from "react"
 import { usePathname, useRouter } from "next/navigation"
 import { ChevronDown, Plus } from "lucide-react"
+import { toast } from "sonner"
 
 import { Button } from "@workspace/ui/components/button"
 import {
@@ -83,6 +84,25 @@ export function DashboardHeader() {
     }
   }
 
+  const handleMainAction = () => {
+    if (currentAction.href === "/home/workflows") {
+      void createWorkflow()
+    } else {
+      toast.info(`${currentAction.label} is not implemented yet.`)
+    }
+  }
+
+  const handleDropdownAction = (action: (typeof actions)[number]) => {
+    if (action.href === "/home/workflows") {
+      void createWorkflow()
+    } else {
+      router.push(action.href)
+      setTimeout(() => {
+        toast.info(`${action.label} is not implemented yet.`)
+      }, 300)
+    }
+  }
+
   return (
     <div className="flex items-center justify-between px-6 py-4">
       <div>
@@ -92,15 +112,11 @@ export function DashboardHeader() {
         </p>
       </div>
 
-      <div className="group flex items-center overflow-hidden rounded-md bg-primary text-primary-foreground shadow-sm transition-all hover:shadow-md">
+      <div className="flex items-center overflow-hidden rounded-lg border border-primary-foreground/10 bg-primary text-primary-foreground shadow-xs">
         <Button
           variant="ghost"
-          className="h-10 rounded-none px-4 text-sm font-semibold whitespace-nowrap text-primary-foreground transition-colors hover:bg-primary/85 hover:text-primary-foreground active:bg-primary/75 active:text-primary-foreground"
-          onClick={() => {
-            if (currentAction.href === "/home/workflows") {
-              void createWorkflow()
-            }
-          }}
+          className="h-10 rounded-none border-0 px-4 text-xs font-semibold whitespace-nowrap text-primary-foreground hover:bg-primary-foreground/10 active:bg-primary-foreground/15 disabled:opacity-50"
+          onClick={handleMainAction}
           disabled={isCreating && currentAction.href === "/home/workflows"}
         >
           {currentAction.label}
@@ -110,14 +126,18 @@ export function DashboardHeader() {
             <Button
               variant="ghost"
               size="icon"
-              className="h-10 w-10 rounded-none border-l border-primary-foreground/15 px-0 text-primary-foreground transition-colors hover:bg-primary/85 hover:text-primary-foreground active:bg-primary/75 active:text-primary-foreground data-[state=open]:bg-primary/85 data-[state=open]:text-primary-foreground"
+              className="h-10 w-10 rounded-none border-0 border-l border-primary-foreground/10 px-0 text-primary-foreground hover:bg-primary-foreground/10 active:bg-primary-foreground/15 data-[state=open]:bg-primary-foreground/15"
             >
               <ChevronDown className="size-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
             {otherActions.map((action) => (
-              <DropdownMenuItem key={action.label} className="cursor-pointer">
+              <DropdownMenuItem
+                key={action.label}
+                className="cursor-pointer"
+                onClick={() => handleDropdownAction(action)}
+              >
                 <Plus className="mr-2 size-4" />
                 <span>{action.label}</span>
               </DropdownMenuItem>
