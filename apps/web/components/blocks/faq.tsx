@@ -5,8 +5,8 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion"
-import { cn } from "@/lib/utils"
+} from "@workspace/ui/components/accordion"
+import { cn } from "@workspace/ui/lib/utils"
 
 const categories = [
   {

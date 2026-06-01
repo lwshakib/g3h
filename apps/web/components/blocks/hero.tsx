@@ -9,7 +9,7 @@ import {
 } from "lucide-react"
 
 import { DashedLine } from "@/components/dashed-line"
-import { Button } from "@/components/ui/button"
+import { Button } from "@workspace/ui/components/button"
 
 const features = [
   {

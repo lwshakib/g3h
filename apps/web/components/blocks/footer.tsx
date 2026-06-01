@@ -2,7 +2,7 @@ import Link from "next/link"
 
 import { ArrowUpRight } from "lucide-react"
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@workspace/ui/components/button"
 
 export function Footer() {
   const navigation = [

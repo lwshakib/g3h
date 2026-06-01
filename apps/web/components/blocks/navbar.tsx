@@ -20,7 +20,7 @@ const Github = ({ className }: { className?: string }) => (
 
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Logo } from "@/components/logo"
-import { Button } from "@/components/ui/button"
+import { Button } from "@workspace/ui/components/button"
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -28,8 +28,8 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu"
-import { cn } from "@/lib/utils"
+} from "@workspace/ui/components/navigation-menu"
+import { cn } from "@workspace/ui/lib/utils"
 
 const ITEMS = [
   {

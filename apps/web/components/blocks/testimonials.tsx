@@ -4,16 +4,16 @@ import { ArrowRight } from "lucide-react"
 
 import { DashedLine } from "../dashed-line"
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@workspace/ui/components/button"
+import { Card, CardContent } from "@workspace/ui/components/card"
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@/components/ui/carousel"
-import { cn } from "@/lib/utils"
+} from "@workspace/ui/components/carousel"
+import { cn } from "@workspace/ui/lib/utils"
 
 const items = [
   {

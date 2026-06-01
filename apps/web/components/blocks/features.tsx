@@ -5,7 +5,7 @@ import { ChevronRight } from "lucide-react"
 
 import { DashedLine } from "../dashed-line"
 
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent } from "@workspace/ui/components/card"
 
 const items = [
   {
