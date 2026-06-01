@@ -84,9 +84,28 @@ function SidebarProvider({
 
       // This sets the cookie to keep the sidebar state.
       document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
+
+      // Save the state to localStorage
+      try {
+        localStorage.setItem("sidebar_state", String(openState))
+      } catch (e) {
+        console.error("Failed to save sidebar state to localStorage:", e)
+      }
     },
     [setOpenProp, open]
   )
+
+  // Load the state from localStorage on mount
+  React.useEffect(() => {
+    try {
+      const saved = localStorage.getItem("sidebar_state")
+      if (saved !== null) {
+        _setOpen(saved === "true")
+      }
+    } catch (e) {
+      console.error("Failed to load sidebar state from localStorage:", e)
+    }
+  }, [])
 
   // Helper to toggle the sidebar.
   const toggleSidebar = React.useCallback(() => {
