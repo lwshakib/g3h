@@ -66,7 +66,9 @@ interface HttpRequestConfigPanelProps {
       valueType: "fixed" | "expression"
     }>
   }
-  setNodeEditor: React.Dispatch<React.SetStateAction<HttpRequestConfigPanelProps["nodeEditor"]>>
+  setNodeEditor: React.Dispatch<
+    React.SetStateAction<HttpRequestConfigPanelProps["nodeEditor"]>
+  >
   setNodes: React.Dispatch<React.SetStateAction<any>>
 }
 
@@ -82,9 +84,7 @@ export function HttpRequestConfigPanel({
       </p>
       <div className="space-y-4">
         <div className="space-y-2">
-          <label className="text-xs font-medium text-foreground">
-            Method
-          </label>
+          <label className="text-xs font-medium text-foreground">Method</label>
           <Select
             value={nodeEditor.method}
             onValueChange={(value) => {
@@ -121,9 +121,7 @@ export function HttpRequestConfigPanel({
           </Select>
         </div>
         <div className="space-y-2">
-          <label className="text-xs font-medium text-foreground">
-            URL
-          </label>
+          <label className="text-xs font-medium text-foreground">URL</label>
           <Input
             value={nodeEditor.url}
             onChange={(event) => {
@@ -491,10 +489,7 @@ export function HttpRequestConfigPanel({
                         defaultValue={param.id}
                         className="group/param rounded-md border border-border px-3"
                       >
-                        <AccordionItem
-                          value={param.id}
-                          className="border-none"
-                        >
+                        <AccordionItem value={param.id} className="border-none">
                           <AccordionTrigger className="py-2 text-sm no-underline hover:no-underline [&>svg]:hidden">
                             <div className="flex w-full items-center justify-between gap-2 pr-1">
                               <div className="flex min-w-0 items-center gap-2">
@@ -516,9 +511,10 @@ export function HttpRequestConfigPanel({
                                 onClick={(event) => {
                                   event.preventDefault()
                                   event.stopPropagation()
-                                  const nextParams = nodeEditor.queryParams.filter(
-                                    (item) => item.id !== param.id
-                                  )
+                                  const nextParams =
+                                    nodeEditor.queryParams.filter(
+                                      (item) => item.id !== param.id
+                                    )
                                   const normalizedParams =
                                     nextParams.length > 0
                                       ? nextParams
@@ -563,15 +559,15 @@ export function HttpRequestConfigPanel({
                                 <Input
                                   value={param.name}
                                   onChange={(event) => {
-                                    const nextParams = nodeEditor.queryParams.map(
-                                      (item) =>
+                                    const nextParams =
+                                      nodeEditor.queryParams.map((item) =>
                                         item.id === param.id
                                           ? {
                                               ...item,
                                               name: event.target.value,
                                             }
                                           : item
-                                    )
+                                      )
                                     setNodeEditor((current) => ({
                                       ...current,
                                       queryParams: nextParams,
@@ -597,18 +593,22 @@ export function HttpRequestConfigPanel({
                                   onDragOver={(event) => event.preventDefault()}
                                   onDrop={(event) => {
                                     event.preventDefault()
-                                    const path = event.dataTransfer.getData("text/plain")
+                                    const path =
+                                      event.dataTransfer.getData("text/plain")
                                     if (!path) return
-                                    const nextParams = nodeEditor.queryParams.map(
-                                      (item) =>
+                                    const nextParams =
+                                      nodeEditor.queryParams.map((item) =>
                                         item.id === param.id
                                           ? {
                                               ...item,
-                                              name: appendExpression(item.name, path),
+                                              name: appendExpression(
+                                                item.name,
+                                                path
+                                              ),
                                               valueType: "expression" as const,
                                             }
                                           : item
-                                    )
+                                      )
                                     setNodeEditor((current) => ({
                                       ...current,
                                       queryParams: nextParams,
@@ -643,15 +643,15 @@ export function HttpRequestConfigPanel({
                                     <button
                                       type="button"
                                       onClick={() => {
-                                        const nextParams = nodeEditor.queryParams.map(
-                                          (item) =>
+                                        const nextParams =
+                                          nodeEditor.queryParams.map((item) =>
                                             item.id === param.id
                                               ? {
                                                   ...item,
                                                   valueType: "fixed" as const,
                                                 }
                                               : item
-                                        )
+                                          )
                                         setNodeEditor((current) => ({
                                           ...current,
                                           queryParams: nextParams,
@@ -672,7 +672,8 @@ export function HttpRequestConfigPanel({
                                         )
                                       }}
                                       className={`rounded px-2 py-0.5 ${
-                                        param.valueType === "fixed" || !param.valueType
+                                        param.valueType === "fixed" ||
+                                        !param.valueType
                                           ? "bg-background text-foreground"
                                           : "text-muted-foreground"
                                       }`}
@@ -682,15 +683,16 @@ export function HttpRequestConfigPanel({
                                     <button
                                       type="button"
                                       onClick={() => {
-                                        const nextParams = nodeEditor.queryParams.map(
-                                          (item) =>
+                                        const nextParams =
+                                          nodeEditor.queryParams.map((item) =>
                                             item.id === param.id
                                               ? {
                                                   ...item,
-                                                  valueType: "expression" as const,
+                                                  valueType:
+                                                    "expression" as const,
                                                 }
                                               : item
-                                        )
+                                          )
                                         setNodeEditor((current) => ({
                                           ...current,
                                           queryParams: nextParams,
@@ -723,15 +725,15 @@ export function HttpRequestConfigPanel({
                                 <Input
                                   value={param.value}
                                   onChange={(event) => {
-                                    const nextParams = nodeEditor.queryParams.map(
-                                      (item) =>
+                                    const nextParams =
+                                      nodeEditor.queryParams.map((item) =>
                                         item.id === param.id
                                           ? {
                                               ...item,
                                               value: event.target.value,
                                             }
                                           : item
-                                    )
+                                      )
                                     setNodeEditor((current) => ({
                                       ...current,
                                       queryParams: nextParams,
@@ -754,18 +756,22 @@ export function HttpRequestConfigPanel({
                                   onDragOver={(event) => event.preventDefault()}
                                   onDrop={(event) => {
                                     event.preventDefault()
-                                    const path = event.dataTransfer.getData("text/plain")
+                                    const path =
+                                      event.dataTransfer.getData("text/plain")
                                     if (!path) return
-                                    const nextParams = nodeEditor.queryParams.map(
-                                      (item) =>
+                                    const nextParams =
+                                      nodeEditor.queryParams.map((item) =>
                                         item.id === param.id
                                           ? {
                                               ...item,
-                                              value: appendExpression(item.value, path),
+                                              value: appendExpression(
+                                                item.value,
+                                                path
+                                              ),
                                               valueType: "expression" as const,
                                             }
                                           : item
-                                    )
+                                      )
                                     setNodeEditor((current) => ({
                                       ...current,
                                       queryParams: nextParams,
@@ -946,7 +952,10 @@ export function HttpRequestConfigPanel({
                     event.preventDefault()
                     const path = event.dataTransfer.getData("text/plain")
                     if (!path) return
-                    const nextValue = appendExpression(nodeEditor.headersJson, path)
+                    const nextValue = appendExpression(
+                      nodeEditor.headersJson,
+                      path
+                    )
                     setNodeEditor((current) => ({
                       ...current,
                       headersJson: nextValue,
@@ -1314,7 +1323,10 @@ export function HttpRequestConfigPanel({
                     event.preventDefault()
                     const path = event.dataTransfer.getData("text/plain")
                     if (!path) return
-                    const nextValue = appendExpression(nodeEditor.bodyJson, path)
+                    const nextValue = appendExpression(
+                      nodeEditor.bodyJson,
+                      path
+                    )
                     setNodeEditor((current) => ({
                       ...current,
                       bodyJson: nextValue,
@@ -1353,13 +1365,14 @@ export function HttpRequestConfigPanel({
                       <Input
                         value={field.name}
                         onChange={(event) => {
-                          const nextFields = nodeEditor.bodyFields.map((item) =>
-                            item.id === field.id
-                              ? {
-                                  ...item,
-                                  name: event.target.value,
-                                }
-                              : item
+                          const nextFields = nodeEditor.bodyFields.map(
+                            (item) =>
+                              item.id === field.id
+                                ? {
+                                    ...item,
+                                    name: event.target.value,
+                                  }
+                                : item
                           )
                           setNodeEditor((current) => ({
                             ...current,
@@ -1390,14 +1403,15 @@ export function HttpRequestConfigPanel({
                           event.preventDefault()
                           const path = event.dataTransfer.getData("text/plain")
                           if (!path) return
-                          const nextFields = nodeEditor.bodyFields.map((item) =>
-                            item.id === field.id
-                              ? {
-                                  ...item,
-                                  name: appendExpression(item.name, path),
-                                  valueType: "expression" as const,
-                                }
-                              : item
+                          const nextFields = nodeEditor.bodyFields.map(
+                            (item) =>
+                              item.id === field.id
+                                ? {
+                                    ...item,
+                                    name: appendExpression(item.name, path),
+                                    valueType: "expression" as const,
+                                  }
+                                : item
                           )
                           setNodeEditor((current) => ({
                             ...current,
@@ -1429,13 +1443,14 @@ export function HttpRequestConfigPanel({
                       <Input
                         value={field.value}
                         onChange={(event) => {
-                          const nextFields = nodeEditor.bodyFields.map((item) =>
-                            item.id === field.id
-                              ? {
-                                  ...item,
-                                  value: event.target.value,
-                                }
-                              : item
+                          const nextFields = nodeEditor.bodyFields.map(
+                            (item) =>
+                              item.id === field.id
+                                ? {
+                                    ...item,
+                                    value: event.target.value,
+                                  }
+                                : item
                           )
                           setNodeEditor((current) => ({
                             ...current,
@@ -1461,14 +1476,15 @@ export function HttpRequestConfigPanel({
                           event.preventDefault()
                           const path = event.dataTransfer.getData("text/plain")
                           if (!path) return
-                          const nextFields = nodeEditor.bodyFields.map((item) =>
-                            item.id === field.id
-                              ? {
-                                  ...item,
-                                  value: appendExpression(item.value, path),
-                                  valueType: "expression" as const,
-                                }
-                              : item
+                          const nextFields = nodeEditor.bodyFields.map(
+                            (item) =>
+                              item.id === field.id
+                                ? {
+                                    ...item,
+                                    value: appendExpression(item.value, path),
+                                    valueType: "expression" as const,
+                                  }
+                                : item
                           )
                           setNodeEditor((current) => ({
                             ...current,

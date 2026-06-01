@@ -10,12 +10,7 @@ import {
   ReactFlow,
 } from "@xyflow/react"
 import "@xyflow/react/dist/style.css"
-import {
-  ExternalLinkIcon,
-  GlobeIcon,
-  PlusIcon,
-  XIcon,
-} from "lucide-react"
+import { ExternalLinkIcon, GlobeIcon, PlusIcon, XIcon } from "lucide-react"
 
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
@@ -38,10 +33,7 @@ import {
   TavilyExecutionNode,
 } from "./workflow/nodes"
 import { ButtonEdge } from "./workflow/edges"
-import {
-  InputTabsPanel,
-  OutputTabsPanel,
-} from "./workflow/panels"
+import { InputTabsPanel, OutputTabsPanel } from "./workflow/panels"
 import { SelectorContext, EdgeActionsContext } from "./workflow/contexts"
 
 import { useWorkflowEditor } from "./workflow/use-workflow-editor"

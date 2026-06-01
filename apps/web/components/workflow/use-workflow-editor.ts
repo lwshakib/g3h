@@ -36,11 +36,9 @@ export function useWorkflowEditor({
 }: Partial<WorkflowEditorProps>) {
   const { resolvedTheme } = useTheme()
   const [mounted, setMounted] = React.useState(false)
-  const colorMode = (mounted
-    ? resolvedTheme === "dark"
-      ? "dark"
-      : "light"
-    : undefined) as "dark" | "light" | undefined
+  const colorMode = (
+    mounted ? (resolvedTheme === "dark" ? "dark" : "light") : undefined
+  ) as "dark" | "light" | undefined
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
   const [selectorOpen, setSelectorOpen] = React.useState(false)
