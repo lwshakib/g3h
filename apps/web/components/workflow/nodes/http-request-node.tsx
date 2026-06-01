@@ -1,7 +1,13 @@
 "use client"
 
 import * as React from "react"
-import { Handle, Position, type NodeProps, useReactFlow, useStore } from "@xyflow/react"
+import {
+  Handle,
+  Position,
+  type NodeProps,
+  useReactFlow,
+  useStore,
+} from "@xyflow/react"
 import { GlobeIcon, PlusIcon } from "lucide-react"
 import type { WorkflowNodeData } from "../types"
 import { isNodeConfigured, deleteNodeAndConnections } from "../utils"
@@ -25,7 +31,9 @@ export function HttpRequestNode({ id, data }: NodeProps) {
   return (
     <div
       className="group/node relative w-[244px]"
-      onDoubleClick={() => ctx?.openNodeEditor(id, (data as WorkflowNodeData).label, "Execution")}
+      onDoubleClick={() =>
+        ctx?.openNodeEditor(id, (data as WorkflowNodeData).label, "Execution")
+      }
     >
       <NodeTopToolbar
         onDelete={() =>
@@ -56,7 +64,7 @@ export function HttpRequestNode({ id, data }: NodeProps) {
               <button
                 type="button"
                 onClick={() => ctx?.openSelector(id, "executions")}
-                className="pointer-events-auto absolute top-1/2 right-[-76px] flex h-[24px] w-[24px] -translate-y-1/2 items-center justify-center rounded-[6px] border border-border bg-muted text-muted-foreground hover:text-foreground hover:bg-accent"
+                className="pointer-events-auto absolute top-1/2 right-[-76px] flex h-[24px] w-[24px] -translate-y-1/2 items-center justify-center rounded-[6px] border border-border bg-muted text-muted-foreground hover:bg-accent hover:text-foreground"
               >
                 <PlusIcon className="size-3.5 stroke-[2.4]" />
               </button>

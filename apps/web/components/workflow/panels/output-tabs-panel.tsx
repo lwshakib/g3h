@@ -8,7 +8,12 @@ import {
   TabsList,
   TabsTrigger,
 } from "@workspace/ui/components/tabs"
-import { CheckCircle2Icon, InfoIcon, SearchIcon, PencilIcon } from "lucide-react"
+import {
+  CheckCircle2Icon,
+  InfoIcon,
+  SearchIcon,
+  PencilIcon,
+} from "lucide-react"
 import { OutputSchemaTab } from "./output-schema-tab"
 import { OutputTableTab } from "./output-table-tab"
 import { OutputErrorDetails } from "./output-error-details"

@@ -1,7 +1,12 @@
 "use client"
 
 import * as React from "react"
-import { AlertTriangleIcon, CheckCircle2Icon, CircleXIcon, Loader2Icon } from "lucide-react"
+import {
+  AlertTriangleIcon,
+  CheckCircle2Icon,
+  CircleXIcon,
+  Loader2Icon,
+} from "lucide-react"
 import type { NodeRunStatus } from "../types"
 
 export function NodeConfigIndicator({

@@ -691,13 +691,6 @@ export function WorkflowEditor({
 
             setNodeStatuses((current) => {
               const next = { ...current }
-              if (status.status === "running") {
-                for (const nodeId of Object.keys(next)) {
-                  if (next[nodeId] === "loading" && nodeId !== status.nodeId) {
-                    next[nodeId] = "success"
-                  }
-                }
-              }
               next[status.nodeId] = toNodeRunStatus(status.status)
               return next
             })
@@ -771,24 +764,8 @@ export function WorkflowEditor({
         } else {
           setNodeStatuses(() => {
             const fallbackStatuses = { ...initialStatuses }
-            if (manualNode) {
-              fallbackStatuses[manualNode.id] = "error"
-            }
             return fallbackStatuses
           })
-          if (manualNode) {
-            setExecutionStatuses([
-              {
-                nodeId: manualNode.id,
-                label:
-                  (manualNode.data as WorkflowNodeData)?.label ||
-                  "Manual Trigger",
-                status: "error",
-                message:
-                  "Execution stream ended before node updates were received.",
-              },
-            ])
-          }
         }
       } else {
         setExecutionStatuses([
@@ -799,14 +776,7 @@ export function WorkflowEditor({
             message: "Executed locally",
           },
         ])
-        if (manualNode) {
-          setNodeStatuses({
-            ...initialStatuses,
-            [manualNode.id]: "success",
-          })
-        } else {
-          setNodeStatuses(initialStatuses)
-        }
+        setNodeStatuses(initialStatuses)
       }
     } finally {
       setIsExecuting(false)

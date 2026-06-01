@@ -21,7 +21,8 @@ const getSessionToken = () => {
   if (typeof document === "undefined") return null
   const value = `; ${document.cookie}`
   const parts = value.split(`; axonix_session_token=`)
-  const token = parts.length === 2 ? parts.pop()?.split(";").shift() ?? null : null
+  const token =
+    parts.length === 2 ? (parts.pop()?.split(";").shift() ?? null) : null
   return token
 }
 

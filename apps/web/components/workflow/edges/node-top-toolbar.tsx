@@ -1,6 +1,12 @@
 "use client"
 
-import { PlayIcon, PowerIcon, Trash2Icon, SparklesIcon, EllipsisIcon } from "lucide-react"
+import {
+  PlayIcon,
+  PowerIcon,
+  Trash2Icon,
+  SparklesIcon,
+  EllipsisIcon,
+} from "lucide-react"
 
 export function NodeTopToolbar({ onDelete }: { onDelete: () => void }) {
   const handleToolbarClick = (event: React.MouseEvent<HTMLButtonElement>) => {
