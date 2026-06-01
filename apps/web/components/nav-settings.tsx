@@ -15,6 +15,7 @@ import {
   useSidebar,
 } from "@workspace/ui/components/sidebar"
 import { usePathname } from "next/navigation"
+import Link from "next/link"
 import { authClient } from "@/lib/auth-client"
 
 export function NavSettings() {
@@ -44,13 +45,13 @@ export function NavSettings() {
             sideOffset={4}
           >
             <DropdownMenuItem asChild>
-              <a
+              <Link
                 href="/settings/personal"
                 className="flex w-full cursor-pointer items-center"
               >
                 <User className="mr-2 size-4" />
                 <span>Personal</span>
-              </a>
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuItem
               className="cursor-pointer"

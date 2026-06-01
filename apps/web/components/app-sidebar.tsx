@@ -4,6 +4,7 @@ import * as React from "react"
 import { LayoutDashboard, LayoutTemplate, Plus, Search } from "lucide-react"
 
 import { usePathname } from "next/navigation"
+import Link from "next/link"
 
 import { NavMain } from "@/components/nav-main"
 import { NavSettings } from "@/components/nav-settings"
@@ -121,10 +122,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 tooltip={item.title}
                 isActive={item.isActive}
               >
-                <a href={item.url}>
+                <Link href={item.url}>
                   <item.icon className="size-4" />
                   <span>{item.title}</span>
-                </a>
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
