@@ -240,14 +240,8 @@ class AuthClient {
   }
 
   constructor() {
-    const apiURL = process.env.NEXT_PUBLIC_API_URL
-    const baseURL = process.env.NEXT_PUBLIC_BASE_URL
-
-    if (!apiURL || !baseURL) {
-      throw new Error(
-        "[AuthClient] Critical system configuration missing: NEXT_PUBLIC_API_URL or NEXT_PUBLIC_BASE_URL. Please check your .env file."
-      )
-    }
+    const apiURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api/v1"
+    const baseURL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
 
     const normalizedApiUrl = apiURL.replace(/\/+$/, "")
     const normalizedAuthUrl = normalizedApiUrl.endsWith("/auth")
