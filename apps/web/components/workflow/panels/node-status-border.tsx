@@ -26,7 +26,7 @@ export function NodeStatusBorder({ status }: { status: NodeRunStatus }) {
             }
           `}
         </style>
-        <div className="pointer-events-none absolute -top-1.5 -left-1.5 -z-10 h-[calc(100%+12px)] w-[calc(100%+12px)] rounded-[30px] bg-[#161616]" />
+        <div className="pointer-events-none absolute -top-1.5 -left-1.5 -z-10 h-[calc(100%+12px)] w-[calc(100%+12px)] rounded-[30px] bg-background" />
         <div className="pointer-events-none absolute -top-1.5 -left-1.5 -z-10 h-[calc(100%+12px)] w-[calc(100%+12px)] overflow-hidden rounded-[30px]">
           <div className="workflow-node-border-spinner rounded-full bg-[conic-gradient(from_0deg_at_50%_50%,rgb(42,67,233)_0deg,rgba(42,138,246,0)_360deg)]" />
         </div>
@@ -37,7 +37,7 @@ export function NodeStatusBorder({ status }: { status: NodeRunStatus }) {
   if (status === "success") {
     return (
       <>
-        <div className="pointer-events-none absolute -top-1.5 -left-1.5 -z-10 h-[calc(100%+12px)] w-[calc(100%+12px)] rounded-[30px] bg-[#161616]" />
+        <div className="pointer-events-none absolute -top-1.5 -left-1.5 -z-10 h-[calc(100%+12px)] w-[calc(100%+12px)] rounded-[30px] bg-background" />
         <div className="pointer-events-none absolute -top-1.5 -left-1.5 -z-10 h-[calc(100%+12px)] w-[calc(100%+12px)] rounded-[30px] border-[3px] border-emerald-600/60" />
       </>
     )
@@ -45,7 +45,7 @@ export function NodeStatusBorder({ status }: { status: NodeRunStatus }) {
 
   return (
     <>
-      <div className="pointer-events-none absolute -top-1.5 -left-1.5 -z-10 h-[calc(100%+12px)] w-[calc(100%+12px)] rounded-[30px] bg-[#161616]" />
+      <div className="pointer-events-none absolute -top-1.5 -left-1.5 -z-10 h-[calc(100%+12px)] w-[calc(100%+12px)] rounded-[30px] bg-background" />
       <div className="pointer-events-none absolute -top-1.5 -left-1.5 -z-10 h-[calc(100%+12px)] w-[calc(100%+12px)] rounded-[30px] border-[3px] border-red-600/60" />
     </>
   )
